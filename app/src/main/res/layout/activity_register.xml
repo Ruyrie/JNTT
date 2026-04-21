@@ -1,43 +1,108 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:fitsSystemWindows="true"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:gravity="center"
-    android:padding="32dp">
+    android:background="@color/white"
+    android:fillViewport="true">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="注册账号"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        android:layout_marginBottom="32dp" />
-
-    <EditText
-        android:id="@+id/etRegUsername"
+    <LinearLayout
         android:layout_width="match_parent"
-    android:fitsSystemWindows="true"
         android:layout_height="wrap_content"
-        android:hint="用户名"
-        android:inputType="text"
-        android:layout_marginBottom="16dp" />
+        android:orientation="vertical"
+        android:paddingHorizontal="28dp"
+        android:paddingTop="72dp"
+        android:paddingBottom="32dp">
 
-    <EditText
-        android:id="@+id/etRegPassword"
-        android:layout_width="match_parent"
-    android:fitsSystemWindows="true"
-        android:layout_height="wrap_content"
-        android:hint="密码（至少6位）"
-        android:inputType="textPassword"
-        android:layout_marginBottom="24dp" />
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="16dp">
 
-    <Button
-        android:id="@+id/btnRegister"
-        android:layout_width="match_parent"
-    android:fitsSystemWindows="true"
-        android:layout_height="wrap_content"
-        android:text="注 册" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_auth_logo"
+                android:text="头条"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="4dp" />
 
-</LinearLayout>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="吉农头条"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                android:textColor="#1F1F1F"
+                android:layout_marginStart="10dp" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="创建账号"
+            android:textSize="30sp"
+            android:textStyle="bold"
+            android:textColor="#1F1F1F"
+            android:layout_marginBottom="8dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="加入吉农头条，开启你的资讯之旅"
+            android:textSize="14sp"
+            android:textColor="#8A8A8A"
+            android:layout_marginBottom="40dp" />
+
+        <EditText
+            android:id="@+id/etRegUsername"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:background="@drawable/bg_auth_input"
+            android:hint="设置用户名"
+            android:textColorHint="#B5B5B5"
+            android:textColor="#1F1F1F"
+            android:textSize="15sp"
+            android:inputType="text"
+            android:paddingHorizontal="20dp"
+            android:layout_marginBottom="14dp" />
+
+        <EditText
+            android:id="@+id/etRegPassword"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:background="@drawable/bg_auth_input"
+            android:hint="设置密码（至少6位）"
+            android:textColorHint="#B5B5B5"
+            android:textColor="#1F1F1F"
+            android:textSize="15sp"
+            android:inputType="textPassword"
+            android:paddingHorizontal="20dp"
+            android:layout_marginBottom="28dp" />
+
+        <Button
+            android:id="@+id/btnRegister"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:background="@drawable/bg_auth_button"
+            android:text="注 册"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:stateListAnimator="@null"
+            android:layout_marginBottom="24dp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="注册即表示同意《用户协议》和《隐私政策》"
+            android:textSize="11sp"
+            android:textColor="#B5B5B5"
+            android:gravity="center" />
+
+    </LinearLayout>
+</ScrollView>

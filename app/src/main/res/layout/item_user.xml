@@ -2,8 +2,24 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="14dp"
-    android:background="?android:attr/selectableItemBackground">
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:paddingHorizontal="20dp"
+    android:paddingVertical="14dp"
+    android:background="@color/white">
+
+    <!-- 头像圈 -->
+    <TextView
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:id="@+id/tvUserInitial"
+        android:gravity="center"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:textColor="@color/white"
+        android:background="@drawable/bg_auth_logo"
+        android:layout_marginEnd="14dp"
+        android:text="A" />
 
     <TextView
         android:id="@+id/tvUsername"
@@ -11,12 +27,21 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:textSize="15sp"
+        android:textColor="#1F1F1F"
         android:text="账号名" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="短按修改 | 长按删除"
-        android:textSize="12sp"
-        android:textColor="#999999" />
+        android:text="修改密码"
+        android:textSize="13sp"
+        android:textColor="#2F80ED"
+        android:paddingEnd="6dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="›"
+        android:textSize="22sp"
+        android:textColor="#C7C7CC" />
 </LinearLayout>

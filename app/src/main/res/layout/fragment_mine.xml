@@ -1,66 +1,178 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#F2F2F7">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="16dp">
+        android:orientation="vertical">
 
-        <!-- 头像占位 + 用户名 -->
+        <!-- 头部个人卡片（可点击） -->
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:layout_marginBottom="20dp">
         <LinearLayout
+            android:id="@+id/layoutProfile"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center_vertical"
-            android:padding="16dp"
-            android:background="@color/colorPrimary"
-            android:layout_marginBottom="16dp">
+            android:paddingHorizontal="20dp"
+            android:paddingTop="24dp"
+            android:paddingBottom="24dp"
+            android:background="?android:attr/selectableItemBackground">
 
-            <ImageView
-                android:layout_width="60dp"
-                android:layout_height="60dp"
-                android:src="@drawable/ic_nav_mine"
-                android:layout_marginEnd="16dp" />
+            <!-- 头像 -->
+            <FrameLayout
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:layout_marginEnd="16dp">
+                <ImageView
+                    android:id="@+id/ivMineAvatar"
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    android:scaleType="centerCrop"
+                    android:background="@drawable/bg_auth_logo"
+                    android:visibility="gone" />
+                <TextView
+                    android:id="@+id/tvAvatarInitial"
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    android:background="@drawable/bg_auth_logo"
+                    android:gravity="center"
+                    android:textSize="26sp"
+                    android:textColor="@color/white"
+                    android:text="我" />
+            </FrameLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+                <TextView
+                    android:id="@+id/tvMineUsername"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:textColor="#1F1F1F"
+                    android:text="用户名" />
+                <TextView
+                    android:id="@+id/tvMineNickname"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="13sp"
+                    android:textColor="#8A8A8A"
+                    android:layout_marginTop="2dp"
+                    android:text="点击编辑资料" />
+            </LinearLayout>
 
             <TextView
-                android:id="@+id/tvMineUsername"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="20sp"
-                android:textColor="@android:color/white"
-                android:textStyle="bold"
-                android:text="用户名" />
+                android:text="›"
+                android:textSize="22sp"
+                android:textColor="#C7C7CC" />
+        </LinearLayout>
+        </FrameLayout>
+
+        <!-- 功能分组1 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@color/white"
+            android:layout_marginHorizontal="0dp"
+            android:layout_marginBottom="10dp">
+
+            <LinearLayout
+                android:id="@+id/tvMyArticles"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="20dp"
+                android:background="?android:attr/selectableItemBackground">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="📰" android:textSize="18sp" android:layout_marginEnd="14dp"/>
+                <TextView android:layout_width="0dp" android:layout_height="wrap_content"
+                    android:layout_weight="1" android:text="我的文章"
+                    android:textSize="16sp" android:textColor="#1F1F1F"/>
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="›" android:textSize="22sp" android:textColor="#C7C7CC"/>
+            </LinearLayout>
+
+            <View android:layout_width="match_parent" android:layout_height="0.5dp"
+                android:background="#E5E5EA" android:layout_marginStart="52dp"/>
+
+            <LinearLayout
+                android:id="@+id/tvMyOrders"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="20dp"
+                android:background="?android:attr/selectableItemBackground">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="📦" android:textSize="18sp" android:layout_marginEnd="14dp"/>
+                <TextView android:layout_width="0dp" android:layout_height="wrap_content"
+                    android:layout_weight="1" android:text="我的订单"
+                    android:textSize="16sp" android:textColor="#1F1F1F"/>
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="›" android:textSize="22sp" android:textColor="#C7C7CC"/>
+            </LinearLayout>
+
+            <View android:layout_width="match_parent" android:layout_height="0.5dp"
+                android:background="#E5E5EA" android:layout_marginStart="52dp"/>
+
+            <LinearLayout
+                android:id="@+id/tvCart"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="20dp"
+                android:background="?android:attr/selectableItemBackground">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="🛒" android:textSize="18sp" android:layout_marginEnd="14dp"/>
+                <TextView android:layout_width="0dp" android:layout_height="wrap_content"
+                    android:layout_weight="1" android:text="购物车"
+                    android:textSize="16sp" android:textColor="#1F1F1F"/>
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="›" android:textSize="22sp" android:textColor="#C7C7CC"/>
+            </LinearLayout>
         </LinearLayout>
 
-        <!-- 菜单项 -->
-        <TextView
-            android:id="@+id/tvMyArticles"
-            style="@style/MineMenuStyle"
-            android:text="我的文章" />
+        <!-- 功能分组2：设置 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@color/white"
+            android:layout_marginBottom="32dp">
 
-        <View style="@style/Divider" />
-
-        <TextView
-            android:id="@+id/tvMyOrders"
-            style="@style/MineMenuStyle"
-            android:text="我的订单" />
-
-        <View style="@style/Divider" />
-
-        <TextView
-            android:id="@+id/tvCart"
-            style="@style/MineMenuStyle"
-            android:text="购物车" />
-
-        <View style="@style/Divider" />
-
-        <TextView
-            android:id="@+id/tvSettings"
-            style="@style/MineMenuStyle"
-            android:text="设置" />
+            <LinearLayout
+                android:id="@+id/tvSettings"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="20dp"
+                android:background="?android:attr/selectableItemBackground">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="⚙️" android:textSize="18sp" android:layout_marginEnd="14dp"/>
+                <TextView android:layout_width="0dp" android:layout_height="wrap_content"
+                    android:layout_weight="1" android:text="设置"
+                    android:textSize="16sp" android:textColor="#1F1F1F"/>
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="›" android:textSize="22sp" android:textColor="#C7C7CC"/>
+            </LinearLayout>
+        </LinearLayout>
 
     </LinearLayout>
 </ScrollView>

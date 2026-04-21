@@ -10,7 +10,6 @@ import com.example.jntt.R;
 import com.example.jntt.model.User;
 import java.util.List;
 
-/** 账号管理列表适配器，支持短按和长按回调 */
 public class UserAdapter extends RecyclerView.Adapter<UserAdapter.VH> {
 
     public interface OnItemListener {
@@ -38,21 +37,23 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.VH> {
     public void onBindViewHolder(@NonNull VH holder, int position) {
         User u = data.get(position);
         holder.tvUsername.setText(u.username);
+        // 首字母头像
+        String initial = u.username.length() > 0
+                ? String.valueOf(u.username.charAt(0)).toUpperCase() : "?";
+        holder.tvInitial.setText(initial);
         holder.itemView.setOnClickListener(v -> listener.onShortClick(u));
-        holder.itemView.setOnLongClickListener(v -> {
-            listener.onLongClick(u);
-            return true;
-        });
+        holder.itemView.setOnLongClickListener(v -> { listener.onLongClick(u); return true; });
     }
 
     @Override
     public int getItemCount() { return data.size(); }
 
     static class VH extends RecyclerView.ViewHolder {
-        TextView tvUsername;
+        TextView tvUsername, tvInitial;
         VH(View v) {
             super(v);
             tvUsername = v.findViewById(R.id.tvUsername);
+            tvInitial  = v.findViewById(R.id.tvUserInitial);
         }
     }
 }

@@ -44,10 +44,10 @@ public class ProductDetailActivity extends AppCompatActivity {
             Toast.makeText(this, "已加入购物车", Toast.LENGTH_SHORT).show();
         });
 
-        // 立即购买
+        // 立即购买 → 生成待支付订单
         ((Button) findViewById(R.id.btnBuy)).setOnClickListener(v -> {
-            dm.addOrder(username, product);
-            Toast.makeText(this, "购买成功", Toast.LENGTH_SHORT).show();
+            dm.addOrder(username, product.id, product.name, product.price, 1);
+            Toast.makeText(this, "下单成功，请在24小时内完成支付", Toast.LENGTH_SHORT).show();
         });
 
         // 购物车图标

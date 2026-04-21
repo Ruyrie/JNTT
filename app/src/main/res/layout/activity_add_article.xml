@@ -1,36 +1,222 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:fitsSystemWindows="true"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:background="#FAFAFA"
+    android:fitsSystemWindows="true">
 
-    <EditText
-        android:id="@+id/etArticleTitle"
+    <!-- 顶部工具栏 -->
+    <LinearLayout
         android:layout_width="match_parent"
-    android:fitsSystemWindows="true"
-        android:layout_height="wrap_content"
-        android:hint="文章标题"
-        android:inputType="text"
-        android:layout_marginBottom="16dp" />
+        android:layout_height="56dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:background="#FFFFFF"
+        android:elevation="4dp">
 
-    <EditText
-        android:id="@+id/etArticleContent"
+        <TextView
+            android:id="@+id/tvBack"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="✕"
+            android:textSize="20sp"
+            android:textColor="#333333"
+            android:padding="8dp" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="发布文章"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="#333333"
+            android:gravity="center" />
+
+        <Button
+            android:id="@+id/btnSubmitArticle"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:text="发布"
+            android:textSize="14sp"
+            android:textColor="#FFFFFF"
+            android:backgroundTint="#E53935"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp" />
+    </LinearLayout>
+
+    <ScrollView
         android:layout_width="match_parent"
-    android:fitsSystemWindows="true"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:hint="文章内容"
-        android:inputType="textMultiLine"
-        android:gravity="top"
-        android:layout_marginBottom="16dp" />
+        android:fillViewport="true">
 
-    <Button
-        android:id="@+id/btnSubmitArticle"
-        android:layout_width="match_parent"
-    android:fitsSystemWindows="true"
-        android:layout_height="wrap_content"
-        android:text="发布文章" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- 封面图区域 -->
+            <FrameLayout
+                android:id="@+id/flCoverPicker"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:background="#EEEEEE"
+                android:foreground="?attr/selectableItemBackground">
+
+                <ImageView
+                    android:id="@+id/ivCover"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerCrop" />
+
+                <!-- 未选图时的提示 -->
+                <LinearLayout
+                    android:id="@+id/llCoverHint"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:orientation="vertical"
+                    android:gravity="center">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="＋"
+                        android:textSize="36sp"
+                        android:textColor="#AAAAAA" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="添加封面图"
+                        android:textSize="14sp"
+                        android:textColor="#AAAAAA" />
+                </LinearLayout>
+            </FrameLayout>
+
+            <!-- 标题输入 -->
+            <EditText
+                android:id="@+id/etArticleTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="请输入文章标题"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="#222222"
+                android:textColorHint="#BBBBBB"
+                android:background="@null"
+                android:inputType="text"
+                android:maxLines="2"
+                android:padding="16dp" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#EEEEEE"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp" />
+
+            <!-- 正文输入 -->
+            <EditText
+                android:id="@+id/etArticleContent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="300dp"
+                android:hint="分享你的农业资讯..."
+                android:textSize="16sp"
+                android:textColor="#333333"
+                android:textColorHint="#BBBBBB"
+                android:background="@null"
+                android:inputType="textMultiLine"
+                android:gravity="top"
+                android:padding="16dp" />
+
+            <!-- 内容配图区域 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="内容配图"
+                    android:textSize="14sp"
+                    android:textColor="#888888"
+                    android:layout_marginBottom="8dp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="start">
+
+                    <!-- 已选内容图 -->
+                    <FrameLayout
+                        android:layout_width="90dp"
+                        android:layout_height="90dp"
+                        android:layout_marginEnd="8dp">
+
+                        <ImageView
+                            android:id="@+id/ivContentImage"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:scaleType="centerCrop"
+                            android:background="#EEEEEE"
+                            android:visibility="gone" />
+
+                        <TextView
+                            android:id="@+id/tvRemoveContentImg"
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:layout_gravity="top|end"
+                            android:text="✕"
+                            android:textSize="11sp"
+                            android:textColor="#FFFFFF"
+                            android:gravity="center"
+                            android:background="#88000000"
+                            android:visibility="gone" />
+                    </FrameLayout>
+
+                    <!-- 添加内容图按钮 -->
+                    <FrameLayout
+                        android:id="@+id/flContentImagePicker"
+                        android:layout_width="90dp"
+                        android:layout_height="90dp"
+                        android:background="#EEEEEE"
+                        android:foreground="?attr/selectableItemBackground">
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:orientation="vertical"
+                            android:gravity="center">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="＋"
+                                android:textSize="24sp"
+                                android:textColor="#AAAAAA" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="配图"
+                                android:textSize="12sp"
+                                android:textColor="#AAAAAA" />
+                        </LinearLayout>
+                    </FrameLayout>
+                </LinearLayout>
+            </LinearLayout>
+
+        </LinearLayout>
+    </ScrollView>
 
 </LinearLayout>
