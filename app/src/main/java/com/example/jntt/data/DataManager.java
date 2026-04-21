@@ -129,6 +129,30 @@ public class DataManager {
            .edit().remove(KEY_LOGGED_USER).apply();
     }
 
+    // ─── 用户资料（昵称 & 头像） ───────────────────────────────────────────────
+
+    /** 获取昵称，默认返回 username */
+    public String getNickname(String username) {
+        return ctx.getSharedPreferences("pref_profile_" + username, Context.MODE_PRIVATE)
+                  .getString("nickname", username);
+    }
+
+    public void setNickname(String username, String nickname) {
+        ctx.getSharedPreferences("pref_profile_" + username, Context.MODE_PRIVATE)
+           .edit().putString("nickname", nickname).apply();
+    }
+
+    /** 头像本地 URI（字符串），null 表示未设置 */
+    public String getAvatarUri(String username) {
+        return ctx.getSharedPreferences("pref_profile_" + username, Context.MODE_PRIVATE)
+                  .getString("avatar_uri", null);
+    }
+
+    public void setAvatarUri(String username, String uri) {
+        ctx.getSharedPreferences("pref_profile_" + username, Context.MODE_PRIVATE)
+           .edit().putString("avatar_uri", uri).apply();
+    }
+
     // ─── 管理员模式 ───────────────────────────────────────────────────────────
 
     public void setAdminMode(boolean enabled) {
@@ -151,13 +175,26 @@ public class DataManager {
             JSONArray arr = new JSONArray(json);
             for (int i = 0; i < arr.length(); i++) {
                 JSONObject o = arr.getJSONObject(i);
-                list.add(new Article(
+                Article a = new Article(
                     o.getInt("id"), o.getString("title"),
                     o.getString("content"), o.getString("author"),
-                    o.getString("time")));
+                    o.getString("time"));
+                a.readCount = o.optInt("readCount", 0);
+                a.coverUri  = o.optString("coverUri", null);
+                if ("null".equals(a.coverUri)) a.coverUri = null;
+                list.add(a);
             }
         } catch (JSONException ignored) {}
         return list;
+    }
+
+    /** 阅读数 +1 并持久化 */
+    public void incrementReadCount(int articleId) {
+        List<Article> list = getArticles();
+        for (Article a : list) {
+            if (a.id == articleId) { a.readCount++; break; }
+        }
+        saveArticles(list);
     }
 
     private void saveArticles(List<Article> articles) {
@@ -167,7 +204,8 @@ public class DataManager {
             try {
                 o.put("id", a.id); o.put("title", a.title);
                 o.put("content", a.content); o.put("author", a.author);
-                o.put("time", a.time);
+                o.put("time", a.time); o.put("readCount", a.readCount);
+                if (a.coverUri != null) o.put("coverUri", a.coverUri);
             } catch (JSONException ignored) {}
             arr.put(o);
         }
@@ -175,13 +213,15 @@ public class DataManager {
            .edit().putString(KEY_ARTICLES, arr.toString()).apply();
     }
 
-    public void addArticle(String title, String content) {
+    public void addArticle(String title, String content, String coverUri) {
         List<Article> list = getArticles();
         int id = list.isEmpty() ? 1 : list.get(list.size() - 1).id + 1;
         String author = getLoggedUser();
         String time = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm",
             java.util.Locale.getDefault()).format(new java.util.Date());
-        list.add(new Article(id, title, content, author, time));
+        Article a = new Article(id, title, content, author, time);
+        a.coverUri = coverUri;
+        list.add(a);
         saveArticles(list);
     }
 
@@ -264,6 +304,10 @@ public class DataManager {
         saveCart(username, list);
     }
 
+    public void saveCartPublic(String username, List<CartItem> items) {
+        saveCart(username, items);
+    }
+
     private void saveCart(String username, List<CartItem> items) {
         JSONArray arr = new JSONArray();
         for (CartItem c : items) {
@@ -288,19 +332,33 @@ public class DataManager {
             JSONArray arr = new JSONArray(json);
             for (int i = 0; i < arr.length(); i++) {
                 JSONObject o = arr.getJSONObject(i);
-                list.add(new Order(
+                Order ord = new Order(
+                    o.optString("orderId", "ORD" + i),
                     o.getInt("productId"), o.getString("name"),
-                    o.getDouble("price"), o.getString("time")));
+                    o.getDouble("price"),
+                    o.optInt("quantity", 1),
+                    o.getString("time"),
+                    o.optString("status", Order.STATUS_PAID));
+                list.add(ord);
             }
         } catch (JSONException ignored) {}
         return list;
     }
 
-    public void addOrder(String username, Product product) {
+    public void addOrder(String username, int productId, String name, double price, int quantity) {
         List<Order> list = getOrders(username);
         String time = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm",
             java.util.Locale.getDefault()).format(new java.util.Date());
-        list.add(new Order(product.id, product.name, product.price, time));
+        String orderId = "JN" + System.currentTimeMillis();
+        list.add(new Order(orderId, productId, name, price, quantity, time, Order.STATUS_PENDING));
+        saveOrders(username, list);
+    }
+
+    public void updateOrderStatus(String username, String orderId, String status) {
+        List<Order> list = getOrders(username);
+        for (Order o : list) {
+            if (orderId.equals(o.orderId)) { o.status = status; break; }
+        }
         saveOrders(username, list);
     }
 
@@ -309,8 +367,10 @@ public class DataManager {
         for (Order ord : orders) {
             JSONObject o = new JSONObject();
             try {
+                o.put("orderId", ord.orderId);
                 o.put("productId", ord.productId); o.put("name", ord.name);
-                o.put("price", ord.price); o.put("time", ord.time);
+                o.put("price", ord.price); o.put("quantity", ord.quantity);
+                o.put("time", ord.time); o.put("status", ord.status);
             } catch (JSONException ignored) {}
             arr.put(o);
         }
@@ -331,7 +391,7 @@ public class DataManager {
 
         // 示例文章
         List<Article> articles = new ArrayList<>();
-        articles.add(new Article(1, "吉林农业大学举办科技节", "本次科技节汇聚了来自全国各地的农业科技专家，展示了最新农业技术成果，吸引了众多师生参与。", "admin", "2026-04-01 09:00"));
+        articles.add(new Article(1, "吉林科技学院举办科技节", "本次科技节汇聚了来自全国各地的农业科技专家，展示了最新农业技术成果，吸引了众多师生参与。", "admin", "2026-04-01 09:00"));
         articles.add(new Article(2, "新型水稻品种研发成功", "经过多年培育，我校农学院成功研发出高产、抗病新型水稻品种，亩产可达800公斤以上，为粮食安全提供有力保障。", "admin", "2026-04-05 14:30"));
         articles.add(new Article(3, "智慧农业实验基地投入使用", "学校智慧农业实验基地正式投入使用，基地配备物联网传感器、无人机等先进设备，开创农业教育新模式。", "admin", "2026-04-10 10:00"));
         articles.add(new Article(4, "农业经济论坛成功举办", "本届农业经济论坛围绕乡村振兴战略展开深入讨论，多位专家学者分享了最新研究成果和政策解读。", "user1", "2026-04-15 16:00"));

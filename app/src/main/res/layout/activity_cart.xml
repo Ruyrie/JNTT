@@ -1,28 +1,103 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:fitsSystemWindows="true"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="#F5F5F5">
+
+    <!-- 顶部标题栏 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="16dp"
+        android:background="@color/white"
+        android:elevation="2dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="购物车"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="#1F1F1F" />
+
+        <TextView
+            android:id="@+id/tvCartCount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            android:textColor="#8A8A8A"
+            android:layout_marginEnd="12dp" />
+
+        <TextView
+            android:id="@+id/tvClearCart"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="清空"
+            android:textSize="14sp"
+            android:textColor="#FF3B30"
+            android:padding="4dp" />
+    </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvCart"
         android:layout_width="match_parent"
-    android:fitsSystemWindows="true"
         android:layout_height="0dp"
-        android:layout_weight="1" />
+        android:layout_weight="1"
+        android:paddingTop="8dp"
+        android:clipToPadding="false" />
 
-    <TextView
-        android:id="@+id/tvCartTotal"
+    <!-- 底部结算栏 -->
+    <LinearLayout
         android:layout_width="match_parent"
-    android:fitsSystemWindows="true"
-        android:layout_height="wrap_content"
-        android:padding="16dp"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        android:textColor="#E53935"
-        android:gravity="end"
-        android:background="#F5F5F5"
-        android:text="合计：¥0.00" />
+        android:layout_height="64dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="16dp"
+        android:background="@color/white"
+        android:elevation="8dp">
+
+        <CheckBox
+            android:id="@+id/cbSelectAll"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="全选"
+            android:textSize="14sp"
+            android:textColor="#1F1F1F"
+            android:buttonTint="#F04142" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="合计："
+            android:textSize="14sp"
+            android:textColor="#8A8A8A"
+            android:layout_marginStart="8dp" />
+
+        <TextView
+            android:id="@+id/tvCartTotal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="¥0.00"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="#F04142"
+            android:layout_marginEnd="12dp" />
+
+        <Button
+            android:id="@+id/btnCheckout"
+            android:layout_width="100dp"
+            android:layout_height="44dp"
+            android:text="去结算"
+            android:textSize="14sp"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            android:background="@drawable/bg_auth_button"
+            android:stateListAnimator="@null" />
+    </LinearLayout>
 
 </LinearLayout>

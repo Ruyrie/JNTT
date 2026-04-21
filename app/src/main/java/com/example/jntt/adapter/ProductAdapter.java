@@ -11,20 +11,21 @@ import com.example.jntt.R;
 import com.example.jntt.model.Product;
 import java.util.List;
 
-/** 商品列表适配器 */
 public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.VH> {
 
-    public interface OnItemClickListener {
-        void onItemClick(Product product);
-    }
+    public interface OnItemClickListener { void onItemClick(Product product); }
+    public interface OnAddCartListener  { void onAddCart(Product product); }
 
     private final List<Product> data;
-    private final OnItemClickListener listener;
+    private final OnItemClickListener clickListener;
+    private OnAddCartListener addCartListener;
 
     public ProductAdapter(List<Product> data, OnItemClickListener listener) {
         this.data = data;
-        this.listener = listener;
+        this.clickListener = listener;
     }
+
+    public void setOnAddCartListener(OnAddCartListener l) { this.addCartListener = l; }
 
     @NonNull
     @Override
@@ -37,11 +38,23 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.VH> {
     @Override
     public void onBindViewHolder(@NonNull VH holder, int position) {
         Product p = data.get(position);
-        // 图片使用固定占位图
-        holder.ivProduct.setImageResource(R.drawable.ic_product_placeholder);
+        switch (p.id) {
+            case 1: holder.ivProduct.setImageResource(R.mipmap.dami);   break; // 东北大米
+            case 2: holder.ivProduct.setImageResource(R.mipmap.muer);   break; // 有机黑木耳
+            case 3: holder.ivProduct.setImageResource(R.mipmap.fengmi); break; // 农家蜂蜜
+            case 4: holder.ivProduct.setImageResource(R.mipmap.shucai); break; // 绿色蔬菜礼盒
+            default: holder.ivProduct.setImageResource(R.drawable.ic_product_placeholder);
+        }
         holder.tvName.setText(p.name);
-        holder.tvPrice.setText(String.format("¥%.2f", p.price));
-        holder.itemView.setOnClickListener(v -> listener.onItemClick(p));
+        holder.tvDesc.setText(p.desc);
+        // Show price without ¥ prefix (¥ is a separate TextView in XML)
+        holder.tvPrice.setText(String.valueOf((long) p.price % 1 == 0
+                ? String.format("%d", (long) p.price)
+                : String.format("%.2f", p.price)));
+        holder.itemView.setOnClickListener(v -> clickListener.onItemClick(p));
+        holder.btnAddCart.setOnClickListener(v -> {
+            if (addCartListener != null) addCartListener.onAddCart(p);
+        });
     }
 
     @Override
@@ -49,12 +62,14 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.VH> {
 
     static class VH extends RecyclerView.ViewHolder {
         ImageView ivProduct;
-        TextView tvName, tvPrice;
+        TextView tvName, tvDesc, tvPrice, btnAddCart;
         VH(View v) {
             super(v);
-            ivProduct = v.findViewById(R.id.ivProductImage);
-            tvName    = v.findViewById(R.id.tvProductName);
-            tvPrice   = v.findViewById(R.id.tvProductPrice);
+            ivProduct  = v.findViewById(R.id.ivProductImage);
+            tvName     = v.findViewById(R.id.tvProductName);
+            tvDesc     = v.findViewById(R.id.tvProductDesc);
+            tvPrice    = v.findViewById(R.id.tvProductPrice);
+            btnAddCart = v.findViewById(R.id.btnAddCart);
         }
     }
 }

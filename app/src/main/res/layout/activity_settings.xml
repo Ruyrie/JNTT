@@ -1,81 +1,159 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:fitsSystemWindows="true"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#F2F2F7">
 
     <LinearLayout
         android:layout_width="match_parent"
-    android:fitsSystemWindows="true"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:paddingTop="16dp"
+        android:paddingBottom="40dp">
 
-        <!-- 账号管理 -->
+        <!-- 分组1：账号 -->
         <TextView
-            android:id="@+id/tvAccountManager"
-            style="@style/SettingsItemStyle"
-            android:text="账号管理" />
-
-        <View style="@style/Divider" />
-
-        <!-- 退出登录 -->
-        <TextView
-            android:id="@+id/tvLogout"
-            style="@style/SettingsItemStyle"
-            android:text="退出登录"
-            android:textColor="#E53935" />
-
-        <View style="@style/Divider" />
-
-        <!-- 管理员模式 -->
-        <LinearLayout
             android:layout_width="match_parent"
-    android:fitsSystemWindows="true"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:padding="16dp">
+            android:text="账号"
+            android:textSize="13sp"
+            android:textColor="#8A8A8A"
+            android:paddingHorizontal="20dp"
+            android:paddingBottom="6dp" />
 
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:textSize="16sp"
-                android:text="管理员模式" />
-
-            <Switch
-                android:id="@+id/swAdminMode"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-        </LinearLayout>
-
-        <View style="@style/Divider" />
-
-        <!-- 管理员功能区（开启管理员模式后显示） -->
         <LinearLayout
-            android:id="@+id/layoutAdminOptions"
             android:layout_width="match_parent"
-    android:fitsSystemWindows="true"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:visibility="gone">
+            android:background="@color/white"
+            android:layout_marginBottom="20dp">
 
-            <TextView
-                android:id="@+id/tvAddArticle"
-                style="@style/SettingsItemStyle"
-                android:text="添加文章"
-                android:paddingStart="32dp" />
+            <LinearLayout
+                android:id="@+id/tvAccountManager"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="20dp"
+                android:background="?android:attr/selectableItemBackground">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="👤" android:textSize="18sp" android:layout_marginEnd="14dp"/>
+                <TextView android:layout_width="0dp" android:layout_height="wrap_content"
+                    android:layout_weight="1" android:text="账号管理"
+                    android:textSize="16sp" android:textColor="#1F1F1F"/>
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="›" android:textSize="22sp" android:textColor="#C7C7CC"/>
+            </LinearLayout>
+        </LinearLayout>
 
-            <View style="@style/Divider" />
+        <!-- 分组2：管理员模式 -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="权限"
+            android:textSize="13sp"
+            android:textColor="#8A8A8A"
+            android:paddingHorizontal="20dp"
+            android:paddingBottom="6dp" />
 
-            <TextView
-                android:id="@+id/tvAddProduct"
-                style="@style/SettingsItemStyle"
-                android:text="添加商品"
-                android:paddingStart="32dp" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@color/white"
+            android:layout_marginBottom="20dp">
 
-            <View style="@style/Divider" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="20dp">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="🔐" android:textSize="18sp" android:layout_marginEnd="14dp"/>
+                <TextView android:layout_width="0dp" android:layout_height="wrap_content"
+                    android:layout_weight="1" android:text="管理员模式"
+                    android:textSize="16sp" android:textColor="#1F1F1F"/>
+                <Switch
+                    android:id="@+id/swAdminMode"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:thumbTint="#FFFFFF"
+                    android:trackTint="@null" />
+            </LinearLayout>
+
+            <!-- 管理员功能（动态显示） -->
+            <LinearLayout
+                android:id="@+id/layoutAdminOptions"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <View android:layout_width="match_parent" android:layout_height="0.5dp"
+                    android:background="#E5E5EA" android:layout_marginStart="52dp"/>
+
+                <LinearLayout
+                    android:id="@+id/tvAddArticle"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:paddingHorizontal="20dp"
+                    android:background="?android:attr/selectableItemBackground">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="✍️" android:textSize="18sp" android:layout_marginEnd="14dp"/>
+                    <TextView android:layout_width="0dp" android:layout_height="wrap_content"
+                        android:layout_weight="1" android:text="添加文章"
+                        android:textSize="16sp" android:textColor="#1F1F1F"/>
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="›" android:textSize="22sp" android:textColor="#C7C7CC"/>
+                </LinearLayout>
+
+                <View android:layout_width="match_parent" android:layout_height="0.5dp"
+                    android:background="#E5E5EA" android:layout_marginStart="52dp"/>
+
+                <LinearLayout
+                    android:id="@+id/tvAddProduct"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:paddingHorizontal="20dp"
+                    android:background="?android:attr/selectableItemBackground">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="🏷️" android:textSize="18sp" android:layout_marginEnd="14dp"/>
+                    <TextView android:layout_width="0dp" android:layout_height="wrap_content"
+                        android:layout_weight="1" android:text="添加商品"
+                        android:textSize="16sp" android:textColor="#1F1F1F"/>
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="›" android:textSize="22sp" android:textColor="#C7C7CC"/>
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- 分组3：退出登录（危险区） -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@color/white"
+            android:layout_marginBottom="20dp">
+
+            <LinearLayout
+                android:id="@+id/tvLogout"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="20dp"
+                android:background="?android:attr/selectableItemBackground">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="🚪" android:textSize="18sp" android:layout_marginEnd="14dp"/>
+                <TextView android:layout_width="0dp" android:layout_height="wrap_content"
+                    android:layout_weight="1" android:text="退出登录"
+                    android:textSize="16sp" android:textColor="#FF3B30"/>
+            </LinearLayout>
         </LinearLayout>
 
     </LinearLayout>

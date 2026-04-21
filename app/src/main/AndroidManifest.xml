@@ -58,6 +58,12 @@
         <!-- 添加商品（管理员） -->
         <activity android:name=".AddProductActivity" />
 
+        <!-- 订单详情 -->
+        <activity android:name=".OrderDetailActivity" />
+
+        <!-- 编辑资料 -->
+        <activity android:name=".ProfileEditActivity" />
+
     </application>
 
 </manifest>

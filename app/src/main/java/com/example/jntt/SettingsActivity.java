@@ -6,12 +6,10 @@ import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.Switch;
-import android.widget.TextView;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import com.example.jntt.data.DataManager;
 
-/** 设置界面：账号管理、退出登录、管理员模式 */
 public class SettingsActivity extends AppCompatActivity {
 
     private DataManager dm;
@@ -21,18 +19,14 @@ public class SettingsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
-        setTitle("设置");
 
         dm = DataManager.getInstance(this);
 
-        // 账号管理
         findViewById(R.id.tvAccountManager).setOnClickListener(v ->
             startActivity(new Intent(this, AccountManagerActivity.class)));
 
-        // 退出登录
         findViewById(R.id.tvLogout).setOnClickListener(v -> confirmLogout());
 
-        // 管理员模式开关
         Switch swAdmin = findViewById(R.id.swAdminMode);
         layoutAdminOptions = findViewById(R.id.layoutAdminOptions);
         swAdmin.setChecked(dm.isAdminMode());
@@ -43,11 +37,9 @@ public class SettingsActivity extends AppCompatActivity {
             updateAdminVisibility(checked);
         });
 
-        // 添加文章
         findViewById(R.id.tvAddArticle).setOnClickListener(v ->
             startActivity(new Intent(this, AddArticleActivity.class)));
 
-        // 添加商品
         findViewById(R.id.tvAddProduct).setOnClickListener(v ->
             startActivity(new Intent(this, AddProductActivity.class)));
     }
