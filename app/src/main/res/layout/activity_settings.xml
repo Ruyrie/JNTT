@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- 账号管理 -->
+        <TextView
+            android:id="@+id/tvAccountManager"
+            style="@style/SettingsItemStyle"
+            android:text="账号管理" />
+
+        <View style="@style/Divider" />
+
+        <!-- 退出登录 -->
+        <TextView
+            android:id="@+id/tvLogout"
+            style="@style/SettingsItemStyle"
+            android:text="退出登录"
+            android:textColor="#E53935" />
+
+        <View style="@style/Divider" />
+
+        <!-- 管理员模式 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:padding="16dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textSize="16sp"
+                android:text="管理员模式" />
+
+            <Switch
+                android:id="@+id/swAdminMode"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+
+        <View style="@style/Divider" />
+
+        <!-- 管理员功能区（开启管理员模式后显示） -->
+        <LinearLayout
+            android:id="@+id/layoutAdminOptions"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/tvAddArticle"
+                style="@style/SettingsItemStyle"
+                android:text="添加文章"
+                android:paddingStart="32dp" />
+
+            <View style="@style/Divider" />
+
+            <TextView
+                android:id="@+id/tvAddProduct"
+                style="@style/SettingsItemStyle"
+                android:text="添加商品"
+                android:paddingStart="32dp" />
+
+            <View style="@style/Divider" />
+        </LinearLayout>
+
+    </LinearLayout>
+</ScrollView>

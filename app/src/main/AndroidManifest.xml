@@ -11,15 +11,53 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.JNTT">
+
+        <!-- 登录（启动页） -->
         <activity
-            android:name=".MainActivity"
+            android:name=".LoginActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- 注册 / 添加账号 -->
+        <activity android:name=".RegisterActivity" />
+
+        <!-- 主界面 -->
+        <activity android:name=".MainActivity" />
+
+        <!-- 文章详情 -->
+        <activity android:name=".ArticleDetailActivity" />
+
+        <!-- 商品详情 -->
+        <activity android:name=".ProductDetailActivity" />
+
+        <!-- 购物车 -->
+        <activity android:name=".CartActivity" />
+
+        <!-- 我的文章 -->
+        <activity android:name=".MyArticlesActivity" />
+
+        <!-- 我的订单 -->
+        <activity android:name=".MyOrdersActivity" />
+
+        <!-- 设置 -->
+        <activity android:name=".SettingsActivity" />
+
+        <!-- 账号管理 -->
+        <activity android:name=".AccountManagerActivity" />
+
+        <!-- 修改密码 -->
+        <activity android:name=".ChangePasswordActivity" />
+
+        <!-- 添加文章（管理员） -->
+        <activity android:name=".AddArticleActivity" />
+
+        <!-- 添加商品（管理员） -->
+        <activity android:name=".AddProductActivity" />
+
     </application>
 
 </manifest>

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- 头像占位 + 用户名 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:padding="16dp"
+            android:background="@color/colorPrimary"
+            android:layout_marginBottom="16dp">
+
+            <ImageView
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:src="@drawable/ic_nav_mine"
+                android:layout_marginEnd="16dp" />
+
+            <TextView
+                android:id="@+id/tvMineUsername"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:textColor="@android:color/white"
+                android:textStyle="bold"
+                android:text="用户名" />
+        </LinearLayout>
+
+        <!-- 菜单项 -->
+        <TextView
+            android:id="@+id/tvMyArticles"
+            style="@style/MineMenuStyle"
+            android:text="我的文章" />
+
+        <View style="@style/Divider" />
+
+        <TextView
+            android:id="@+id/tvMyOrders"
+            style="@style/MineMenuStyle"
+            android:text="我的订单" />
+
+        <View style="@style/Divider" />
+
+        <TextView
+            android:id="@+id/tvCart"
+            style="@style/MineMenuStyle"
+            android:text="购物车" />
+
+        <View style="@style/Divider" />
+
+        <TextView
+            android:id="@+id/tvSettings"
+            style="@style/MineMenuStyle"
+            android:text="设置" />
+
+    </LinearLayout>
+</ScrollView>
