@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
+    android:fitsSystemWindows="true"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:gravity="center"
@@ -18,6 +19,7 @@
     <EditText
         android:id="@+id/etLoginUsername"
         android:layout_width="match_parent"
+    android:fitsSystemWindows="true"
         android:layout_height="wrap_content"
         android:hint="用户名"
         android:inputType="text"
@@ -26,6 +28,7 @@
     <EditText
         android:id="@+id/etLoginPassword"
         android:layout_width="match_parent"
+    android:fitsSystemWindows="true"
         android:layout_height="wrap_content"
         android:hint="密码"
         android:inputType="textPassword"
@@ -34,6 +37,7 @@
     <Button
         android:id="@+id/btnLogin"
         android:layout_width="match_parent"
+    android:fitsSystemWindows="true"
         android:layout_height="wrap_content"
         android:text="登 录"
         android:layout_marginBottom="12dp" />
