@@ -1,59 +1,61 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F2F2F7">
+    android:background="#F0F2F5"
+    android:clipToPadding="false"
+    android:paddingBottom="90dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <!-- 头部个人卡片（可点击） -->
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/white"
-            android:layout_marginBottom="20dp">
+        <!-- ── Top white card (profile + stats) ── -->
         <LinearLayout
-            android:id="@+id/layoutProfile"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:paddingHorizontal="20dp"
-            android:paddingTop="24dp"
-            android:paddingBottom="24dp"
-            android:background="?android:attr/selectableItemBackground">
+            android:orientation="vertical"
+            android:background="@color/white"
+            android:layout_marginBottom="12dp">
 
-            <!-- 头像 -->
-            <FrameLayout
-                android:layout_width="64dp"
-                android:layout_height="64dp"
-                android:layout_marginEnd="16dp">
-                <ImageView
-                    android:id="@+id/ivMineAvatar"
-                    android:layout_width="64dp"
-                    android:layout_height="64dp"
-                    android:scaleType="centerCrop"
-                    android:background="@drawable/bg_auth_logo"
-                    android:visibility="gone" />
-                <TextView
-                    android:id="@+id/tvAvatarInitial"
-                    android:layout_width="64dp"
-                    android:layout_height="64dp"
-                    android:background="@drawable/bg_auth_logo"
-                    android:gravity="center"
-                    android:textSize="26sp"
-                    android:textColor="@color/white"
-                    android:text="我" />
-            </FrameLayout>
-
+            <!-- Avatar + username + bio (clicking this area → edit profile) -->
             <LinearLayout
-                android:layout_width="0dp"
+                android:id="@+id/layoutProfile"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:gravity="center_horizontal"
+                android:paddingHorizontal="24dp"
+                android:paddingTop="32dp"
+                android:paddingBottom="16dp"
+                android:foreground="?attr/selectableItemBackground">
+
+                <FrameLayout
+                    android:layout_width="80dp"
+                    android:layout_height="80dp">
+
+                    <ImageView
+                        android:id="@+id/ivMineAvatar"
+                        android:layout_width="80dp"
+                        android:layout_height="80dp"
+                        android:scaleType="centerCrop"
+                        android:background="@drawable/bg_auth_logo"
+                        android:visibility="gone" />
+
+                    <TextView
+                        android:id="@+id/tvAvatarInitial"
+                        android:layout_width="80dp"
+                        android:layout_height="80dp"
+                        android:background="@drawable/bg_auth_logo"
+                        android:gravity="center"
+                        android:textSize="30sp"
+                        android:textColor="@color/white"
+                        android:textStyle="bold"
+                        android:text="我" />
+                </FrameLayout>
+
                 <TextView
                     android:id="@+id/tvMineUsername"
                     android:layout_width="wrap_content"
@@ -61,118 +63,254 @@
                     android:textSize="20sp"
                     android:textStyle="bold"
                     android:textColor="#1F1F1F"
+                    android:layout_marginTop="14dp"
                     android:text="用户名" />
+
                 <TextView
                     android:id="@+id/tvMineNickname"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="13sp"
                     android:textColor="#8A8A8A"
-                    android:layout_marginTop="2dp"
+                    android:layout_marginTop="4dp"
                     android:text="点击编辑资料" />
             </LinearLayout>
 
-            <TextView
-                android:layout_width="wrap_content"
+            <!-- Thin divider between profile and stats -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="0.5dp"
+                android:background="#EBEBEB"
+                android:layout_marginHorizontal="24dp" />
+
+            <!-- Stats row: each column is independently tappable -->
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="›"
-                android:textSize="22sp"
-                android:textColor="#C7C7CC" />
-        </LinearLayout>
-        </FrameLayout>
+                android:orientation="horizontal"
+                android:paddingVertical="18dp">
 
-        <!-- 功能分组1 -->
-        <LinearLayout
+                <!-- 粉丝 → FollowListActivity (followers) -->
+                <LinearLayout
+                    android:id="@+id/statFollowers"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:foreground="?attr/selectableItemBackgroundBorderless">
+
+                    <TextView
+                        android:id="@+id/tvStatFollowers"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        android:textColor="#1F1F1F"
+                        android:text="0" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="12sp"
+                        android:textColor="#8A8A8A"
+                        android:layout_marginTop="2dp"
+                        android:text="粉丝" />
+                </LinearLayout>
+
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="28dp"
+                    android:layout_gravity="center_vertical"
+                    android:background="#E5E5EA" />
+
+                <!-- 关注 → FollowListActivity (following) -->
+                <LinearLayout
+                    android:id="@+id/statFollowing"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:foreground="?attr/selectableItemBackgroundBorderless">
+
+                    <TextView
+                        android:id="@+id/tvStatFollowing"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        android:textColor="#1F1F1F"
+                        android:text="0" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="12sp"
+                        android:textColor="#8A8A8A"
+                        android:layout_marginTop="2dp"
+                        android:text="关注" />
+                </LinearLayout>
+
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="28dp"
+                    android:layout_gravity="center_vertical"
+                    android:background="#E5E5EA" />
+
+                <!-- 获赞 → not navigable, shows total likes received -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:gravity="center">
+
+                    <TextView
+                        android:id="@+id/tvStatLikes"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        android:textColor="#1F1F1F"
+                        android:text="0" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="12sp"
+                        android:textColor="#8A8A8A"
+                        android:layout_marginTop="2dp"
+                        android:text="获赞" />
+                </LinearLayout>
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- ── Menu Card Group 1: Articles / Favorites / Orders / Cart ── -->
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:background="@color/white"
-            android:layout_marginHorizontal="0dp"
-            android:layout_marginBottom="10dp">
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginBottom="12dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="2dp"
+            app:cardBackgroundColor="@color/white"
+            app:strokeWidth="0dp">
 
             <LinearLayout
-                android:id="@+id/tvMyArticles"
                 android:layout_width="match_parent"
-                android:layout_height="52dp"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:paddingHorizontal="20dp"
-                android:background="?android:attr/selectableItemBackground">
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:text="📰" android:textSize="18sp" android:layout_marginEnd="14dp"/>
-                <TextView android:layout_width="0dp" android:layout_height="wrap_content"
-                    android:layout_weight="1" android:text="我的文章"
-                    android:textSize="16sp" android:textColor="#1F1F1F"/>
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:text="›" android:textSize="22sp" android:textColor="#C7C7CC"/>
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:id="@+id/tvMyArticles"
+                    android:layout_width="match_parent"
+                    android:layout_height="54dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:paddingHorizontal="20dp"
+                    android:background="?android:attr/selectableItemBackground">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="📰" android:textSize="18sp" android:layout_marginEnd="14dp" />
+                    <TextView android:layout_width="0dp" android:layout_height="wrap_content"
+                        android:layout_weight="1" android:text="我的文章" android:textSize="16sp" android:textColor="#1F1F1F" />
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="›" android:textSize="22sp" android:textColor="#C7C7CC" />
+                </LinearLayout>
+
+                <View android:layout_width="match_parent" android:layout_height="0.5dp"
+                    android:background="#F0F0F0" android:layout_marginStart="52dp" />
+
+                <LinearLayout
+                    android:id="@+id/tvMyFavorites"
+                    android:layout_width="match_parent"
+                    android:layout_height="54dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:paddingHorizontal="20dp"
+                    android:background="?android:attr/selectableItemBackground">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="❤️" android:textSize="18sp" android:layout_marginEnd="14dp" />
+                    <TextView android:layout_width="0dp" android:layout_height="wrap_content"
+                        android:layout_weight="1" android:text="我的收藏" android:textSize="16sp" android:textColor="#1F1F1F" />
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="›" android:textSize="22sp" android:textColor="#C7C7CC" />
+                </LinearLayout>
+
+                <View android:layout_width="match_parent" android:layout_height="0.5dp"
+                    android:background="#F0F0F0" android:layout_marginStart="52dp" />
+
+                <LinearLayout
+                    android:id="@+id/tvMyOrders"
+                    android:layout_width="match_parent"
+                    android:layout_height="54dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:paddingHorizontal="20dp"
+                    android:background="?android:attr/selectableItemBackground">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="📦" android:textSize="18sp" android:layout_marginEnd="14dp" />
+                    <TextView android:layout_width="0dp" android:layout_height="wrap_content"
+                        android:layout_weight="1" android:text="我的订单" android:textSize="16sp" android:textColor="#1F1F1F" />
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="›" android:textSize="22sp" android:textColor="#C7C7CC" />
+                </LinearLayout>
+
+                <View android:layout_width="match_parent" android:layout_height="0.5dp"
+                    android:background="#F0F0F0" android:layout_marginStart="52dp" />
+
+                <LinearLayout
+                    android:id="@+id/tvCart"
+                    android:layout_width="match_parent"
+                    android:layout_height="54dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:paddingHorizontal="20dp"
+                    android:background="?android:attr/selectableItemBackground">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="🛒" android:textSize="18sp" android:layout_marginEnd="14dp" />
+                    <TextView android:layout_width="0dp" android:layout_height="wrap_content"
+                        android:layout_weight="1" android:text="购物车" android:textSize="16sp" android:textColor="#1F1F1F" />
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="›" android:textSize="22sp" android:textColor="#C7C7CC" />
+                </LinearLayout>
             </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
 
-            <View android:layout_width="match_parent" android:layout_height="0.5dp"
-                android:background="#E5E5EA" android:layout_marginStart="52dp"/>
-
-            <LinearLayout
-                android:id="@+id/tvMyOrders"
-                android:layout_width="match_parent"
-                android:layout_height="52dp"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:paddingHorizontal="20dp"
-                android:background="?android:attr/selectableItemBackground">
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:text="📦" android:textSize="18sp" android:layout_marginEnd="14dp"/>
-                <TextView android:layout_width="0dp" android:layout_height="wrap_content"
-                    android:layout_weight="1" android:text="我的订单"
-                    android:textSize="16sp" android:textColor="#1F1F1F"/>
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:text="›" android:textSize="22sp" android:textColor="#C7C7CC"/>
-            </LinearLayout>
-
-            <View android:layout_width="match_parent" android:layout_height="0.5dp"
-                android:background="#E5E5EA" android:layout_marginStart="52dp"/>
-
-            <LinearLayout
-                android:id="@+id/tvCart"
-                android:layout_width="match_parent"
-                android:layout_height="52dp"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:paddingHorizontal="20dp"
-                android:background="?android:attr/selectableItemBackground">
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:text="🛒" android:textSize="18sp" android:layout_marginEnd="14dp"/>
-                <TextView android:layout_width="0dp" android:layout_height="wrap_content"
-                    android:layout_weight="1" android:text="购物车"
-                    android:textSize="16sp" android:textColor="#1F1F1F"/>
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:text="›" android:textSize="22sp" android:textColor="#C7C7CC"/>
-            </LinearLayout>
-        </LinearLayout>
-
-        <!-- 功能分组2：设置 -->
-        <LinearLayout
+        <!-- ── Menu Card Group 2: Settings ── -->
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:background="@color/white"
-            android:layout_marginBottom="32dp">
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginBottom="16dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="2dp"
+            app:cardBackgroundColor="@color/white"
+            app:strokeWidth="0dp">
 
             <LinearLayout
-                android:id="@+id/tvSettings"
                 android:layout_width="match_parent"
-                android:layout_height="52dp"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:paddingHorizontal="20dp"
-                android:background="?android:attr/selectableItemBackground">
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:text="⚙️" android:textSize="18sp" android:layout_marginEnd="14dp"/>
-                <TextView android:layout_width="0dp" android:layout_height="wrap_content"
-                    android:layout_weight="1" android:text="设置"
-                    android:textSize="16sp" android:textColor="#1F1F1F"/>
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:text="›" android:textSize="22sp" android:textColor="#C7C7CC"/>
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:id="@+id/tvSettings"
+                    android:layout_width="match_parent"
+                    android:layout_height="54dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:paddingHorizontal="20dp"
+                    android:background="?android:attr/selectableItemBackground">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="⚙️" android:textSize="18sp" android:layout_marginEnd="14dp" />
+                    <TextView android:layout_width="0dp" android:layout_height="wrap_content"
+                        android:layout_weight="1" android:text="设置" android:textSize="16sp" android:textColor="#1F1F1F" />
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="›" android:textSize="22sp" android:textColor="#C7C7CC" />
+                </LinearLayout>
             </LinearLayout>
-        </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
 
     </LinearLayout>
 </ScrollView>

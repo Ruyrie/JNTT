@@ -1,45 +1,197 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:fitsSystemWindows="true"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:background="#FAFAFA"
+    android:fitsSystemWindows="true">
 
-    <EditText
-        android:id="@+id/etProductName"
+    <!-- Toolbar -->
+    <LinearLayout
         android:layout_width="match_parent"
-    android:fitsSystemWindows="true"
-        android:layout_height="wrap_content"
-        android:hint="商品名称"
-        android:inputType="text"
-        android:layout_marginBottom="16dp" />
+        android:layout_height="56dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:background="#FFFFFF"
+        android:elevation="4dp">
 
-    <EditText
-        android:id="@+id/etProductDesc"
+        <TextView
+            android:id="@+id/tvBack"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="✕"
+            android:textSize="20sp"
+            android:textColor="#333333"
+            android:padding="8dp" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="添加商品"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="#333333"
+            android:gravity="center" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnSubmitProduct"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:text="添加"
+            android:textSize="14sp"
+            android:textColor="#FFFFFF"
+            android:backgroundTint="#E53935"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"
+            app:cornerRadius="18dp"
+            app:strokeWidth="0dp" />
+    </LinearLayout>
+
+    <ScrollView
         android:layout_width="match_parent"
-    android:fitsSystemWindows="true"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:hint="商品介绍"
-        android:inputType="textMultiLine"
-        android:gravity="top"
-        android:layout_marginBottom="16dp" />
+        android:fillViewport="true">
 
-    <EditText
-        android:id="@+id/etProductPrice"
-        android:layout_width="match_parent"
-    android:fitsSystemWindows="true"
-        android:layout_height="wrap_content"
-        android:hint="价格（例：99.00）"
-        android:inputType="numberDecimal"
-        android:layout_marginBottom="16dp" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
-    <Button
-        android:id="@+id/btnSubmitProduct"
-        android:layout_width="match_parent"
-    android:fitsSystemWindows="true"
-        android:layout_height="wrap_content"
-        android:text="添加商品" />
+            <!-- Cover image picker area -->
+            <FrameLayout
+                android:id="@+id/flProductCoverPicker"
+                android:layout_width="match_parent"
+                android:layout_height="220dp"
+                android:background="#EDEDEF"
+                android:foreground="?attr/selectableItemBackground">
+
+                <ImageView
+                    android:id="@+id/ivProductCover"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerCrop"
+                    android:visibility="gone" />
+
+                <!-- Hint shown when no image is selected -->
+                <LinearLayout
+                    android:id="@+id/llProductCoverHint"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:orientation="vertical"
+                    android:gravity="center">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="📷"
+                        android:textSize="40sp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="添加商品图片"
+                        android:textSize="14sp"
+                        android:textColor="#AAAAAA"
+                        android:layout_marginTop="8dp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="建议正方形图，展示效果更佳"
+                        android:textSize="11sp"
+                        android:textColor="#CCCCCC"
+                        android:layout_marginTop="4dp" />
+                </LinearLayout>
+            </FrameLayout>
+
+            <!-- Product name -->
+            <EditText
+                android:id="@+id/etProductName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="商品名称"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="#222222"
+                android:textColorHint="#BBBBBB"
+                android:background="@null"
+                android:inputType="text"
+                android:maxLines="2"
+                android:padding="16dp" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#EEEEEE"
+                android:layout_marginHorizontal="16dp" />
+
+            <!-- Product description -->
+            <EditText
+                android:id="@+id/etProductDesc"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="180dp"
+                android:hint="商品介绍（产地、规格、特点…）"
+                android:textSize="16sp"
+                android:textColor="#333333"
+                android:textColorHint="#BBBBBB"
+                android:background="@null"
+                android:inputType="textMultiLine"
+                android:gravity="top"
+                android:padding="16dp" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#EEEEEE"
+                android:layout_marginHorizontal="16dp" />
+
+            <!-- Price row with ¥ prefix -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="4dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="¥"
+                    android:textSize="22sp"
+                    android:textStyle="bold"
+                    android:textColor="#F04142"
+                    android:layout_marginEnd="2dp" />
+
+                <EditText
+                    android:id="@+id/etProductPrice"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:hint="0.00"
+                    android:textSize="22sp"
+                    android:textStyle="bold"
+                    android:textColor="#F04142"
+                    android:textColorHint="#DDBBBB"
+                    android:background="@null"
+                    android:inputType="numberDecimal"
+                    android:padding="12dp" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#EEEEEE"
+                android:layout_marginHorizontal="16dp" />
+
+        </LinearLayout>
+    </ScrollView>
 
 </LinearLayout>

@@ -36,7 +36,7 @@
             android:textColor="#333333"
             android:gravity="center" />
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btnSubmitArticle"
             android:layout_width="wrap_content"
             android:layout_height="36dp"
@@ -45,7 +45,10 @@
             android:textColor="#FFFFFF"
             android:backgroundTint="#E53935"
             android:paddingStart="20dp"
-            android:paddingEnd="20dp" />
+            android:paddingEnd="20dp"
+            app:cornerRadius="18dp"
+            app:strokeWidth="0dp"
+            xmlns:app="http://schemas.android.com/apk/res-auto" />
     </LinearLayout>
 
     <ScrollView
@@ -59,12 +62,12 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <!-- 封面图区域 -->
+            <!-- 封面图区域（4:3 沉浸式封面） -->
             <FrameLayout
                 android:id="@+id/flCoverPicker"
                 android:layout_width="match_parent"
-                android:layout_height="200dp"
-                android:background="#EEEEEE"
+                android:layout_height="260dp"
+                android:background="#EDEDEF"
                 android:foreground="?attr/selectableItemBackground">
 
                 <ImageView
@@ -85,16 +88,24 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="＋"
-                        android:textSize="36sp"
-                        android:textColor="#AAAAAA" />
+                        android:text="📷"
+                        android:textSize="40sp" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="添加封面图"
                         android:textSize="14sp"
-                        android:textColor="#AAAAAA" />
+                        android:textColor="#AAAAAA"
+                        android:layout_marginTop="8dp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="建议 16:9 横图效果最佳"
+                        android:textSize="11sp"
+                        android:textColor="#CCCCCC"
+                        android:layout_marginTop="4dp" />
                 </LinearLayout>
             </FrameLayout>
 

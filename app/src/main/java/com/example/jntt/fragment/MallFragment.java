@@ -14,8 +14,8 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 import com.example.jntt.CartActivity;
 import com.example.jntt.ProductDetailActivity;
 import com.example.jntt.R;
@@ -48,7 +48,7 @@ public class MallFragment extends Fragment {
         displayed   = new ArrayList<>(allProducts);
 
         RecyclerView rv = view.findViewById(R.id.rvProducts);
-        rv.setLayoutManager(new LinearLayoutManager(getContext()));
+        rv.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
 
         adapter = new ProductAdapter(displayed, product -> {
             Intent intent = new Intent(getContext(), ProductDetailActivity.class);
