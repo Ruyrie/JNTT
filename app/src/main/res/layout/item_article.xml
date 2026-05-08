@@ -4,106 +4,194 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:background="@color/white"
-    android:layout_marginHorizontal="0dp"
-    android:layout_marginBottom="1dp">
+    android:foreground="?attr/selectableItemBackground">
 
-    <!-- 标题行 + 右侧图片 -->
+    <!-- ── Author row ── -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="52dp"
         android:orientation="horizontal"
-        android:paddingHorizontal="14dp"
-        android:paddingTop="14dp"
-        android:paddingBottom="6dp">
+        android:gravity="center_vertical"
+        android:paddingHorizontal="14dp">
+
+        <TextView
+            android:id="@+id/tvAuthorInitial"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:gravity="center"
+            android:textSize="14sp"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            android:background="@drawable/bg_auth_logo"
+            android:layout_marginEnd="10dp" />
 
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:orientation="vertical"
-            android:paddingEnd="10dp">
+            android:orientation="vertical">
 
             <TextView
-                android:id="@+id/tvArticleTitle"
-                android:layout_width="match_parent"
+                android:id="@+id/tvArticleAuthor"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="16sp"
+                android:textSize="14sp"
                 android:textStyle="bold"
                 android:textColor="#1F1F1F"
-                android:lineSpacingMultiplier="1.3"
-                android:maxLines="2"
-                android:ellipsize="end"
-                android:text="标题" />
+                android:text="作者" />
 
             <TextView
-                android:id="@+id/tvArticleContent"
-                android:layout_width="match_parent"
+                android:id="@+id/tvArticleTime"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="13sp"
-                android:textColor="#666666"
-                android:maxLines="2"
-                android:ellipsize="end"
-                android:lineSpacingMultiplier="1.4"
-                android:layout_marginTop="4dp"
-                android:text="内容预览" />
+                android:textSize="11sp"
+                android:textColor="#AAAAAA"
+                android:layout_marginTop="2dp"
+                android:text="时间" />
         </LinearLayout>
-
-        <!-- 缩略图（约 30% 宽度，固定高度） -->
-        <ImageView
-            android:id="@+id/ivArticleThumb"
-            android:layout_width="96dp"
-            android:layout_height="72dp"
-            android:scaleType="centerCrop"
-            android:background="#F0F0F0" />
     </LinearLayout>
 
-    <!-- 底部：作者 + 时间 + 阅读数 -->
-    <LinearLayout
+    <!-- ── Full-width cover image with gradient title overlay ── -->
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:paddingHorizontal="14dp"
-        android:paddingBottom="12dp">
+        android:layout_height="220dp">
 
-        <TextView
-            android:id="@+id/tvArticleAuthor"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="12sp"
-            android:textColor="#F04142"
-            android:text="作者" />
+        <ImageView
+            android:id="@+id/ivArticleThumb"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            android:background="#E8F5E9" />
 
         <View
-            android:layout_width="1dp"
-            android:layout_height="10dp"
-            android:background="#DDDDDD"
-            android:layout_marginHorizontal="8dp" />
+            android:layout_width="match_parent"
+            android:layout_height="130dp"
+            android:layout_gravity="bottom"
+            android:background="@drawable/gradient_article_overlay" />
 
         <TextView
-            android:id="@+id/tvArticleTime"
-            android:layout_width="0dp"
+            android:id="@+id/tvArticleTitle"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:textSize="12sp"
-            android:textColor="#AAAAAA"
-            android:text="时间" />
+            android:layout_gravity="bottom"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="@color/white"
+            android:lineSpacingMultiplier="1.3"
+            android:maxLines="2"
+            android:ellipsize="end"
+            android:paddingHorizontal="14dp"
+            android:paddingBottom="14dp"
+            android:text="标题" />
+    </FrameLayout>
 
-        <!-- 评论数占位标签 -->
+    <!-- ── Instagram-style action bar ── -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="44dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="14dp">
+
+        <!-- Like button: icon + count -->
+        <LinearLayout
+            android:id="@+id/layoutItemLike"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingEnd="6dp"
+            android:background="?attr/selectableItemBackgroundBorderless">
+
+            <ImageView
+                android:id="@+id/ivItemLikeIcon"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:src="@drawable/ic_like_outline" />
+
+            <TextView
+                android:id="@+id/tvItemLikeCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="13sp"
+                android:textColor="#333333"
+                android:layout_marginStart="5dp"
+                android:text="" />
+        </LinearLayout>
+
+        <!-- Comment count: icon + count -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginStart="20dp">
+
+            <ImageView
+                android:layout_width="21dp"
+                android:layout_height="21dp"
+                android:src="@drawable/ic_comment_outline" />
+
+            <TextView
+                android:id="@+id/tvItemCommentCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="13sp"
+                android:textColor="#333333"
+                android:layout_marginStart="5dp"
+                android:text="" />
+        </LinearLayout>
+
+        <!-- Flexible spacer -->
+        <View
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1" />
+
+        <!-- Read count (subtle, right-aligned) -->
         <TextView
             android:id="@+id/tvArticleReadCount"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="12sp"
-            android:textColor="#AAAAAA"
+            android:textSize="11sp"
+            android:textColor="#BBBBBB"
             android:text="阅读 0" />
     </LinearLayout>
 
-    <!-- 底部分隔线 -->
+    <!-- ── Top comment preview (Instagram style, hidden when no comments) ── -->
+    <LinearLayout
+        android:id="@+id/layoutTopComment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingHorizontal="14dp"
+        android:paddingBottom="12dp"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/tvTopCommentUsername"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            android:textColor="#1F1F1F"
+            android:layout_marginEnd="5dp" />
+
+        <TextView
+            android:id="@+id/tvTopCommentContent"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textSize="13sp"
+            android:textColor="#555555"
+            android:maxLines="1"
+            android:ellipsize="end" />
+    </LinearLayout>
+
+    <!-- ── Card separator ── -->
     <View
         android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="#F0F0F0"
-        android:layout_marginHorizontal="14dp" />
+        android:layout_height="8dp"
+        android:background="#F2F2F7" />
 
 </LinearLayout>

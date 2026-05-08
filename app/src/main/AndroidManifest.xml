@@ -28,8 +28,21 @@
         <!-- 主界面 -->
         <activity android:name=".MainActivity" />
 
-        <!-- 文章详情 -->
-        <activity android:name=".ArticleDetailActivity" />
+        <!-- 文章详情（adjustResize 让底部评论栏随键盘上移） -->
+        <activity
+            android:name=".ArticleDetailActivity"
+            android:windowSoftInputMode="adjustResize" />
+
+        <!-- 我的收藏 -->
+        <activity android:name=".MyFavoritesActivity" />
+
+        <!-- 粉丝 / 关注列表 -->
+        <activity android:name=".FollowListActivity" />
+
+        <!-- 搜索 -->
+        <activity
+            android:name=".SearchActivity"
+            android:windowSoftInputMode="adjustResize" />
 
         <!-- 商品详情 -->
         <activity android:name=".ProductDetailActivity" />

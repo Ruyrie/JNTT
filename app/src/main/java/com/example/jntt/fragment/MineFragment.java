@@ -12,7 +12,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import com.example.jntt.CartActivity;
+import com.example.jntt.FollowListActivity;
 import com.example.jntt.MyArticlesActivity;
+import com.example.jntt.MyFavoritesActivity;
 import com.example.jntt.MyOrdersActivity;
 import com.example.jntt.ProfileEditActivity;
 import com.example.jntt.R;
@@ -41,18 +43,19 @@ public class MineFragment extends Fragment {
     }
 
     private void bindViews(View view) {
-        DataManager dm = DataManager.getInstance(requireContext());
-        String username = dm.getLoggedUser();
+        DataManager dm       = DataManager.getInstance(requireContext());
+        String      username = dm.getLoggedUser();
 
+        // Username + nickname
         ((TextView) view.findViewById(R.id.tvMineUsername)).setText(username);
         String nick = dm.getNickname(username);
         ((TextView) view.findViewById(R.id.tvMineNickname)).setText(
                 nick.equals(username) ? "点击编辑资料" : nick);
 
-        // 头像
-        ImageView ivAvatar      = view.findViewById(R.id.ivMineAvatar);
-        TextView tvInitial       = view.findViewById(R.id.tvAvatarInitial);
-        String avatarUri         = dm.getAvatarUri(username);
+        // Avatar
+        ImageView ivAvatar = view.findViewById(R.id.ivMineAvatar);
+        TextView  tvInitial = view.findViewById(R.id.tvAvatarInitial);
+        String    avatarUri = dm.getAvatarUri(username);
         if (avatarUri != null) {
             try {
                 ivAvatar.setImageURI(Uri.parse(avatarUri));
@@ -63,28 +66,52 @@ public class MineFragment extends Fragment {
                 tvInitial.setVisibility(View.VISIBLE);
             }
         } else {
-            // 首字母
-            String initial = username.length() > 0
+            String initial = (!username.isEmpty())
                     ? String.valueOf(username.charAt(0)).toUpperCase() : "我";
             tvInitial.setText(initial);
             ivAvatar.setVisibility(View.GONE);
             tvInitial.setVisibility(View.VISIBLE);
         }
 
-        // 点击头像区 → 编辑资料
+        // Stats: 粉丝 / 关注 / 获赞
+        ((TextView) view.findViewById(R.id.tvStatFollowers))
+                .setText(String.valueOf(dm.getFollowersCount(username)));
+        ((TextView) view.findViewById(R.id.tvStatFollowing))
+                .setText(String.valueOf(dm.getFollowingCount(username)));
+        ((TextView) view.findViewById(R.id.tvStatLikes))
+                .setText(String.valueOf(dm.getTotalLikesReceived(username)));
+
+        // Stat row click handlers (separate from layoutProfile)
+        view.findViewById(R.id.statFollowers).setOnClickListener(v -> {
+            Intent i = new Intent(getContext(), FollowListActivity.class);
+            i.putExtra("type", "followers");
+            i.putExtra("username", username);
+            startActivity(i);
+        });
+        view.findViewById(R.id.statFollowing).setOnClickListener(v -> {
+            Intent i = new Intent(getContext(), FollowListActivity.class);
+            i.putExtra("type", "following");
+            i.putExtra("username", username);
+            startActivity(i);
+        });
+
+        // Click listeners
         view.findViewById(R.id.layoutProfile).setOnClickListener(v ->
                 startActivity(new Intent(getContext(), ProfileEditActivity.class)));
 
         view.findViewById(R.id.tvMyArticles).setOnClickListener(v ->
-            startActivity(new Intent(getContext(), MyArticlesActivity.class)));
+                startActivity(new Intent(getContext(), MyArticlesActivity.class)));
+
+        view.findViewById(R.id.tvMyFavorites).setOnClickListener(v ->
+                startActivity(new Intent(getContext(), MyFavoritesActivity.class)));
 
         view.findViewById(R.id.tvMyOrders).setOnClickListener(v ->
-            startActivity(new Intent(getContext(), MyOrdersActivity.class)));
+                startActivity(new Intent(getContext(), MyOrdersActivity.class)));
 
         view.findViewById(R.id.tvCart).setOnClickListener(v ->
-            startActivity(new Intent(getContext(), CartActivity.class)));
+                startActivity(new Intent(getContext(), CartActivity.class)));
 
         view.findViewById(R.id.tvSettings).setOnClickListener(v ->
-            startActivity(new Intent(getContext(), SettingsActivity.class)));
+                startActivity(new Intent(getContext(), SettingsActivity.class)));
     }
 }

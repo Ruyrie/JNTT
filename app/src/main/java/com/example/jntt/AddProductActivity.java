@@ -1,8 +1,8 @@
 package com.example.jntt;
 
 import android.os.Bundle;
-import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import com.example.jntt.data.DataManager;
@@ -14,12 +14,15 @@ public class AddProductActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_product);
-        setTitle("添加商品");
+        if (getSupportActionBar() != null) getSupportActionBar().hide();
 
+        TextView tvBack  = findViewById(R.id.tvBack);
         EditText etName  = findViewById(R.id.etProductName);
         EditText etDesc  = findViewById(R.id.etProductDesc);
         EditText etPrice = findViewById(R.id.etProductPrice);
-        Button btnSubmit = findViewById(R.id.btnSubmitProduct);
+        TextView btnSubmit = findViewById(R.id.btnSubmitProduct);
+
+        tvBack.setOnClickListener(v -> finish());
 
         DataManager dm = DataManager.getInstance(this);
 
