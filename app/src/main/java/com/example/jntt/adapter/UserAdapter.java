@@ -3,6 +3,7 @@ package com.example.jntt.adapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -14,6 +15,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.VH> {
 
     public interface OnItemListener {
         void onShortClick(User user);
+
         void onLongClick(User user);
     }
 
@@ -39,21 +41,49 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.VH> {
         holder.tvUsername.setText(u.username);
         // 首字母头像
         String initial = u.username.length() > 0
-                ? String.valueOf(u.username.charAt(0)).toUpperCase() : "?";
+                ? String.valueOf(u.username.charAt(0)).toUpperCase()
+                : "?";
         holder.tvInitial.setText(initial);
+
+        if (u.avatarUri != null) {
+            try {
+                if (u.avatarUri.startsWith("data:image")) {
+                    com.example.jntt.utils.ImageUtils.setAvatarFromBase64(holder.ivAvatar, u.avatarUri);
+                } else {
+                    holder.ivAvatar.setImageURI(android.net.Uri.parse(u.avatarUri));
+                }
+                holder.ivAvatar.setVisibility(View.VISIBLE);
+                holder.tvInitial.setVisibility(View.GONE);
+            } catch (Exception e) {
+                holder.ivAvatar.setVisibility(View.GONE);
+                holder.tvInitial.setVisibility(View.VISIBLE);
+            }
+        } else {
+            holder.ivAvatar.setVisibility(View.GONE);
+            holder.tvInitial.setVisibility(View.VISIBLE);
+        }
+
         holder.itemView.setOnClickListener(v -> listener.onShortClick(u));
-        holder.itemView.setOnLongClickListener(v -> { listener.onLongClick(u); return true; });
+        holder.itemView.setOnLongClickListener(v -> {
+            listener.onLongClick(u);
+            return true;
+        });
     }
 
     @Override
-    public int getItemCount() { return data.size(); }
+    public int getItemCount() {
+        return data.size();
+    }
 
     static class VH extends RecyclerView.ViewHolder {
         TextView tvUsername, tvInitial;
+        ImageView ivAvatar;
+
         VH(View v) {
             super(v);
             tvUsername = v.findViewById(R.id.tvUsername);
-            tvInitial  = v.findViewById(R.id.tvUserInitial);
+            tvInitial = v.findViewById(R.id.tvUserInitial);
+            ivAvatar = v.findViewById(R.id.ivUserAvatar);
         }
     }
 }

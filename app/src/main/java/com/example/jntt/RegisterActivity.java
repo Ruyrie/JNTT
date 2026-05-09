@@ -11,7 +11,7 @@ import com.example.jntt.data.DataManager;
 /** 注册界面（复用为添加账号界面） */
 public class RegisterActivity extends AppCompatActivity {
 
-    private EditText etUsername, etPassword;
+    private EditText etUsername, etPassword, etPhone;
     private DataManager dm;
 
     // 是否从账号管理进入（添加账号模式）
@@ -27,6 +27,7 @@ public class RegisterActivity extends AppCompatActivity {
 
         etUsername = findViewById(R.id.etRegUsername);
         etPassword = findViewById(R.id.etRegPassword);
+        etPhone = findViewById(R.id.etRegPhone);
         Button btnRegister = findViewById(R.id.btnRegister);
 
         setTitle(isAddMode ? "添加账号" : "注册");
@@ -37,6 +38,7 @@ public class RegisterActivity extends AppCompatActivity {
     private void doRegister() {
         String username = etUsername.getText().toString().trim();
         String password = etPassword.getText().toString().trim();
+        String phone = etPhone.getText().toString().trim();
 
         if (username.isEmpty() || password.isEmpty()) {
             Toast.makeText(this, "用户名和密码不能为空", Toast.LENGTH_SHORT).show();
@@ -46,9 +48,15 @@ public class RegisterActivity extends AppCompatActivity {
             Toast.makeText(this, "密码至少6位", Toast.LENGTH_SHORT).show();
             return;
         }
-        boolean ok = dm.register(username, password);
+
+        if (!phone.isEmpty() && dm.isPhoneBound(phone)) {
+            Toast.makeText(this, "该手机号已被注册或绑定，请更换手机号", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        boolean ok = dm.register(username, password, phone);
         if (!ok) {
-            Toast.makeText(this, "该用户名已存在", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "该用户名已被使用，请更换用户名", Toast.LENGTH_SHORT).show();
             return;
         }
 

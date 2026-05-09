@@ -39,19 +39,36 @@ public class MyOrdersActivity extends AppCompatActivity {
         });
 
         adapter.setOnActionListener(new OrderAdapter.OnActionListener() {
-            @Override public void onPay(Order order) {
+            @Override
+            public void onPay(Order order) {
                 dm.updateOrderStatus(username, order.orderId, Order.STATUS_PAID);
                 refresh();
                 android.widget.Toast.makeText(MyOrdersActivity.this, "支付成功！", android.widget.Toast.LENGTH_SHORT).show();
             }
-            @Override public void onCancel(Order order) {
-                new AlertDialog.Builder(MyOrdersActivity.this)
-                    .setTitle("取消订单").setMessage("确定取消此订单吗？")
-                    .setPositiveButton("确定", (d, w) -> {
-                        dm.updateOrderStatus(username, order.orderId, Order.STATUS_CANCELLED);
-                        refresh();
-                    })
-                    .setNegativeButton("取消", null).show();
+
+            @Override
+            public void onCancel(Order order) {
+                android.view.View view = getLayoutInflater().inflate(R.layout.dialog_confirm, null);
+                android.widget.TextView tvTitle = view.findViewById(R.id.tvDialogTitle);
+                android.widget.TextView tvMessage = view.findViewById(R.id.tvDialogMessage);
+                tvTitle.setText("取消订单");
+                tvMessage.setText("确定取消此订单吗？");
+
+                AlertDialog dialog = new AlertDialog.Builder(MyOrdersActivity.this)
+                        .setView(view)
+                        .create();
+
+                if (dialog.getWindow() != null) {
+                    dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+                }
+
+                view.findViewById(R.id.btnDialogCancel).setOnClickListener(v -> dialog.dismiss());
+                view.findViewById(R.id.btnDialogConfirm).setOnClickListener(v -> {
+                    dialog.dismiss();
+                    dm.updateOrderStatus(username, order.orderId, Order.STATUS_CANCELLED);
+                    refresh();
+                });
+                dialog.show();
             }
         });
 
@@ -59,7 +76,10 @@ public class MyOrdersActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onResume() { super.onResume(); refresh(); }
+    protected void onResume() {
+        super.onResume();
+        refresh();
+    }
 
     private void refresh() {
         orders.clear();

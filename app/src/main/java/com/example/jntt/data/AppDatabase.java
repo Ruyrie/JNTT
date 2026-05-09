@@ -10,107 +10,118 @@ import android.database.sqlite.SQLiteOpenHelper;
  */
 public class AppDatabase extends SQLiteOpenHelper {
 
-    private static final String DB_NAME    = "jntt.db";
-    private static final int    DB_VERSION = 1;
+        private static final String DB_NAME = "jntt.db";
+        private static final int DB_VERSION = 3;
 
-    private static AppDatabase instance;
+        private static AppDatabase instance;
 
-    public static AppDatabase getInstance(Context ctx) {
-        if (instance == null) instance = new AppDatabase(ctx.getApplicationContext());
-        return instance;
-    }
+        public static AppDatabase getInstance(Context ctx) {
+                if (instance == null)
+                        instance = new AppDatabase(ctx.getApplicationContext());
+                return instance;
+        }
 
-    private AppDatabase(Context ctx) {
-        super(ctx, DB_NAME, null, DB_VERSION);
-    }
+        private AppDatabase(Context ctx) {
+                super(ctx, DB_NAME, null, DB_VERSION);
+        }
 
-    @Override
-    public void onCreate(SQLiteDatabase db) {
-        // 用户表（含昵称和头像）
-        db.execSQL("CREATE TABLE users (" +
-                "id INTEGER PRIMARY KEY AUTOINCREMENT," +
-                "username TEXT UNIQUE NOT NULL," +
-                "password TEXT NOT NULL," +
-                "nickname TEXT," +
-                "avatar_uri TEXT)");
+        @Override
+        public void onCreate(SQLiteDatabase db) {
+                // 用户表（含昵称和头像）
+                db.execSQL("CREATE TABLE users (" +
+                                "id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                                "username TEXT UNIQUE NOT NULL," +
+                                "password TEXT NOT NULL," +
+                                "nickname TEXT," +
+                                "avatar_uri TEXT," +
+                                "signature TEXT," +
+                                "phone TEXT UNIQUE)");
 
-        // 文章表
-        db.execSQL("CREATE TABLE articles (" +
-                "id INTEGER PRIMARY KEY," +
-                "title TEXT NOT NULL," +
-                "content TEXT NOT NULL," +
-                "author TEXT NOT NULL," +
-                "time TEXT NOT NULL," +
-                "read_count INTEGER DEFAULT 0," +
-                "cover_uri TEXT)");
+                // 文章表
+                db.execSQL("CREATE TABLE articles (" +
+                                "id INTEGER PRIMARY KEY," +
+                                "title TEXT NOT NULL," +
+                                "content TEXT NOT NULL," +
+                                "author TEXT NOT NULL," +
+                                "time TEXT NOT NULL," +
+                                "read_count INTEGER DEFAULT 0," +
+                                "cover_uri TEXT)");
 
-        // 商品表
-        db.execSQL("CREATE TABLE products (" +
-                "id INTEGER PRIMARY KEY," +
-                "name TEXT NOT NULL," +
-                "desc TEXT NOT NULL," +
-                "price REAL NOT NULL)");
+                // 商品表
+                db.execSQL("CREATE TABLE products (" +
+                                "id INTEGER PRIMARY KEY," +
+                                "name TEXT NOT NULL," +
+                                "desc TEXT NOT NULL," +
+                                "cover_uri TEXT," +
+                                "price REAL NOT NULL)");
 
-        // 购物车（每用户独立）
-        db.execSQL("CREATE TABLE cart (" +
-                "id INTEGER PRIMARY KEY AUTOINCREMENT," +
-                "username TEXT NOT NULL," +
-                "product_id INTEGER NOT NULL," +
-                "name TEXT NOT NULL," +
-                "price REAL NOT NULL," +
-                "quantity INTEGER NOT NULL DEFAULT 1," +
-                "UNIQUE(username, product_id))");
+                // 购物车（每用户独立）
+                db.execSQL("CREATE TABLE cart (" +
+                                "id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                                "username TEXT NOT NULL," +
+                                "product_id INTEGER NOT NULL," +
+                                "name TEXT NOT NULL," +
+                                "price REAL NOT NULL," +
+                                "quantity INTEGER NOT NULL DEFAULT 1," +
+                                "UNIQUE(username, product_id))");
 
-        // 订单表
-        db.execSQL("CREATE TABLE orders (" +
-                "id INTEGER PRIMARY KEY AUTOINCREMENT," +
-                "order_id TEXT UNIQUE NOT NULL," +
-                "username TEXT NOT NULL," +
-                "product_id INTEGER NOT NULL," +
-                "name TEXT NOT NULL," +
-                "price REAL NOT NULL," +
-                "quantity INTEGER NOT NULL," +
-                "time TEXT NOT NULL," +
-                "status TEXT NOT NULL)");
+                // 订单表
+                db.execSQL("CREATE TABLE orders (" +
+                                "id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                                "order_id TEXT UNIQUE NOT NULL," +
+                                "username TEXT NOT NULL," +
+                                "product_id INTEGER NOT NULL," +
+                                "name TEXT NOT NULL," +
+                                "price REAL NOT NULL," +
+                                "quantity INTEGER NOT NULL," +
+                                "time TEXT NOT NULL," +
+                                "status TEXT NOT NULL)");
 
-        // 文章点赞表（UNIQUE 防止重复）
-        db.execSQL("CREATE TABLE article_likes (" +
-                "id INTEGER PRIMARY KEY AUTOINCREMENT," +
-                "username TEXT NOT NULL," +
-                "article_id INTEGER NOT NULL," +
-                "UNIQUE(username, article_id))");
+                // 文章点赞表（UNIQUE 防止重复）
+                db.execSQL("CREATE TABLE article_likes (" +
+                                "id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                                "username TEXT NOT NULL," +
+                                "article_id INTEGER NOT NULL," +
+                                "UNIQUE(username, article_id))");
 
-        // 评论表
-        db.execSQL("CREATE TABLE comments (" +
-                "id INTEGER PRIMARY KEY AUTOINCREMENT," +
-                "article_id INTEGER NOT NULL," +
-                "username TEXT NOT NULL," +
-                "content TEXT NOT NULL," +
-                "time TEXT NOT NULL)");
+                // 评论表
+                db.execSQL("CREATE TABLE comments (" +
+                                "id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                                "article_id INTEGER NOT NULL," +
+                                "username TEXT NOT NULL," +
+                                "content TEXT NOT NULL," +
+                                "time TEXT NOT NULL)");
 
-        // 评论点赞表
-        db.execSQL("CREATE TABLE comment_likes (" +
-                "id INTEGER PRIMARY KEY AUTOINCREMENT," +
-                "username TEXT NOT NULL," +
-                "comment_id INTEGER NOT NULL," +
-                "UNIQUE(username, comment_id))");
+                // 评论点赞表
+                db.execSQL("CREATE TABLE comment_likes (" +
+                                "id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                                "username TEXT NOT NULL," +
+                                "comment_id INTEGER NOT NULL," +
+                                "UNIQUE(username, comment_id))");
 
-        // 关注关系表
-        db.execSQL("CREATE TABLE follows (" +
-                "id INTEGER PRIMARY KEY AUTOINCREMENT," +
-                "follower TEXT NOT NULL," +
-                "following TEXT NOT NULL," +
-                "UNIQUE(follower, following))");
+                // 关注关系表
+                db.execSQL("CREATE TABLE follows (" +
+                                "id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                                "follower TEXT NOT NULL," +
+                                "following TEXT NOT NULL," +
+                                "UNIQUE(follower, following))");
 
-        // 创建常用查询索引
-        db.execSQL("CREATE INDEX idx_articles_author ON articles(author)");
-        db.execSQL("CREATE INDEX idx_comments_article ON comments(article_id)");
-        db.execSQL("CREATE INDEX idx_article_likes_article ON article_likes(article_id)");
-        db.execSQL("CREATE INDEX idx_follows_following ON follows(following)");
-    }
+                // 创建常用查询索引
+                db.execSQL("CREATE INDEX idx_articles_author ON articles(author)");
+                db.execSQL("CREATE INDEX idx_comments_article ON comments(article_id)");
+                db.execSQL("CREATE INDEX idx_article_likes_article ON article_likes(article_id)");
+                db.execSQL("CREATE INDEX idx_follows_following ON follows(following)");
+        }
 
-    @Override
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        // 未来升级时在此处理迁移逻辑
-    }
+        @Override
+        public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+                if (oldVersion < 2) {
+                        db.execSQL("ALTER TABLE users ADD COLUMN signature TEXT");
+                        db.execSQL("ALTER TABLE users ADD COLUMN phone TEXT");
+                        db.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS idx_users_phone ON users(phone)");
+                }
+                if (oldVersion < 3) {
+                        db.execSQL("ALTER TABLE products ADD COLUMN cover_uri TEXT");
+                }
+        }
 }

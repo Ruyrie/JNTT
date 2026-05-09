@@ -24,19 +24,49 @@ public class ProductDetailActivity extends AppCompatActivity {
         // 查找商品
         Product target = null;
         for (Product p : dm.getProducts()) {
-            if (p.id == productId) { target = p; break; }
+            if (p.id == productId) {
+                target = p;
+                break;
+            }
         }
-        if (target == null) { finish(); return; }
+        if (target == null) {
+            finish();
+            return;
+        }
 
         final Product product = target;
         String username = dm.getLoggedUser();
 
-        ((ImageView) findViewById(R.id.ivDetailProductImage))
-            .setImageResource(R.drawable.ic_product_placeholder);
+        ImageView ivProduct = findViewById(R.id.ivDetailProductImage);
+        switch (product.id) {
+            case 1:
+                ivProduct.setImageResource(R.mipmap.dami);
+                break;
+            case 2:
+                ivProduct.setImageResource(R.mipmap.muer);
+                break;
+            case 3:
+                ivProduct.setImageResource(R.mipmap.fengmi);
+                break;
+            case 4:
+                ivProduct.setImageResource(R.mipmap.shucai);
+                break;
+            default:
+                if (product.coverUri != null) {
+                    try {
+                        ivProduct.setImageURI(android.net.Uri.parse(product.coverUri));
+                    } catch (Exception e) {
+                        ivProduct.setImageResource(R.drawable.ic_product_placeholder);
+                    }
+                } else {
+                    ivProduct.setImageResource(R.drawable.ic_product_placeholder);
+                }
+        }
+
         ((TextView) findViewById(R.id.tvDetailProductName)).setText(product.name);
         ((TextView) findViewById(R.id.tvDetailProductDesc)).setText(product.desc);
         ((TextView) findViewById(R.id.tvDetailProductPrice))
-            .setText(String.format("¥%.2f", product.price));
+                .setText(String.format("¥%.2f", product.price));
 
         // 加入购物车
         ((Button) findViewById(R.id.btnAddCart)).setOnClickListener(v -> {
@@ -51,7 +81,6 @@ public class ProductDetailActivity extends AppCompatActivity {
         });
 
         // 购物车图标
-        findViewById(R.id.ivCartIcon).setOnClickListener(v ->
-            startActivity(new Intent(this, CartActivity.class)));
+        findViewById(R.id.ivCartIcon).setOnClickListener(v -> startActivity(new Intent(this, CartActivity.class)));
     }
 }

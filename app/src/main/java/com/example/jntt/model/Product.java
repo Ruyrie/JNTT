@@ -6,11 +6,20 @@ public class Product {
     public String name;
     public String desc;
     public double price;
+    public String coverUri;
 
     public Product(int id, String name, String desc, double price) {
         this.id = id;
         this.name = name;
         this.desc = desc;
         this.price = price;
+    }
+
+    public Product(int id, String name, String desc, double price, String coverUri) {
+        this.id = id;
+        this.name = name;
+        this.desc = desc;
+        this.price = price;
+        this.coverUri = coverUri;
     }
 }
