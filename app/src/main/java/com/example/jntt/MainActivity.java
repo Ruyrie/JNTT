@@ -46,17 +46,17 @@ public class MainActivity extends AppCompatActivity {
 
         glassPill = findViewById(R.id.glassPill);
         tabBar = findViewById(R.id.glassTabBar);
-        tabs = new LinearLayout[]{
+        tabs = new LinearLayout[] {
                 findViewById(R.id.tabHeadline),
                 findViewById(R.id.tabMall),
                 findViewById(R.id.tabMine)
         };
-        icons = new ImageView[]{
+        icons = new ImageView[] {
                 findViewById(R.id.iconHeadline),
                 findViewById(R.id.iconMall),
                 findViewById(R.id.iconMine)
         };
-        labels = new TextView[]{
+        labels = new TextView[] {
                 findViewById(R.id.labelHeadline),
                 findViewById(R.id.labelMall),
                 findViewById(R.id.labelMine)
@@ -74,11 +74,14 @@ public class MainActivity extends AppCompatActivity {
                     public void onGlobalLayout() {
                         tabBar.getViewTreeObserver().removeOnGlobalLayoutListener(this);
                         int tabWidth = tabs[0].getWidth();
-                        FrameLayout.LayoutParams lp =
-                                (FrameLayout.LayoutParams) glassPill.getLayoutParams();
-                        lp.width = tabWidth - 12;
+                        float density = getResources().getDisplayMetrics().density;
+                        int dp12 = (int) (12 * density);
+                        float dp6 = 6 * density;
+
+                        FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) glassPill.getLayoutParams();
+                        lp.width = tabWidth - dp12;
                         glassPill.setLayoutParams(lp);
-                        glassPill.setTranslationX(tabs[currentIndex].getLeft() + 6f);
+                        glassPill.setTranslationX(tabs[currentIndex].getLeft() + dp6);
                     }
                 });
 
@@ -88,10 +91,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void selectTab(int idx, boolean animate) {
-        if (idx == currentIndex) return;
+        if (idx == currentIndex)
+            return;
+
+        float density = getResources().getDisplayMetrics().density;
+        float dp6 = 6 * density;
 
         // 滑动液态药丸
-        float targetX = tabs[idx].getLeft() + 6f;
+        float targetX = tabs[idx].getLeft() + dp6;
         if (animate) {
             ValueAnimator anim = ValueAnimator.ofFloat(glassPill.getTranslationX(), targetX);
             anim.setDuration(420);
@@ -107,16 +114,18 @@ public class MainActivity extends AppCompatActivity {
             labels[idx].setTextColor(ACTIVE_COLOR);
             labels[idx].setTypeface(null, android.graphics.Typeface.BOLD);
 
-
         } else {
             glassPill.setTranslationX(targetX);
         }
 
         currentIndex = idx;
         Fragment f;
-        if (idx == 0) f = new HeadlineFragment();
-        else if (idx == 1) f = new MallFragment();
-        else f = new MineFragment();
+        if (idx == 0)
+            f = new HeadlineFragment();
+        else if (idx == 1)
+            f = new MallFragment();
+        else
+            f = new MineFragment();
         switchFragment(f, false);
     }
 

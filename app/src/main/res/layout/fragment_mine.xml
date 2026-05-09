@@ -26,48 +26,63 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:gravity="center_horizontal"
                 android:paddingHorizontal="24dp"
                 android:paddingTop="32dp"
                 android:paddingBottom="16dp"
                 android:foreground="?attr/selectableItemBackground">
 
-                <FrameLayout
-                    android:layout_width="80dp"
-                    android:layout_height="80dp">
-
-                    <ImageView
-                        android:id="@+id/ivMineAvatar"
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+                    
+                    <FrameLayout
                         android:layout_width="80dp"
-                        android:layout_height="80dp"
-                        android:scaleType="centerCrop"
-                        android:background="@drawable/bg_auth_logo"
-                        android:visibility="gone" />
+                        android:layout_height="80dp">
+
+                        <ImageView
+                            android:id="@+id/ivMineAvatar"
+                            android:layout_width="80dp"
+                            android:layout_height="80dp"
+                            android:scaleType="centerCrop"
+                            android:background="@drawable/bg_auth_logo"
+                            android:visibility="gone" />
+
+                        <TextView
+                            android:id="@+id/tvAvatarInitial"
+                            android:layout_width="80dp"
+                            android:layout_height="80dp"
+                            android:background="@drawable/bg_auth_logo"
+                            android:gravity="center"
+                            android:textSize="30sp"
+                            android:textColor="@color/white"
+                            android:textStyle="bold"
+                            android:text="我" />
+                    </FrameLayout>
 
                     <TextView
-                        android:id="@+id/tvAvatarInitial"
-                        android:layout_width="80dp"
-                        android:layout_height="80dp"
-                        android:background="@drawable/bg_auth_logo"
-                        android:gravity="center"
-                        android:textSize="30sp"
-                        android:textColor="@color/white"
+                        android:id="@+id/tvMineNickname"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:textSize="20sp"
                         android:textStyle="bold"
-                        android:text="我" />
-                </FrameLayout>
+                        android:textColor="#1F1F1F"
+                        android:text="昵称" />
+                </LinearLayout>
 
                 <TextView
                     android:id="@+id/tvMineUsername"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="20sp"
-                    android:textStyle="bold"
-                    android:textColor="#1F1F1F"
+                    android:textSize="14sp"
+                    android:textColor="#8A8A8A"
                     android:layout_marginTop="14dp"
-                    android:text="用户名" />
+                    android:text="用户名： " />
 
                 <TextView
-                    android:id="@+id/tvMineNickname"
+                    android:id="@+id/tvMineSignature"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="13sp"
@@ -158,13 +173,15 @@
                     android:layout_gravity="center_vertical"
                     android:background="#E5E5EA" />
 
-                <!-- 获赞 → not navigable, shows total likes received -->
+                <!-- 获赞 → FollowListActivity (likes) -->
                 <LinearLayout
+                    android:id="@+id/statLikes"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:orientation="vertical"
-                    android:gravity="center">
+                    android:gravity="center"
+                    android:foreground="?attr/selectableItemBackgroundBorderless">
 
                     <TextView
                         android:id="@+id/tvStatLikes"

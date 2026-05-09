@@ -71,7 +71,7 @@
             android:layout_width="match_parent"
             android:layout_height="52dp"
             android:background="@drawable/bg_auth_input"
-            android:hint="请输入用户名"
+            android:hint="请输入用户名/手机号"
             android:textColorHint="#B5B5B5"
             android:textColor="#1F1F1F"
             android:textSize="15sp"

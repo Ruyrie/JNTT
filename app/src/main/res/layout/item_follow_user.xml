@@ -8,16 +8,29 @@
     android:background="?android:attr/selectableItemBackground">
 
     <!-- Avatar circle -->
-    <TextView
-        android:id="@+id/tvFollowUserAvatar"
+    <FrameLayout
         android:layout_width="44dp"
         android:layout_height="44dp"
-        android:gravity="center"
-        android:textSize="16sp"
-        android:textColor="@color/white"
-        android:textStyle="bold"
-        android:background="@drawable/bg_auth_logo"
-        android:layout_marginEnd="14dp" />
+        android:layout_marginEnd="14dp">
+
+        <ImageView
+            android:id="@+id/ivFollowUserAvatar"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            android:background="@drawable/bg_auth_logo"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/tvFollowUserAvatar"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:textSize="16sp"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            android:background="@drawable/bg_auth_logo" />
+    </FrameLayout>
 
     <!-- Username -->
     <TextView

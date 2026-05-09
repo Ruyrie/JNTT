@@ -51,7 +51,6 @@
                 android:layout_width="0dp"
                 android:layout_height="56dp"
                 android:layout_gravity="start|center_vertical"
-                android:layout_marginStart="6dp"
                 app:cornerRadius="26dp">
 
                 <com.example.jntt.view.BlurBehindView

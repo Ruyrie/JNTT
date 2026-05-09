@@ -9,6 +9,9 @@ public class Article {
     public String time;
     public int readCount;
     public String coverUri; // 封面图本地 URI，null 表示使用默认图
+    public boolean isDeleted; // 是否已被删除（占位符）
+    public String authorNickname; // 连表查询时附带的作者昵称
+    public String authorAvatarUri; // 连表查询时附带的作者头像
 
     public Article(int id, String title, String content, String author, String time) {
         this.id = id;

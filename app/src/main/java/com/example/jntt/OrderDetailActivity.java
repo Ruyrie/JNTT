@@ -28,34 +28,49 @@ public class OrderDetailActivity extends AppCompatActivity {
         String orderId = getIntent().getStringExtra("order_id");
 
         for (Order o : dm.getOrders(username)) {
-            if (o.orderId.equals(orderId)) { order = o; break; }
+            if (o.orderId.equals(orderId)) {
+                order = o;
+                break;
+            }
         }
-        if (order == null) { finish(); return; }
+        if (order == null) {
+            finish();
+            return;
+        }
 
         bind();
     }
 
     private void bind() {
-        TextView tvStatus    = findViewById(R.id.tvDetailStatus);
+        TextView tvStatus = findViewById(R.id.tvDetailStatus);
         TextView tvCountdown = findViewById(R.id.tvDetailCountdown);
-        ImageView ivProduct  = findViewById(R.id.ivDetailProduct);
-        TextView tvName      = findViewById(R.id.tvDetailName);
-        TextView tvPrice     = findViewById(R.id.tvDetailPrice);
-        TextView tvQty       = findViewById(R.id.tvDetailQty);
-        TextView tvOrderId   = findViewById(R.id.tvDetailOrderId);
-        TextView tvTime      = findViewById(R.id.tvDetailTime);
-        TextView tvTotal     = findViewById(R.id.tvDetailTotal);
+        ImageView ivProduct = findViewById(R.id.ivDetailProduct);
+        TextView tvName = findViewById(R.id.tvDetailName);
+        TextView tvPrice = findViewById(R.id.tvDetailPrice);
+        TextView tvQty = findViewById(R.id.tvDetailQty);
+        TextView tvOrderId = findViewById(R.id.tvDetailOrderId);
+        TextView tvTime = findViewById(R.id.tvDetailTime);
+        TextView tvTotal = findViewById(R.id.tvDetailTotal);
         LinearLayout layoutActions = findViewById(R.id.layoutDetailActions);
-        Button btnPay    = findViewById(R.id.btnDetailPay);
+        Button btnPay = findViewById(R.id.btnDetailPay);
         Button btnCancel = findViewById(R.id.btnDetailCancel);
 
         tvName.setText(order.name);
         switch (order.productId) {
-            case 1: ivProduct.setImageResource(R.mipmap.dami);   break;
-            case 2: ivProduct.setImageResource(R.mipmap.muer);   break;
-            case 3: ivProduct.setImageResource(R.mipmap.fengmi); break;
-            case 4: ivProduct.setImageResource(R.mipmap.shucai); break;
-            default: ivProduct.setImageResource(R.drawable.ic_product_placeholder);
+            case 1:
+                ivProduct.setImageResource(R.mipmap.dami);
+                break;
+            case 2:
+                ivProduct.setImageResource(R.mipmap.muer);
+                break;
+            case 3:
+                ivProduct.setImageResource(R.mipmap.fengmi);
+                break;
+            case 4:
+                ivProduct.setImageResource(R.mipmap.shucai);
+                break;
+            default:
+                ivProduct.setImageResource(R.drawable.ic_product_placeholder);
         }
         tvPrice.setText(String.format("¥%.2f", order.price));
         tvQty.setText("x" + order.quantity);
@@ -95,16 +110,29 @@ public class OrderDetailActivity extends AppCompatActivity {
             finish();
         });
 
-        btnCancel.setOnClickListener(v ->
-            new AlertDialog.Builder(this)
-                .setTitle("取消订单")
-                .setMessage("确定取消此订单吗？")
-                .setPositiveButton("确定", (d, w) -> {
-                    dm.updateOrderStatus(username, order.orderId, Order.STATUS_CANCELLED);
-                    Toast.makeText(this, "订单已取消", Toast.LENGTH_SHORT).show();
-                    finish();
-                })
-                .setNegativeButton("取消", null).show()
-        );
+        btnCancel.setOnClickListener(v -> {
+            android.view.View view = getLayoutInflater().inflate(R.layout.dialog_confirm, null);
+            android.widget.TextView tvTitle = view.findViewById(R.id.tvDialogTitle);
+            android.widget.TextView tvMessage = view.findViewById(R.id.tvDialogMessage);
+            tvTitle.setText("取消订单");
+            tvMessage.setText("确定取消此订单吗？");
+
+            AlertDialog dialog = new AlertDialog.Builder(this)
+                    .setView(view)
+                    .create();
+
+            if (dialog.getWindow() != null) {
+                dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+            }
+
+            view.findViewById(R.id.btnDialogCancel).setOnClickListener(v1 -> dialog.dismiss());
+            view.findViewById(R.id.btnDialogConfirm).setOnClickListener(v1 -> {
+                dialog.dismiss();
+                dm.updateOrderStatus(username, order.orderId, Order.STATUS_CANCELLED);
+                Toast.makeText(this, "订单已取消", Toast.LENGTH_SHORT).show();
+                finish();
+            });
+            dialog.show();
+        });
     }
 }

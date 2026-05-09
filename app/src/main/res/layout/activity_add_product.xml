@@ -37,18 +37,17 @@
             android:textColor="#333333"
             android:gravity="center" />
 
-        <com.google.android.material.button.MaterialButton
+        <TextView
             android:id="@+id/btnSubmitProduct"
             android:layout_width="wrap_content"
             android:layout_height="36dp"
             android:text="添加"
             android:textSize="14sp"
             android:textColor="#FFFFFF"
+            android:background="@drawable/bg_auth_button"
             android:backgroundTint="#E53935"
-            android:paddingStart="20dp"
-            android:paddingEnd="20dp"
-            app:cornerRadius="18dp"
-            app:strokeWidth="0dp" />
+            android:gravity="center"
+            android:paddingHorizontal="20dp" />
     </LinearLayout>
 
     <ScrollView

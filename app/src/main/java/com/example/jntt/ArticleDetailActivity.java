@@ -23,34 +23,41 @@ import java.util.List;
 
 public class ArticleDetailActivity extends AppCompatActivity {
 
-    private int            articleId;
-    private Article        article;
-    private DataManager    dm;
-    private String         currentUser;
-    private List<Comment>  comments;
+    private int articleId;
+    private Article article;
+    private DataManager dm;
+    private String currentUser;
+    private List<Comment> comments;
     private CommentAdapter commentAdapter;
 
     // Views
-    private TextView       tvLikeBtn, tvLikeCount, tvCommentCount, tvCommentCountBar;
-    private LinearLayout   llNoComments;
+    private TextView tvLikeBtn, tvLikeCount, tvCommentCount, tvCommentCountBar;
+    private LinearLayout llNoComments;
     private NestedScrollView nestedScroll;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_article_detail);
-        if (getSupportActionBar() != null) getSupportActionBar().hide();
+        if (getSupportActionBar() != null)
+            getSupportActionBar().hide();
 
-        dm          = DataManager.getInstance(this);
+        dm = DataManager.getInstance(this);
         currentUser = dm.getLoggedUser();
-        articleId   = getIntent().getIntExtra("article_id", -1);
+        articleId = getIntent().getIntExtra("article_id", -1);
 
         dm.incrementReadCount(articleId);
 
         for (Article a : dm.getArticles()) {
-            if (a.id == articleId) { article = a; break; }
+            if (a.id == articleId) {
+                article = a;
+                break;
+            }
         }
-        if (article == null) { finish(); return; }
+        if (article == null) {
+            finish();
+            return;
+        }
 
         bindViews();
         setupComments();
@@ -66,13 +73,47 @@ public class ArticleDetailActivity extends AppCompatActivity {
         ((TextView) findViewById(R.id.tvToolbarTitle)).setText(article.title);
         findViewById(R.id.tvBack).setOnClickListener(v -> finish());
 
+        TextView tvDelete = findViewById(R.id.tvDeleteBtn);
+        if (currentUser != null && article.author.equals(currentUser)) {
+            tvDelete.setVisibility(View.VISIBLE);
+            tvDelete.setOnClickListener(v -> {
+                android.view.View view = getLayoutInflater().inflate(R.layout.dialog_confirm, null);
+                android.widget.TextView tvTitle = view.findViewById(R.id.tvDialogTitle);
+                android.widget.TextView tvMessage = view.findViewById(R.id.tvDialogMessage);
+                tvTitle.setText("删除作品");
+                tvMessage.setText("确定要删除这篇稿件吗？删除后其他人将无法查看。");
+
+                androidx.appcompat.app.AlertDialog dialog = new androidx.appcompat.app.AlertDialog.Builder(this)
+                        .setView(view)
+                        .create();
+
+                if (dialog.getWindow() != null) {
+                    dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+                }
+
+                android.widget.TextView btnConfirm = view.findViewById(R.id.btnDialogConfirm);
+                btnConfirm.setText("删除");
+                btnConfirm.setBackgroundResource(R.drawable.bg_auth_button);
+
+                view.findViewById(R.id.btnDialogCancel).setOnClickListener(btn -> dialog.dismiss());
+                btnConfirm.setOnClickListener(btn -> {
+                    dialog.dismiss();
+                    dm.deleteArticle(articleId);
+                    Toast.makeText(this, "作品已删除", Toast.LENGTH_SHORT).show();
+                    finish();
+                });
+                dialog.show();
+            });
+        }
+
         // Cover
         ImageView ivCover = findViewById(R.id.ivDetailCover);
         if (article.coverUri != null) {
             try {
                 ivCover.setImageURI(Uri.parse(article.coverUri));
                 ivCover.setVisibility(View.VISIBLE);
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+            }
         }
 
         // Title + content
@@ -81,10 +122,34 @@ public class ArticleDetailActivity extends AppCompatActivity {
         ((TextView) findViewById(R.id.tvDetailReadCount)).setText("阅读 " + article.readCount + " 次");
 
         // Author avatar initial
-        String initial = (article.author != null && !article.author.isEmpty())
-                ? String.valueOf(article.author.charAt(0)).toUpperCase() : "A";
-        ((TextView) findViewById(R.id.tvDetailAuthorInitial)).setText(initial);
-        ((TextView) findViewById(R.id.tvDetailAuthor)).setText(article.author);
+        String authorName = article.authorNickname != null && !article.authorNickname.isEmpty() ? article.authorNickname
+                : article.author;
+        String initial = (authorName != null && !authorName.isEmpty())
+                ? String.valueOf(authorName.charAt(0)).toUpperCase()
+                : "A";
+        TextView tvAuthorInitial = findViewById(R.id.tvDetailAuthorInitial);
+        ImageView ivAuthorAvatar = findViewById(R.id.ivDetailAuthorAvatar);
+        tvAuthorInitial.setText(initial);
+
+        if (article.authorAvatarUri != null) {
+            try {
+                if (article.authorAvatarUri.startsWith("data:image")) {
+                    com.example.jntt.utils.ImageUtils.setAvatarFromBase64(ivAuthorAvatar, article.authorAvatarUri);
+                } else {
+                    ivAuthorAvatar.setImageURI(Uri.parse(article.authorAvatarUri));
+                }
+                ivAuthorAvatar.setVisibility(View.VISIBLE);
+                tvAuthorInitial.setVisibility(View.GONE);
+            } catch (Exception e) {
+                ivAuthorAvatar.setVisibility(View.GONE);
+                tvAuthorInitial.setVisibility(View.VISIBLE);
+            }
+        } else {
+            ivAuthorAvatar.setVisibility(View.GONE);
+            tvAuthorInitial.setVisibility(View.VISIBLE);
+        }
+
+        ((TextView) findViewById(R.id.tvDetailAuthor)).setText(authorName);
         ((TextView) findViewById(R.id.tvDetailTime)).setText(article.time);
 
         // Follow button (hidden if viewing own article)
@@ -112,26 +177,43 @@ public class ArticleDetailActivity extends AppCompatActivity {
     // ─── Comments ────────────────────────────────────────────────────────────
 
     private void setupComments() {
-        tvCommentCount    = findViewById(R.id.tvCommentCount);
+        tvCommentCount = findViewById(R.id.tvCommentCount);
         tvCommentCountBar = findViewById(R.id.tvCommentCountBar);
-        llNoComments      = findViewById(R.id.llNoComments);
+        llNoComments = findViewById(R.id.llNoComments);
 
         comments = dm.getComments(articleId, currentUser != null ? currentUser : "");
         updateCommentCountUI();
 
         commentAdapter = new CommentAdapter(comments, currentUser, article.author, dm);
-        commentAdapter.setOnDeleteListener(comment ->
-            new AlertDialog.Builder(this)
-                .setTitle("删除评论")
-                .setMessage("确定删除这条评论吗？")
-                .setPositiveButton("删除", (d, w) -> {
-                    dm.deleteComment(comment.id);
-                    comments.remove(comment);
-                    commentAdapter.notifyDataSetChanged();
-                    updateCommentCountUI();
-                })
-                .setNegativeButton("取消", null)
-                .show());
+        commentAdapter.setOnDeleteListener(comment -> {
+            android.view.View view = getLayoutInflater().inflate(R.layout.dialog_confirm, null);
+            android.widget.TextView tvTitle = view.findViewById(R.id.tvDialogTitle);
+            android.widget.TextView tvMessage = view.findViewById(R.id.tvDialogMessage);
+            tvTitle.setText("删除评论");
+            tvMessage.setText("确定删除这条评论吗？");
+
+            androidx.appcompat.app.AlertDialog dialog = new androidx.appcompat.app.AlertDialog.Builder(this)
+                    .setView(view)
+                    .create();
+
+            if (dialog.getWindow() != null) {
+                dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+            }
+
+            android.widget.TextView btnConfirm = view.findViewById(R.id.btnDialogConfirm);
+            btnConfirm.setText("删除");
+            btnConfirm.setBackgroundResource(R.drawable.bg_auth_button);
+
+            view.findViewById(R.id.btnDialogCancel).setOnClickListener(btn -> dialog.dismiss());
+            btnConfirm.setOnClickListener(btn -> {
+                dialog.dismiss();
+                dm.deleteComment(comment.id);
+                comments.remove(comment);
+                commentAdapter.notifyDataSetChanged();
+                updateCommentCountUI();
+            });
+            dialog.show();
+        });
 
         RecyclerView rv = findViewById(R.id.rvComments);
         rv.setLayoutManager(new LinearLayoutManager(this));
@@ -149,7 +231,7 @@ public class ArticleDetailActivity extends AppCompatActivity {
     // ─── Bottom bar (like + comment input) ───────────────────────────────────
 
     private void setupBottomBar() {
-        tvLikeBtn   = findViewById(R.id.tvLikeBtn);
+        tvLikeBtn = findViewById(R.id.tvLikeBtn);
         tvLikeCount = findViewById(R.id.tvLikeCount);
         refreshLikeUI();
 
@@ -166,9 +248,8 @@ public class ArticleDetailActivity extends AppCompatActivity {
                 dm.likeArticle(currentUser, articleId);
                 // Heart-beat animation
                 tvLikeBtn.animate().scaleX(1.35f).scaleY(1.35f).setDuration(130)
-                    .withEndAction(() ->
-                        tvLikeBtn.animate().scaleX(1f).scaleY(1f).setDuration(100).start())
-                    .start();
+                        .withEndAction(() -> tvLikeBtn.animate().scaleX(1f).scaleY(1f).setDuration(100).start())
+                        .start();
             }
             refreshLikeUI();
         });
@@ -182,11 +263,21 @@ public class ArticleDetailActivity extends AppCompatActivity {
             }
             return false;
         });
+
+        // Scroll to comments when clicking the comment icon
+        findViewById(R.id.layoutCommentIcon).setOnClickListener(v -> {
+            if (tvCommentCount != null) {
+                nestedScroll.post(() -> {
+                    // Scroll to the comment header
+                    nestedScroll.smoothScrollTo(0, ((View) tvCommentCount.getParent()).getTop());
+                });
+            }
+        });
     }
 
     private void refreshLikeUI() {
         boolean liked = currentUser != null && dm.isArticleLiked(currentUser, articleId);
-        int count     = dm.getArticleLikeCount(articleId);
+        int count = dm.getArticleLikeCount(articleId);
         tvLikeBtn.setText(liked ? "♥" : "♡");
         tvLikeBtn.setTextColor(liked ? 0xFFE53935 : 0xFFAAAAAA);
         tvLikeCount.setText(count > 0 ? String.valueOf(count) : "");
@@ -198,9 +289,11 @@ public class ArticleDetailActivity extends AppCompatActivity {
             return;
         }
         String text = et.getText().toString().trim();
-        if (text.isEmpty()) return;
+        if (text.isEmpty())
+            return;
 
         Comment c = dm.addComment(articleId, currentUser, text);
+        c.nickname = dm.getNickname(currentUser);
         c.isLikedByMe = false;
         comments.add(c);
         commentAdapter.notifyItemInserted(comments.size() - 1);
@@ -208,7 +301,8 @@ public class ArticleDetailActivity extends AppCompatActivity {
 
         // Hide keyboard
         InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
-        if (imm != null) imm.hideSoftInputFromWindow(et.getWindowToken(), 0);
+        if (imm != null)
+            imm.hideSoftInputFromWindow(et.getWindowToken(), 0);
 
         updateCommentCountUI();
 
@@ -220,6 +314,7 @@ public class ArticleDetailActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         // Refresh like count in case user navigated away and back
-        if (tvLikeBtn != null) refreshLikeUI();
+        if (tvLikeBtn != null)
+            refreshLikeUI();
     }
 }

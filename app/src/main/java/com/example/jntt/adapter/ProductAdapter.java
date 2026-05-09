@@ -13,8 +13,13 @@ import java.util.List;
 
 public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.VH> {
 
-    public interface OnItemClickListener { void onItemClick(Product product); }
-    public interface OnAddCartListener  { void onAddCart(Product product); }
+    public interface OnItemClickListener {
+        void onItemClick(Product product);
+    }
+
+    public interface OnAddCartListener {
+        void onAddCart(Product product);
+    }
 
     private final List<Product> data;
     private final OnItemClickListener clickListener;
@@ -25,7 +30,9 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.VH> {
         this.clickListener = listener;
     }
 
-    public void setOnAddCartListener(OnAddCartListener l) { this.addCartListener = l; }
+    public void setOnAddCartListener(OnAddCartListener l) {
+        this.addCartListener = l;
+    }
 
     @NonNull
     @Override
@@ -39,11 +46,28 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.VH> {
     public void onBindViewHolder(@NonNull VH holder, int position) {
         Product p = data.get(position);
         switch (p.id) {
-            case 1: holder.ivProduct.setImageResource(R.mipmap.dami);   break; // 东北大米
-            case 2: holder.ivProduct.setImageResource(R.mipmap.muer);   break; // 有机黑木耳
-            case 3: holder.ivProduct.setImageResource(R.mipmap.fengmi); break; // 农家蜂蜜
-            case 4: holder.ivProduct.setImageResource(R.mipmap.shucai); break; // 绿色蔬菜礼盒
-            default: holder.ivProduct.setImageResource(R.drawable.ic_product_placeholder);
+            case 1:
+                holder.ivProduct.setImageResource(R.mipmap.dami);
+                break; // 东北大米
+            case 2:
+                holder.ivProduct.setImageResource(R.mipmap.muer);
+                break; // 有机黑木耳
+            case 3:
+                holder.ivProduct.setImageResource(R.mipmap.fengmi);
+                break; // 农家蜂蜜
+            case 4:
+                holder.ivProduct.setImageResource(R.mipmap.shucai);
+                break; // 绿色蔬菜礼盒
+            default:
+                if (p.coverUri != null) {
+                    try {
+                        holder.ivProduct.setImageURI(android.net.Uri.parse(p.coverUri));
+                    } catch (Exception e) {
+                        holder.ivProduct.setImageResource(R.drawable.ic_product_placeholder);
+                    }
+                } else {
+                    holder.ivProduct.setImageResource(R.drawable.ic_product_placeholder);
+                }
         }
         holder.tvName.setText(p.name);
         holder.tvDesc.setText(p.desc);
@@ -53,22 +77,26 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.VH> {
                 : String.format("%.2f", p.price)));
         holder.itemView.setOnClickListener(v -> clickListener.onItemClick(p));
         holder.btnAddCart.setOnClickListener(v -> {
-            if (addCartListener != null) addCartListener.onAddCart(p);
+            if (addCartListener != null)
+                addCartListener.onAddCart(p);
         });
     }
 
     @Override
-    public int getItemCount() { return data.size(); }
+    public int getItemCount() {
+        return data.size();
+    }
 
     static class VH extends RecyclerView.ViewHolder {
         ImageView ivProduct;
         TextView tvName, tvDesc, tvPrice, btnAddCart;
+
         VH(View v) {
             super(v);
-            ivProduct  = v.findViewById(R.id.ivProductImage);
-            tvName     = v.findViewById(R.id.tvProductName);
-            tvDesc     = v.findViewById(R.id.tvProductDesc);
-            tvPrice    = v.findViewById(R.id.tvProductPrice);
+            ivProduct = v.findViewById(R.id.ivProductImage);
+            tvName = v.findViewById(R.id.tvProductName);
+            tvDesc = v.findViewById(R.id.tvProductDesc);
+            tvPrice = v.findViewById(R.id.tvProductPrice);
             btnAddCart = v.findViewById(R.id.btnAddCart);
         }
     }

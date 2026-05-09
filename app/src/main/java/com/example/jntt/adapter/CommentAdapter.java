@@ -15,23 +15,27 @@ import java.util.List;
 /** 评论列表适配器（抖音 / 小红书风格） */
 public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.VH> {
 
-    public interface OnDeleteListener { void onDelete(Comment comment); }
-
-    private final List<Comment> data;
-    private final String        currentUser;
-    private final String        articleAuthor;
-    private final DataManager   dm;
-    private OnDeleteListener    deleteListener;
-
-    public CommentAdapter(List<Comment> data, String currentUser,
-                          String articleAuthor, DataManager dm) {
-        this.data          = data;
-        this.currentUser   = currentUser;
-        this.articleAuthor = articleAuthor;
-        this.dm            = dm;
+    public interface OnDeleteListener {
+        void onDelete(Comment comment);
     }
 
-    public void setOnDeleteListener(OnDeleteListener l) { this.deleteListener = l; }
+    private final List<Comment> data;
+    private final String currentUser;
+    private final String articleAuthor;
+    private final DataManager dm;
+    private OnDeleteListener deleteListener;
+
+    public CommentAdapter(List<Comment> data, String currentUser,
+            String articleAuthor, DataManager dm) {
+        this.data = data;
+        this.currentUser = currentUser;
+        this.articleAuthor = articleAuthor;
+        this.dm = dm;
+    }
+
+    public void setOnDeleteListener(OnDeleteListener l) {
+        this.deleteListener = l;
+    }
 
     @NonNull
     @Override
@@ -46,11 +50,33 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.VH> {
         Comment c = data.get(position);
 
         // Avatar initial
-        String initial = (c.username != null && !c.username.isEmpty())
-                ? String.valueOf(c.username.charAt(0)).toUpperCase() : "U";
+        String initial = "U";
+        if (c.nickname != null && !c.nickname.isEmpty()) {
+            initial = String.valueOf(c.nickname.charAt(0)).toUpperCase();
+        } else if (c.username != null && !c.username.isEmpty()) {
+            initial = String.valueOf(c.username.charAt(0)).toUpperCase();
+        }
         h.tvAvatar.setText(initial);
 
-        h.tvUsername.setText(c.username);
+        if (c.avatarUri != null) {
+            try {
+                if (c.avatarUri.startsWith("data:image")) {
+                    com.example.jntt.utils.ImageUtils.setAvatarFromBase64(h.ivAvatarImg, c.avatarUri);
+                } else {
+                    h.ivAvatarImg.setImageURI(android.net.Uri.parse(c.avatarUri));
+                }
+                h.ivAvatarImg.setVisibility(View.VISIBLE);
+                h.tvAvatar.setVisibility(View.GONE);
+            } catch (Exception e) {
+                h.ivAvatarImg.setVisibility(View.GONE);
+                h.tvAvatar.setVisibility(View.VISIBLE);
+            }
+        } else {
+            h.ivAvatarImg.setVisibility(View.GONE);
+            h.tvAvatar.setVisibility(View.VISIBLE);
+        }
+
+        h.tvUsername.setText(c.nickname != null && !c.nickname.isEmpty() ? c.nickname : c.username);
         h.tvContent.setText(c.content);
         h.tvTime.setText(c.time);
         h.tvLikeCount.setText(c.likeCount > 0 ? String.valueOf(c.likeCount) : "");
@@ -79,7 +105,8 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.VH> {
 
         // Delete click
         h.tvDelete.setOnClickListener(v -> {
-            if (deleteListener != null) deleteListener.onDelete(c);
+            if (deleteListener != null)
+                deleteListener.onDelete(c);
         });
     }
 
@@ -94,23 +121,27 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.VH> {
     }
 
     @Override
-    public int getItemCount() { return data.size(); }
+    public int getItemCount() {
+        return data.size();
+    }
 
     static class VH extends RecyclerView.ViewHolder {
-        TextView    tvAvatar, tvUsername, tvContent, tvTime, tvDelete;
-        TextView    tvLikeBtn, tvLikeCount;
+        TextView tvAvatar, tvUsername, tvContent, tvTime, tvDelete;
+        TextView tvLikeBtn, tvLikeCount;
         LinearLayout layoutLike;
+        android.widget.ImageView ivAvatarImg;
 
         VH(View v) {
             super(v);
-            tvAvatar    = v.findViewById(R.id.tvCommentAvatar);
-            tvUsername  = v.findViewById(R.id.tvCommentUsername);
-            tvContent   = v.findViewById(R.id.tvCommentContent);
-            tvTime      = v.findViewById(R.id.tvCommentTime);
-            tvDelete    = v.findViewById(R.id.tvDeleteComment);
-            tvLikeBtn   = v.findViewById(R.id.tvCommentLikeBtn);
+            tvAvatar = v.findViewById(R.id.tvCommentAvatar);
+            ivAvatarImg = v.findViewById(R.id.ivCommentAvatar);
+            tvUsername = v.findViewById(R.id.tvCommentUsername);
+            tvContent = v.findViewById(R.id.tvCommentContent);
+            tvTime = v.findViewById(R.id.tvCommentTime);
+            tvDelete = v.findViewById(R.id.tvDeleteComment);
+            tvLikeBtn = v.findViewById(R.id.tvCommentLikeBtn);
             tvLikeCount = v.findViewById(R.id.tvCommentLikeCount);
-            layoutLike  = v.findViewById(R.id.layoutCommentLike);
+            layoutLike = v.findViewById(R.id.layoutCommentLike);
         }
     }
 }

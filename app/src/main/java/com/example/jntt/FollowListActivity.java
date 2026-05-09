@@ -22,23 +22,37 @@ public class FollowListActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_follow_list);
-        if (getSupportActionBar() != null) getSupportActionBar().hide();
+        if (getSupportActionBar() != null)
+            getSupportActionBar().hide();
 
-        String type     = getIntent().getStringExtra("type");      // "followers" | "following"
+        String type = getIntent().getStringExtra("type"); // "followers" | "following" | "likes"
         String username = getIntent().getStringExtra("username");
 
-        if (username == null) { finish(); return; }
+        if (username == null) {
+            finish();
+            return;
+        }
 
         boolean isFollowers = "followers".equals(type);
+        boolean isLikes = "likes".equals(type);
 
         // Toolbar title
         TextView tvTitle = findViewById(R.id.tvFollowTitle);
-        tvTitle.setText(isFollowers ? "粉丝" : "关注");
+        if (isLikes) {
+            tvTitle.setText("获赞");
+        } else {
+            tvTitle.setText(isFollowers ? "粉丝" : "关注");
+        }
         findViewById(R.id.tvFollowBack).setOnClickListener(v -> finish());
 
-        DataManager   dm      = DataManager.getInstance(this);
-        String        me      = dm.getLoggedUser();
-        List<String>  users   = isFollowers ? dm.getFollowers(username) : dm.getFollowing(username);
+        DataManager dm = DataManager.getInstance(this);
+        String me = dm.getLoggedUser();
+        List<String> users;
+        if (isLikes) {
+            users = dm.getUsersWhoLikedMyArticles(username);
+        } else {
+            users = isFollowers ? dm.getFollowers(username) : dm.getFollowing(username);
+        }
 
         RecyclerView rv = findViewById(R.id.rvFollowList);
         rv.setLayoutManager(new LinearLayoutManager(this));
@@ -50,13 +64,13 @@ public class FollowListActivity extends AppCompatActivity {
     static class FollowUserAdapter extends RecyclerView.Adapter<FollowUserAdapter.VH> {
 
         private final List<String> users;
-        private final String       currentUser;
-        private final DataManager  dm;
+        private final String currentUser;
+        private final DataManager dm;
 
         FollowUserAdapter(List<String> users, String currentUser, DataManager dm) {
-            this.users       = users;
+            this.users = users;
             this.currentUser = currentUser;
-            this.dm          = dm;
+            this.dm = dm;
         }
 
         @NonNull
@@ -71,10 +85,35 @@ public class FollowListActivity extends AppCompatActivity {
         public void onBindViewHolder(@NonNull VH h, int position) {
             String username = users.get(position);
 
+            // Fetch user info for avatar and nickname
+            String nickname = dm.getNickname(username);
+            String avatarUri = dm.getAvatarUri(username);
+
             // Avatar initial
-            h.tvAvatar.setText(username.isEmpty() ? "U"
-                    : String.valueOf(username.charAt(0)).toUpperCase());
-            h.tvUsername.setText(username);
+            String initial = (nickname != null && !nickname.isEmpty())
+                    ? String.valueOf(nickname.charAt(0)).toUpperCase()
+                    : (username.isEmpty() ? "U" : String.valueOf(username.charAt(0)).toUpperCase());
+            h.tvAvatar.setText(initial);
+
+            if (avatarUri != null) {
+                try {
+                    if (avatarUri.startsWith("data:image")) {
+                        com.example.jntt.utils.ImageUtils.setAvatarFromBase64(h.ivAvatar, avatarUri);
+                    } else {
+                        h.ivAvatar.setImageURI(android.net.Uri.parse(avatarUri));
+                    }
+                    h.ivAvatar.setVisibility(View.VISIBLE);
+                    h.tvAvatar.setVisibility(View.GONE);
+                } catch (Exception e) {
+                    h.ivAvatar.setVisibility(View.GONE);
+                    h.tvAvatar.setVisibility(View.VISIBLE);
+                }
+            } else {
+                h.ivAvatar.setVisibility(View.GONE);
+                h.tvAvatar.setVisibility(View.VISIBLE);
+            }
+
+            h.tvUsername.setText(nickname != null && !nickname.isEmpty() ? nickname : username);
 
             // Hide follow button for self
             if (username.equals(currentUser)) {
@@ -102,15 +141,20 @@ public class FollowListActivity extends AppCompatActivity {
         }
 
         @Override
-        public int getItemCount() { return users.size(); }
+        public int getItemCount() {
+            return users.size();
+        }
 
         static class VH extends RecyclerView.ViewHolder {
             TextView tvAvatar, tvUsername, tvToggle;
+            android.widget.ImageView ivAvatar;
+
             VH(View v) {
                 super(v);
-                tvAvatar   = v.findViewById(R.id.tvFollowUserAvatar);
+                tvAvatar = v.findViewById(R.id.tvFollowUserAvatar);
+                ivAvatar = v.findViewById(R.id.ivFollowUserAvatar);
                 tvUsername = v.findViewById(R.id.tvFollowUsername);
-                tvToggle   = v.findViewById(R.id.tvFollowToggle);
+                tvToggle = v.findViewById(R.id.tvFollowToggle);
             }
         }
     }

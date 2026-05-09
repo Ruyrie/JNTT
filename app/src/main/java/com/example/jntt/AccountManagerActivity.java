@@ -44,19 +44,51 @@ public class AccountManagerActivity extends AppCompatActivity {
                 // 长按删除，不能删除当前登录账号
                 String current = dm.getLoggedUser();
                 if (user.username.equals(current)) {
-                    new AlertDialog.Builder(AccountManagerActivity.this)
-                        .setMessage("不能删除当前登录的账号").setPositiveButton("确定", null).show();
+                    android.view.View view = getLayoutInflater().inflate(R.layout.dialog_confirm, null);
+                    android.widget.TextView tvTitle = view.findViewById(R.id.tvDialogTitle);
+                    android.widget.TextView tvMessage = view.findViewById(R.id.tvDialogMessage);
+                    tvTitle.setText("提示");
+                    tvMessage.setText("不能删除当前登录的账号");
+
+                    androidx.appcompat.app.AlertDialog dialog = new androidx.appcompat.app.AlertDialog.Builder(
+                            AccountManagerActivity.this)
+                            .setView(view)
+                            .create();
+                    if (dialog.getWindow() != null)
+                        dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+
+                    view.findViewById(R.id.btnDialogCancel).setVisibility(android.view.View.GONE);
+                    android.widget.TextView btnConfirm = view.findViewById(R.id.btnDialogConfirm);
+                    btnConfirm.setText("确定");
+                    btnConfirm.setOnClickListener(btn -> dialog.dismiss());
+                    dialog.show();
                     return;
                 }
-                new AlertDialog.Builder(AccountManagerActivity.this)
-                    .setTitle("删除账号")
-                    .setMessage("确定删除账号 \"" + user.username + "\" 吗？")
-                    .setPositiveButton("删除", (d, w) -> {
-                        dm.deleteUser(user.username);
-                        refreshList();
-                    })
-                    .setNegativeButton("取消", null)
-                    .show();
+
+                android.view.View view = getLayoutInflater().inflate(R.layout.dialog_confirm, null);
+                android.widget.TextView tvTitle = view.findViewById(R.id.tvDialogTitle);
+                android.widget.TextView tvMessage = view.findViewById(R.id.tvDialogMessage);
+                tvTitle.setText("删除账号");
+                tvMessage.setText("确定删除账号 \"" + user.username + "\" 吗？");
+
+                androidx.appcompat.app.AlertDialog dialog = new androidx.appcompat.app.AlertDialog.Builder(
+                        AccountManagerActivity.this)
+                        .setView(view)
+                        .create();
+                if (dialog.getWindow() != null)
+                    dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+
+                android.widget.TextView btnConfirm = view.findViewById(R.id.btnDialogConfirm);
+                btnConfirm.setText("删除");
+                btnConfirm.setBackgroundResource(R.drawable.bg_auth_button);
+
+                view.findViewById(R.id.btnDialogCancel).setOnClickListener(btn -> dialog.dismiss());
+                btnConfirm.setOnClickListener(btn -> {
+                    dialog.dismiss();
+                    dm.deleteUser(user.username);
+                    refreshList();
+                });
+                dialog.show();
             }
         });
         rv.setAdapter(adapter);
@@ -81,4 +113,3 @@ public class AccountManagerActivity extends AppCompatActivity {
         adapter.notifyDataSetChanged();
     }
 }
-
