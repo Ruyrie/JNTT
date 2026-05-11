@@ -90,7 +90,18 @@
             android:textSize="15sp"
             android:inputType="textPassword"
             android:paddingHorizontal="20dp"
-            android:layout_marginBottom="28dp" />
+            android:layout_marginBottom="12dp" />
+
+        <TextView
+            android:id="@+id/tvForgotPassword"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:text="忘记密码？"
+            android:textSize="13sp"
+            android:textColor="#8A8A8A"
+            android:padding="4dp"
+            android:layout_marginBottom="12dp" />
 
         <Button
             android:id="@+id/btnLogin"

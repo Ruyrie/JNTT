@@ -49,9 +49,15 @@ public class RegisterActivity extends AppCompatActivity {
             return;
         }
 
-        if (!phone.isEmpty() && dm.isPhoneBound(phone)) {
-            Toast.makeText(this, "该手机号已被注册或绑定，请更换手机号", Toast.LENGTH_SHORT).show();
-            return;
+        if (!phone.isEmpty()) {
+            if (phone.length() != 11 || !phone.matches("^1[3-9]\\d{9}$") || phone.matches("^(\\d)\\1{10}$")) {
+                Toast.makeText(this, "请输入有效的11位手机号", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            if (dm.isPhoneBound(phone)) {
+                Toast.makeText(this, "该手机号已被注册或绑定，请更换手机号", Toast.LENGTH_SHORT).show();
+                return;
+            }
         }
 
         boolean ok = dm.register(username, password, phone);

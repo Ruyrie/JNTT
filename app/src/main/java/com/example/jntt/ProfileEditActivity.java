@@ -188,8 +188,8 @@ public class ProfileEditActivity extends AppCompatActivity {
                 Toast.makeText(this, "手机号不能为空", Toast.LENGTH_SHORT).show();
                 return;
             }
-            if (phone.length() != 11) {
-                Toast.makeText(this, "请输入11位手机号", Toast.LENGTH_SHORT).show();
+            if (phone.length() != 11 || !phone.matches("^1[3-9]\\d{9}$") || phone.matches("^(\\d)\\1{10}$")) {
+                Toast.makeText(this, "请输入有效的11位手机号", Toast.LENGTH_SHORT).show();
                 return;
             }
             boolean ok = dm.updatePhone(username, phone);

@@ -67,6 +67,12 @@
         <!-- 修改密码 -->
         <activity android:name=".ChangePasswordActivity" />
 
+        <!-- 忘记密码 -->
+        <activity android:name=".ForgotPasswordActivity" />
+
+        <!-- 重置密码 -->
+        <activity android:name=".ResetPasswordActivity" />
+
         <!-- 添加文章（管理员） -->
         <activity android:name=".AddArticleActivity" />
 
