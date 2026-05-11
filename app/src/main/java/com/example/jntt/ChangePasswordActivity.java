@@ -22,12 +22,12 @@ public class ChangePasswordActivity extends AppCompatActivity {
 
         ((TextView) findViewById(R.id.tvChangeUsername)).setText("账号：" + username);
 
-        EditText etNew     = findViewById(R.id.etNewPassword);
+        EditText etNew = findViewById(R.id.etNewPassword);
         EditText etConfirm = findViewById(R.id.etConfirmPassword);
-        Button btnSave     = findViewById(R.id.btnSavePassword);
+        Button btnSave = findViewById(R.id.btnSavePassword);
 
         btnSave.setOnClickListener(v -> {
-            String newPwd     = etNew.getText().toString().trim();
+            String newPwd = etNew.getText().toString().trim();
             String confirmPwd = etConfirm.getText().toString().trim();
             if (newPwd.isEmpty()) {
                 Toast.makeText(this, "密码不能为空", Toast.LENGTH_SHORT).show();
@@ -39,6 +39,10 @@ public class ChangePasswordActivity extends AppCompatActivity {
             }
             if (!newPwd.equals(confirmPwd)) {
                 Toast.makeText(this, "两次密码不一致", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            if (dm.isSameAsOldPassword(username, newPwd)) {
+                Toast.makeText(this, "新密码不能和旧密码相同", Toast.LENGTH_SHORT).show();
                 return;
             }
             dm.changePassword(username, newPwd);

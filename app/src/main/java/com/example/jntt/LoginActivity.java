@@ -31,12 +31,13 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
         etUsername = findViewById(R.id.etLoginUsername);
         etPassword = findViewById(R.id.etLoginPassword);
-        Button btnLogin    = findViewById(R.id.btnLogin);
+        Button btnLogin = findViewById(R.id.btnLogin);
         TextView tvRegister = findViewById(R.id.tvGoRegister);
+        TextView tvForgotPassword = findViewById(R.id.tvForgotPassword);
 
         btnLogin.setOnClickListener(v -> doLogin());
-        tvRegister.setOnClickListener(v ->
-            startActivity(new Intent(this, RegisterActivity.class)));
+        tvRegister.setOnClickListener(v -> startActivity(new Intent(this, RegisterActivity.class)));
+        tvForgotPassword.setOnClickListener(v -> startActivity(new Intent(this, ForgotPasswordActivity.class)));
     }
 
     private void doLogin() {

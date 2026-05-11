@@ -148,6 +148,27 @@ public class DataManager {
         return null;
     }
 
+    public String findUsernameByAccount(String account) {
+        try (Cursor c = rdb().rawQuery(
+                "SELECT username FROM users WHERE username=? OR phone=?",
+                new String[] { account, account })) {
+            if (c.moveToFirst()) {
+                return c.getString(0);
+            }
+        }
+        return null;
+    }
+
+    public boolean isSameAsOldPassword(String username, String password) {
+        try (Cursor c = rdb().rawQuery("SELECT password FROM users WHERE username=?", new String[] { username })) {
+            if (c.moveToFirst()) {
+                String oldPassword = c.getString(0);
+                return password.equals(oldPassword);
+            }
+        }
+        return false;
+    }
+
     public boolean changePassword(String username, String newPassword) {
         ContentValues cv = new ContentValues();
         cv.put("password", newPassword);
@@ -240,8 +261,18 @@ public class DataManager {
                         c.getString(3), c.getString(4));
                 a.readCount = c.getInt(5);
                 a.coverUri = c.getString(6);
-                a.authorNickname = c.getColumnCount() > 7 ? c.getString(7) : null;
-                a.authorAvatarUri = c.getColumnCount() > 8 ? c.getString(8) : null;
+                int nickIdx = c.getColumnIndex("nickname");
+                if (nickIdx >= 0) {
+                    a.authorNickname = c.getString(nickIdx);
+                } else {
+                    a.authorNickname = c.getColumnCount() > 7 ? c.getString(7) : null;
+                }
+                int avatarIdx = c.getColumnIndex("avatar_uri");
+                if (avatarIdx >= 0) {
+                    a.authorAvatarUri = c.getString(avatarIdx);
+                } else {
+                    a.authorAvatarUri = c.getColumnCount() > 8 ? c.getString(8) : null;
+                }
                 list.add(a);
             }
         }
@@ -278,7 +309,7 @@ public class DataManager {
     /** 返回当前用户点赞的文章列表（我的收藏） */
     public List<Article> getLikedArticles(String username) {
         List<Article> list = new ArrayList<>();
-        String sql = "SELECT l.article_id, a.title, a.content, a.author, a.time, a.read_count, a.cover_uri, u.nickname "
+        String sql = "SELECT l.article_id, a.title, a.content, a.author, a.time, a.read_count, a.cover_uri, u.nickname, u.avatar_uri "
                 +
                 "FROM article_likes l LEFT JOIN articles a ON l.article_id=a.id " +
                 "LEFT JOIN users u ON a.author=u.username " +
@@ -295,7 +326,8 @@ public class DataManager {
                     a = new Article(articleId, title, c.getString(2), c.getString(3), c.getString(4));
                     a.readCount = c.getInt(5);
                     a.coverUri = c.getString(6);
-                    a.authorNickname = c.getString(7);
+                    a.authorNickname = c.getColumnCount() > 7 ? c.getString(7) : null;
+                    a.authorAvatarUri = c.getColumnCount() > 8 ? c.getString(8) : null;
                 }
                 list.add(a);
             }
