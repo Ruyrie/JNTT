@@ -31,8 +31,12 @@ public class AddProductActivity extends AppCompatActivity {
                 if (uri == null)
                     return;
                 coverUri = uri;
-                getContentResolver().takePersistableUriPermission(uri,
-                        Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                try {
+                    getContentResolver().takePersistableUriPermission(uri,
+                            Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                } catch (SecurityException e) {
+                    e.printStackTrace();
+                }
                 ivCover.setImageURI(uri);
                 ivCover.setVisibility(View.VISIBLE);
                 llCoverHint.setVisibility(View.GONE);

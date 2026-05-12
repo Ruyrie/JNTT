@@ -15,6 +15,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="10dp"
+        android:background="@null"
         android:buttonTint="#F04142" />
 
     <!-- 商品图片占位 -->

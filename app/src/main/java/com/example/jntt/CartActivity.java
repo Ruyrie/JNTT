@@ -29,6 +29,8 @@ public class CartActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cart);
 
+        findViewById(R.id.tvBack).setOnClickListener(v -> finish());
+
         dm = DataManager.getInstance(this);
         username = dm.getLoggedUser();
         items = dm.getCart(username);
@@ -41,17 +43,16 @@ public class CartActivity extends AppCompatActivity {
         rv.setAdapter(adapter);
 
         cbSelectAll = findViewById(R.id.cbSelectAll);
-        tvTotal     = findViewById(R.id.tvCartTotal);
-        tvCount     = findViewById(R.id.tvCartCount);
+        tvTotal = findViewById(R.id.tvCartTotal);
+        tvCount = findViewById(R.id.tvCartCount);
         Button btnCheckout = findViewById(R.id.btnCheckout);
-        TextView tvClear   = findViewById(R.id.tvClearCart);
+        TextView tvClear = findViewById(R.id.tvClearCart);
 
         cbSelectAll.setOnCheckedChangeListener((btn, checked) -> adapter.setAllChecked(checked));
 
         btnCheckout.setOnClickListener(v -> checkout());
 
-        tvClear.setOnClickListener(v ->
-            new AlertDialog.Builder(this)
+        tvClear.setOnClickListener(v -> new AlertDialog.Builder(this)
                 .setTitle("清空购物车")
                 .setMessage("确定要清空所有商品吗？")
                 .setPositiveButton("清空", (d, w) -> {
@@ -60,8 +61,7 @@ public class CartActivity extends AppCompatActivity {
                     refreshBottomBar();
                 })
                 .setNegativeButton("取消", null)
-                .show()
-        );
+                .show());
 
         refreshBottomBar();
     }

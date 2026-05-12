@@ -20,6 +20,8 @@ public class SettingsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 
+        findViewById(R.id.tvBack).setOnClickListener(v -> finish());
+
         dm = DataManager.getInstance(this);
 
         findViewById(R.id.tvAccountManager)

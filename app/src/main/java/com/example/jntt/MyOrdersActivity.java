@@ -30,6 +30,8 @@ public class MyOrdersActivity extends AppCompatActivity {
         RecyclerView rv = findViewById(R.id.rvOrders);
         rv.setLayoutManager(new LinearLayoutManager(this));
 
+        findViewById(R.id.tvBack).setOnClickListener(v -> finish());
+
         adapter = new OrderAdapter(orders);
 
         adapter.setOnItemClickListener(order -> {

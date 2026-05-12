@@ -8,7 +8,7 @@
     <!-- ── Header bar ── -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="56dp"
+        android:layout_height="48dp"
         android:orientation="horizontal"
         android:gravity="center_vertical"
         android:paddingHorizontal="16dp"
@@ -23,21 +23,16 @@
             android:orientation="horizontal"
             android:gravity="center_vertical">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/bg_auth_logo"
-                android:text="吉"
-                android:textColor="@color/white"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                android:paddingHorizontal="8dp"
-                android:paddingVertical="3dp" />
+            <ImageView
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:src="@mipmap/ic_launcher"
+                android:scaleType="centerCrop" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="头条"
+                android:text="吉农头条"
                 android:textSize="20sp"
                 android:textStyle="bold"
                 android:textColor="#1F1F1F"
@@ -66,7 +61,7 @@
         android:layout_height="0dp"
         android:layout_weight="1"
         android:paddingTop="0dp"
-        android:paddingBottom="8dp"
+        android:paddingBottom="90dp"
         android:clipToPadding="false" />
 
 </LinearLayout>

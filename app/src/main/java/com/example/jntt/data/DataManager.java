@@ -66,6 +66,13 @@ public class DataManager {
         return prefs().getBoolean(KEY_ADMIN_MODE, false);
     }
 
+    public void hideUserFromHistory(String username) {
+        java.util.Set<String> hidden = new java.util.HashSet<>(
+                prefs().getStringSet("hidden_users", new java.util.HashSet<>()));
+        hidden.add(username);
+        prefs().edit().putStringSet("hidden_users", hidden).apply();
+    }
+
     private SharedPreferences prefs() {
         return ctx.getSharedPreferences(PREF_SESSION, Context.MODE_PRIVATE);
     }
@@ -74,9 +81,13 @@ public class DataManager {
 
     public List<User> getUsers() {
         List<User> list = new ArrayList<>();
+        java.util.Set<String> hidden = prefs().getStringSet("hidden_users", new java.util.HashSet<>());
         try (Cursor c = rdb().rawQuery("SELECT username,password,avatar_uri FROM users", null)) {
             while (c.moveToNext()) {
-                User u = new User(c.getString(0), c.getString(1));
+                String uName = c.getString(0);
+                if (hidden.contains(uName))
+                    continue;
+                User u = new User(uName, c.getString(1));
                 u.avatarUri = c.getString(2);
                 list.add(u);
             }
@@ -142,8 +153,15 @@ public class DataManager {
         try (Cursor c = rdb().rawQuery(
                 "SELECT username,password FROM users WHERE (username=? OR phone=?) AND password=?",
                 new String[] { usernameOrPhone, usernameOrPhone, password })) {
-            if (c.moveToFirst())
-                return new User(c.getString(0), c.getString(1));
+            if (c.moveToFirst()) {
+                String uName = c.getString(0);
+                java.util.Set<String> hidden = new java.util.HashSet<>(
+                        prefs().getStringSet("hidden_users", new java.util.HashSet<>()));
+                if (hidden.remove(uName)) {
+                    prefs().edit().putStringSet("hidden_users", hidden).apply();
+                }
+                return new User(uName, c.getString(1));
+            }
         }
         return null;
     }

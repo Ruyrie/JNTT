@@ -22,7 +22,8 @@ public class AccountManagerActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_account_manager);
-        setTitle("账号管理");
+
+        findViewById(R.id.tvBack).setOnClickListener(v -> finish());
 
         dm = DataManager.getInstance(this);
 
@@ -68,8 +69,8 @@ public class AccountManagerActivity extends AppCompatActivity {
                 android.view.View view = getLayoutInflater().inflate(R.layout.dialog_confirm, null);
                 android.widget.TextView tvTitle = view.findViewById(R.id.tvDialogTitle);
                 android.widget.TextView tvMessage = view.findViewById(R.id.tvDialogMessage);
-                tvTitle.setText("删除账号");
-                tvMessage.setText("确定删除账号 \"" + user.username + "\" 吗？");
+                tvTitle.setText("移除记录");
+                tvMessage.setText("确定从本机登录历史中移除账号 \"" + user.username + "\" 吗？（账号本身不会被注销）");
 
                 androidx.appcompat.app.AlertDialog dialog = new androidx.appcompat.app.AlertDialog.Builder(
                         AccountManagerActivity.this)
@@ -79,13 +80,13 @@ public class AccountManagerActivity extends AppCompatActivity {
                     dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
 
                 android.widget.TextView btnConfirm = view.findViewById(R.id.btnDialogConfirm);
-                btnConfirm.setText("删除");
+                btnConfirm.setText("移除");
                 btnConfirm.setBackgroundResource(R.drawable.bg_auth_button);
 
                 view.findViewById(R.id.btnDialogCancel).setOnClickListener(btn -> dialog.dismiss());
                 btnConfirm.setOnClickListener(btn -> {
                     dialog.dismiss();
-                    dm.deleteUser(user.username);
+                    dm.hideUserFromHistory(user.username);
                     refreshList();
                 });
                 dialog.show();

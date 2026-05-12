@@ -18,6 +18,8 @@ public class ProductDetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_product_detail);
 
+        findViewById(R.id.tvBack).setOnClickListener(v -> finish());
+
         int productId = getIntent().getIntExtra("product_id", -1);
         DataManager dm = DataManager.getInstance(this);
 
