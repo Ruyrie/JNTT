@@ -52,10 +52,10 @@ public class ProductCommentAdapter extends RecyclerView.Adapter<ProductCommentAd
             try {
                 holder.ivAvatar.setImageURI(Uri.parse(c.avatarUri));
             } catch (Exception e) {
-                holder.ivAvatar.setImageResource(R.drawable.ic_launcher_background);
+                holder.ivAvatar.setImageResource(R.mipmap.ic_launcher_round);
             }
         } else {
-            holder.ivAvatar.setImageResource(R.drawable.ic_launcher_background);
+            holder.ivAvatar.setImageResource(R.mipmap.ic_launcher_round);
         }
 
         if (c.username.equals(currentUser) || "admin".equals(currentUser)) {

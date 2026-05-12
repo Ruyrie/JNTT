@@ -54,6 +54,7 @@ public class OrderDetailActivity extends AppCompatActivity {
         LinearLayout layoutActions = findViewById(R.id.layoutDetailActions);
         Button btnPay = findViewById(R.id.btnDetailPay);
         Button btnCancel = findViewById(R.id.btnDetailCancel);
+        Button btnComment = findViewById(R.id.btnDetailComment);
 
         tvName.setText(order.name);
         switch (order.productId) {
@@ -68,6 +69,24 @@ public class OrderDetailActivity extends AppCompatActivity {
                 break;
             case 4:
                 ivProduct.setImageResource(R.mipmap.shucai);
+                break;
+            case 5:
+                ivProduct.setImageResource(R.mipmap.dongchongxiacao1);
+                break;
+            case 6:
+                ivProduct.setImageResource(R.mipmap.hongshu1);
+                break;
+            case 7:
+                ivProduct.setImageResource(R.mipmap.shanyao1);
+                break;
+            case 8:
+                ivProduct.setImageResource(R.mipmap.yangdujun1);
+                break;
+            case 9:
+                ivProduct.setImageResource(R.mipmap.luronggu1);
+                break;
+            case 10:
+                ivProduct.setImageResource(R.mipmap.tuedan1);
                 break;
             default:
                 ivProduct.setImageResource(R.drawable.ic_product_placeholder);
@@ -91,18 +110,32 @@ public class OrderDetailActivity extends AppCompatActivity {
                 long h = rem / 3600000, m = (rem % 3600000) / 60000;
                 tvCountdown.setText(String.format("请在 %02d:%02d 内完成支付，逾期将自动取消", h, m));
                 layoutActions.setVisibility(View.VISIBLE);
+                btnPay.setVisibility(View.VISIBLE);
+                btnCancel.setVisibility(View.VISIBLE);
+                btnComment.setVisibility(View.GONE);
                 break;
             case Order.STATUS_PAID:
                 tvStatus.setText("已完成");
                 tvCountdown.setText("感谢您的购买");
+                layoutActions.setVisibility(View.VISIBLE);
+                btnPay.setVisibility(View.GONE);
+                btnCancel.setVisibility(View.GONE);
+                btnComment.setVisibility(View.VISIBLE);
                 break;
             case Order.STATUS_CANCELLED:
                 tvStatus.setText("已取消");
                 tvCountdown.setText("订单已取消");
                 tvStatus.getParent();
                 ((View) tvStatus.getParent()).setBackgroundColor(0xFF8A8A8A);
+                layoutActions.setVisibility(View.GONE);
                 break;
         }
+
+        btnComment.setOnClickListener(v -> {
+            android.content.Intent intent = new android.content.Intent(this, ProductCommentsActivity.class);
+            intent.putExtra("product_id", order.productId);
+            startActivity(intent);
+        });
 
         btnPay.setOnClickListener(v -> {
             dm.updateOrderStatus(username, order.orderId, Order.STATUS_PAID);

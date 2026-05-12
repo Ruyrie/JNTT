@@ -10,6 +10,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.widget.NestedScrollView;
@@ -114,12 +115,94 @@ public class ArticleDetailActivity extends AppCompatActivity {
                 ivCover.setVisibility(View.VISIBLE);
             } catch (Exception ignored) {
             }
+        } else {
+            // Hardcode cover for seed articles
+            switch (article.id) {
+                case 5: // admin
+                    ivCover.setImageResource(R.mipmap.text1);
+                    ivCover.setVisibility(View.VISIBLE);
+                    break;
+                case 4: // user1
+                    ivCover.setImageResource(R.mipmap.text2);
+                    ivCover.setVisibility(View.VISIBLE);
+                    break;
+                case 3: // user2
+                    ivCover.setImageResource(R.mipmap.text3);
+                    ivCover.setVisibility(View.VISIBLE);
+                    break;
+                case 2: // user3
+                    ivCover.setImageResource(R.mipmap.text4);
+                    ivCover.setVisibility(View.VISIBLE);
+                    break;
+                case 1: // user4
+                    ivCover.setImageResource(R.mipmap.text5);
+                    ivCover.setVisibility(View.VISIBLE);
+                    break;
+                default:
+                    ivCover.setVisibility(View.GONE);
+            }
         }
 
         // Title + content
         ((TextView) findViewById(R.id.tvDetailTitle)).setText(article.title);
         ((TextView) findViewById(R.id.tvDetailContent)).setText(article.content);
         ((TextView) findViewById(R.id.tvDetailReadCount)).setText("阅读 " + article.readCount + " 次");
+
+        // Internal Images for Seed Articles
+        RecyclerView rvArticleImages = findViewById(R.id.rvArticleImages);
+        rvArticleImages.setLayoutManager(new LinearLayoutManager(this));
+        java.util.List<Integer> internalImages = new java.util.ArrayList<>();
+        if (article.coverUri == null) {
+            switch (article.id) {
+                case 5: // admin
+                    internalImages.add(R.mipmap.text1);
+                    break;
+                case 4: // user1
+                    internalImages.add(R.mipmap.text2);
+                    break;
+                case 3: // user2
+                    internalImages.add(R.mipmap.text3);
+                    break;
+                case 2: // user3
+                    internalImages.add(R.mipmap.text4);
+                    break;
+                case 1: // user4
+                    internalImages.add(R.mipmap.text5);
+                    break;
+            }
+        }
+
+        if (!internalImages.isEmpty()) {
+            rvArticleImages.setAdapter(new RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+                @NonNull
+                @Override
+                public RecyclerView.ViewHolder onCreateViewHolder(@NonNull android.view.ViewGroup parent,
+                        int viewType) {
+                    ImageView iv = new ImageView(parent.getContext());
+                    iv.setLayoutParams(new android.view.ViewGroup.LayoutParams(
+                            android.view.ViewGroup.LayoutParams.MATCH_PARENT,
+                            android.view.ViewGroup.LayoutParams.WRAP_CONTENT));
+                    iv.setAdjustViewBounds(true);
+                    iv.setScaleType(ImageView.ScaleType.FIT_CENTER);
+                    iv.setPadding(0, 0, 0, 24); // Add some bottom padding
+                    return new RecyclerView.ViewHolder(iv) {
+                    };
+                }
+
+                @Override
+                public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+                    ((ImageView) holder.itemView).setImageResource(internalImages.get(position));
+                }
+
+                @Override
+                public int getItemCount() {
+                    return internalImages.size();
+                }
+            });
+            rvArticleImages.setVisibility(View.VISIBLE);
+        } else {
+            rvArticleImages.setVisibility(View.GONE);
+        }
 
         // Author avatar initial
         String authorName = article.authorNickname != null && !article.authorNickname.isEmpty() ? article.authorNickname

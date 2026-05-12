@@ -183,7 +183,7 @@
             </LinearLayout>
         </LinearLayout>
 
-        <!-- 操作按钮（待支付才显示） -->
+        <!-- 操作按钮 -->
         <LinearLayout
             android:id="@+id/layoutDetailActions"
             android:layout_width="match_parent"
@@ -216,6 +216,19 @@
                 android:textStyle="bold"
                 android:background="@drawable/bg_auth_button"
                 android:stateListAnimator="@null" />
+
+            <Button
+                android:id="@+id/btnDetailComment"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:text="去评价"
+                android:textColor="@color/white"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:background="@drawable/bg_auth_button"
+                android:stateListAnimator="@null"
+                android:visibility="gone" />
         </LinearLayout>
 
     </LinearLayout>

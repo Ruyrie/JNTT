@@ -64,6 +64,38 @@ public class ProductDetailActivity extends AppCompatActivity {
             case 4:
                 images.add(R.mipmap.shucai);
                 break;
+            case 5:
+                images.add(R.mipmap.dongchongxiacao1);
+                images.add(R.mipmap.dongchongxiacao2);
+                images.add(R.mipmap.dongchongxiacao3);
+                break;
+            case 6:
+                images.add(R.mipmap.hongshu1);
+                images.add(R.mipmap.hongshu2);
+                images.add(R.mipmap.hongshu3);
+                images.add(R.mipmap.hongshu4);
+                break;
+            case 7:
+                images.add(R.mipmap.shanyao1);
+                images.add(R.mipmap.shanyao2);
+                images.add(R.mipmap.shanyao3);
+                break;
+            case 8:
+                images.add(R.mipmap.yangdujun1);
+                images.add(R.mipmap.yangdujun2);
+                break;
+            case 9:
+                images.add(R.mipmap.luronggu1);
+                images.add(R.mipmap.luronggu2);
+                images.add(R.mipmap.luronggu3);
+                images.add(R.mipmap.luronggu4);
+                break;
+            case 10:
+                images.add(R.mipmap.tuedan1);
+                images.add(R.mipmap.tuedan2);
+                images.add(R.mipmap.tuedan3);
+                images.add(R.mipmap.tuedan4);
+                break;
             default:
                 if (product.coverUri != null && !product.coverUri.isEmpty()) {
                     String[] uris = product.coverUri.split(",");
@@ -156,10 +188,11 @@ public class ProductDetailActivity extends AppCompatActivity {
             Toast.makeText(this, "已加入购物车", Toast.LENGTH_SHORT).show();
         });
 
-        // 立即购买 → 生成待支付订单
+        // 立即购买 → 生成待支付订单并跳转到订单列表
         ((Button) findViewById(R.id.btnBuy)).setOnClickListener(v -> {
             dm.addOrder(username, product.id, product.name, product.price, 1);
-            Toast.makeText(this, "下单成功，请在24小时内完成支付", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "下单成功", Toast.LENGTH_SHORT).show();
+            startActivity(new Intent(this, MyOrdersActivity.class));
         });
 
         // 购物车图标
@@ -198,10 +231,10 @@ public class ProductDetailActivity extends AppCompatActivity {
                     try {
                         ivAvatar.setImageURI(android.net.Uri.parse(latest.avatarUri));
                     } catch (Exception e) {
-                        ivAvatar.setImageResource(R.drawable.ic_launcher_background);
+                        ivAvatar.setImageResource(R.mipmap.ic_launcher_round);
                     }
                 } else {
-                    ivAvatar.setImageResource(R.drawable.ic_launcher_background);
+                    ivAvatar.setImageResource(R.mipmap.ic_launcher_round);
                 }
             }
         } else {
