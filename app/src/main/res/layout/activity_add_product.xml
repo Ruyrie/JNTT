@@ -62,52 +62,29 @@
             android:orientation="vertical">
 
             <!-- Cover image picker area -->
-            <FrameLayout
-                android:id="@+id/flProductCoverPicker"
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="220dp"
-                android:background="#EDEDEF"
-                android:foreground="?attr/selectableItemBackground">
-
-                <ImageView
-                    android:id="@+id/ivProductCover"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:scaleType="centerCrop"
-                    android:visibility="gone" />
-
-                <!-- Hint shown when no image is selected -->
-                <LinearLayout
-                    android:id="@+id/llProductCoverHint"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp"
+                android:background="#FFFFFF">
+                
+                <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:orientation="vertical"
-                    android:gravity="center">
+                    android:text="商品图片 (最多9张)"
+                    android:textSize="16sp"
+                    android:textColor="#333333"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="12dp" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="📷"
-                        android:textSize="40sp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="添加商品图片"
-                        android:textSize="14sp"
-                        android:textColor="#AAAAAA"
-                        android:layout_marginTop="8dp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="建议正方形图，展示效果更佳"
-                        android:textSize="11sp"
-                        android:textColor="#CCCCCC"
-                        android:layout_marginTop="4dp" />
-                </LinearLayout>
-            </FrameLayout>
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvProductImages"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:minHeight="100dp" />
+                
+            </LinearLayout>
 
             <!-- Product name -->
             <EditText

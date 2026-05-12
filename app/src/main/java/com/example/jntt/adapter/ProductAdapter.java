@@ -59,9 +59,10 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.VH> {
                 holder.ivProduct.setImageResource(R.mipmap.shucai);
                 break; // 绿色蔬菜礼盒
             default:
-                if (p.coverUri != null) {
+                if (p.coverUri != null && !p.coverUri.isEmpty()) {
+                    String firstUri = p.coverUri.split(",")[0];
                     try {
-                        holder.ivProduct.setImageURI(android.net.Uri.parse(p.coverUri));
+                        holder.ivProduct.setImageURI(android.net.Uri.parse(firstUri));
                     } catch (Exception e) {
                         holder.ivProduct.setImageResource(R.drawable.ic_product_placeholder);
                     }

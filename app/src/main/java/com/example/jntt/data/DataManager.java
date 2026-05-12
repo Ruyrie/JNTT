@@ -366,6 +366,57 @@ public class DataManager {
         wdb().delete("comments", "article_id=?", new String[] { String.valueOf(articleId) });
     }
 
+    // ─── 商品评价 ────────────────────────────────────────────────────────────────
+
+    public boolean hasPurchasedProduct(String username, int productId) {
+        if (username == null || username.isEmpty())
+            return false;
+        // Check if user has an order for this product
+        return queryCount("SELECT COUNT(*) FROM orders WHERE username=? AND product_id=?",
+                new String[] { username, String.valueOf(productId) }) > 0;
+    }
+
+    public com.example.jntt.model.ProductComment addProductComment(int productId, String username, String content,
+            String images) {
+        String time = now("MM-dd HH:mm");
+        ContentValues cv = new ContentValues();
+        cv.put("product_id", productId);
+        cv.put("username", username);
+        cv.put("content", content);
+        cv.put("images", images == null ? "" : images);
+        cv.put("time", time);
+        long id = wdb().insert("product_comments", null, cv);
+        return new com.example.jntt.model.ProductComment((int) id, productId, username, content, images, time);
+    }
+
+    public List<com.example.jntt.model.ProductComment> getProductComments(int productId) {
+        List<com.example.jntt.model.ProductComment> list = new ArrayList<>();
+        String sql = "SELECT c.id, c.product_id, c.username, c.content, c.images, c.time, u.nickname, u.avatar_uri " +
+                "FROM product_comments c " +
+                "LEFT JOIN users u ON c.username=u.username " +
+                "WHERE c.product_id=? ORDER BY c.id DESC";
+        try (Cursor c = rdb().rawQuery(sql, new String[] { String.valueOf(productId) })) {
+            while (c.moveToNext()) {
+                com.example.jntt.model.ProductComment pc = new com.example.jntt.model.ProductComment(
+                        c.getInt(0), c.getInt(1), c.getString(2),
+                        c.getString(3), c.getString(4), c.getString(5));
+                pc.nickname = c.getString(6);
+                pc.avatarUri = c.getString(7);
+                list.add(pc);
+            }
+        }
+        return list;
+    }
+
+    public void deleteProductComment(int commentId) {
+        wdb().delete("product_comments", "id=?", new String[] { String.valueOf(commentId) });
+    }
+
+    public int getProductCommentCount(int productId) {
+        return queryCount("SELECT COUNT(*) FROM product_comments WHERE product_id=?",
+                String.valueOf(productId));
+    }
+
     // ─── 评论 ────────────────────────────────────────────────────────────────
 
     public Comment addComment(int articleId, String username, String content) {
@@ -646,6 +697,12 @@ public class DataManager {
 
     private int queryCount(String sql, String arg) {
         try (Cursor c = rdb().rawQuery(sql, new String[] { arg })) {
+            return c.moveToFirst() ? c.getInt(0) : 0;
+        }
+    }
+
+    private int queryCount(String sql, String[] args) {
+        try (Cursor c = rdb().rawQuery(sql, args)) {
             return c.moveToFirst() ? c.getInt(0) : 0;
         }
     }

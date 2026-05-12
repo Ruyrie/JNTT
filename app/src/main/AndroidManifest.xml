@@ -85,6 +85,12 @@
         <!-- 编辑资料 -->
         <activity android:name=".ProfileEditActivity" />
 
+        <!-- 商品评价列表 -->
+        <activity android:name=".ProductCommentsActivity" />
+
+        <!-- 发表商品评价 -->
+        <activity android:name=".AddProductCommentActivity" />
+
         <!-- uCrop 裁剪 Activity -->
         <activity
             android:name="com.yalantis.ucrop.UCropActivity"
