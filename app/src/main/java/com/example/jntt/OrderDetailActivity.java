@@ -59,16 +59,16 @@ public class OrderDetailActivity extends AppCompatActivity {
         tvName.setText(order.name);
         switch (order.productId) {
             case 1:
-                ivProduct.setImageResource(R.mipmap.dami);
+                ivProduct.setImageResource(R.mipmap.dami1);
                 break;
             case 2:
                 ivProduct.setImageResource(R.mipmap.muer);
                 break;
             case 3:
-                ivProduct.setImageResource(R.mipmap.fengmi);
+                ivProduct.setImageResource(R.mipmap.fengmi1);
                 break;
             case 4:
-                ivProduct.setImageResource(R.mipmap.shucai);
+                ivProduct.setImageResource(R.mipmap.shucai1);
                 break;
             case 5:
                 ivProduct.setImageResource(R.mipmap.dongchongxiacao1);

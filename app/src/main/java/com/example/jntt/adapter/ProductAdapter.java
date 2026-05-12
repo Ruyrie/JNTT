@@ -47,16 +47,16 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.VH> {
         Product p = data.get(position);
         switch (p.id) {
             case 1:
-                holder.ivProduct.setImageResource(R.mipmap.dami);
+                holder.ivProduct.setImageResource(R.mipmap.dami1);
                 break; // 东北大米
             case 2:
                 holder.ivProduct.setImageResource(R.mipmap.muer);
                 break; // 有机黑木耳
             case 3:
-                holder.ivProduct.setImageResource(R.mipmap.fengmi);
+                holder.ivProduct.setImageResource(R.mipmap.fengmi1);
                 break; // 农家蜂蜜
             case 4:
-                holder.ivProduct.setImageResource(R.mipmap.shucai);
+                holder.ivProduct.setImageResource(R.mipmap.shucai1);
                 break; // 绿色蔬菜礼盒
             case 5:
                 holder.ivProduct.setImageResource(R.mipmap.dongchongxiacao1);

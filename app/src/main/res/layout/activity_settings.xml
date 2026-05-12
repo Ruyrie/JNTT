@@ -70,8 +70,8 @@
                 android:gravity="center_vertical"
                 android:paddingHorizontal="20dp"
                 android:background="?android:attr/selectableItemBackground">
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:text="👤" android:textSize="18sp" android:layout_marginEnd="14dp"/>
+                <ImageView android:layout_width="18dp" android:layout_height="18dp"
+                    android:src="@mipmap/zhanghaoguanli" android:layout_marginEnd="14dp"/>
                 <TextView android:layout_width="0dp" android:layout_height="wrap_content"
                     android:layout_weight="1" android:text="账号管理"
                     android:textSize="16sp" android:textColor="#1F1F1F"/>
@@ -103,8 +103,8 @@
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
                 android:paddingHorizontal="20dp">
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:text="🔐" android:textSize="18sp" android:layout_marginEnd="14dp"/>
+                <ImageView android:layout_width="18dp" android:layout_height="18dp"
+                    android:src="@mipmap/guanliyuan" android:layout_marginEnd="14dp"/>
                 <TextView android:layout_width="0dp" android:layout_height="wrap_content"
                     android:layout_weight="1" android:text="管理员模式"
                     android:textSize="16sp" android:textColor="#1F1F1F"/>
@@ -135,8 +135,8 @@
                     android:gravity="center_vertical"
                     android:paddingHorizontal="20dp"
                     android:background="?android:attr/selectableItemBackground">
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                        android:text="✍️" android:textSize="18sp" android:layout_marginEnd="14dp"/>
+                    <ImageView android:layout_width="18dp" android:layout_height="18dp"
+                        android:src="@mipmap/tianjiawenzhang" android:layout_marginEnd="14dp"/>
                     <TextView android:layout_width="0dp" android:layout_height="wrap_content"
                         android:layout_weight="1" android:text="添加文章"
                         android:textSize="16sp" android:textColor="#1F1F1F"/>
@@ -155,8 +155,8 @@
                     android:gravity="center_vertical"
                     android:paddingHorizontal="20dp"
                     android:background="?android:attr/selectableItemBackground">
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                        android:text="🏷️" android:textSize="18sp" android:layout_marginEnd="14dp"/>
+                    <ImageView android:layout_width="18dp" android:layout_height="18dp"
+                        android:src="@mipmap/tianjiashangpin" android:layout_marginEnd="14dp"/>
                     <TextView android:layout_width="0dp" android:layout_height="wrap_content"
                         android:layout_weight="1" android:text="添加商品"
                         android:textSize="16sp" android:textColor="#1F1F1F"/>
@@ -182,8 +182,8 @@
                 android:gravity="center_vertical"
                 android:paddingHorizontal="20dp"
                 android:background="?android:attr/selectableItemBackground">
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:text="🚪" android:textSize="18sp" android:layout_marginEnd="14dp"/>
+                <ImageView android:layout_width="18dp" android:layout_height="18dp"
+                    android:src="@mipmap/tuchudenglu" android:layout_marginEnd="14dp"/>
                 <TextView android:layout_width="0dp" android:layout_height="wrap_content"
                     android:layout_weight="1" android:text="退出登录"
                     android:textSize="16sp" android:textColor="#FF3B30"/>

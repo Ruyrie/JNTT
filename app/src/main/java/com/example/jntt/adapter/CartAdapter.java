@@ -105,16 +105,16 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.VH> {
 
         switch (c.productId) {
             case 1:
-                holder.ivImage.setImageResource(R.mipmap.dami);
+                holder.ivImage.setImageResource(R.mipmap.dami1);
                 break;
             case 2:
                 holder.ivImage.setImageResource(R.mipmap.muer);
                 break;
             case 3:
-                holder.ivImage.setImageResource(R.mipmap.fengmi);
+                holder.ivImage.setImageResource(R.mipmap.fengmi1);
                 break;
             case 4:
-                holder.ivImage.setImageResource(R.mipmap.shucai);
+                holder.ivImage.setImageResource(R.mipmap.shucai1);
                 break;
             case 5:
                 holder.ivImage.setImageResource(R.mipmap.dongchongxiacao1);

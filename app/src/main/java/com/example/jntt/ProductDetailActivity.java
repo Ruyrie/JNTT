@@ -49,7 +49,9 @@ public class ProductDetailActivity extends AppCompatActivity {
 
         switch (product.id) {
             case 1:
-                images.add(R.mipmap.dami);
+                images.add(R.mipmap.dami1);
+                images.add(R.mipmap.dami2);
+                images.add(R.mipmap.dami3);
                 break;
             case 2:
                 images.add(R.mipmap.muer);
@@ -59,10 +61,15 @@ public class ProductDetailActivity extends AppCompatActivity {
                 images.add(R.mipmap.muer5);
                 break;
             case 3:
-                images.add(R.mipmap.fengmi);
+                images.add(R.mipmap.fengmi1);
+                images.add(R.mipmap.fengmi2);
+                images.add(R.mipmap.fengmi3);
                 break;
             case 4:
-                images.add(R.mipmap.shucai);
+                images.add(R.mipmap.shucai1);
+                images.add(R.mipmap.shucai2);
+                images.add(R.mipmap.shucai3);
+                images.add(R.mipmap.shucai4);
                 break;
             case 5:
                 images.add(R.mipmap.dongchongxiacao1);

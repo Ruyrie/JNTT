@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -26,10 +26,10 @@
             android:background="@drawable/bg_search_input"
             android:paddingHorizontal="10dp">
 
-            <TextView
+            <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="🔍"
+                android:src="@mipmap/sousuo"
                 android:textSize="13sp"
                 android:textColor="#8E8E93"
                 android:layout_marginEnd="6dp" />
@@ -144,10 +144,10 @@
             android:gravity="center"
             android:visibility="gone">
 
-            <TextView
+            <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="🔍"
+                android:src="@mipmap/sousuo"
                 android:textSize="52sp"
                 android:layout_marginBottom="16dp" />
 
@@ -163,3 +163,4 @@
     </FrameLayout>
 
 </LinearLayout>
+

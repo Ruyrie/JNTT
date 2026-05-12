@@ -236,8 +236,8 @@
                     android:gravity="center_vertical"
                     android:paddingHorizontal="20dp"
                     android:background="?android:attr/selectableItemBackground">
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                        android:text="📰" android:textSize="18sp" android:layout_marginEnd="14dp" />
+                    <ImageView android:layout_width="18dp" android:layout_height="18dp"
+                        android:src="@mipmap/wenzhang" android:layout_marginEnd="14dp" />
                     <TextView android:layout_width="0dp" android:layout_height="wrap_content"
                         android:layout_weight="1" android:text="我的文章" android:textSize="16sp" android:textColor="#1F1F1F" />
                     <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
@@ -255,8 +255,8 @@
                     android:gravity="center_vertical"
                     android:paddingHorizontal="20dp"
                     android:background="?android:attr/selectableItemBackground">
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                        android:text="❤️" android:textSize="18sp" android:layout_marginEnd="14dp" />
+                    <ImageView android:layout_width="18dp" android:layout_height="18dp"
+                        android:src="@mipmap/shoucang" android:layout_marginEnd="14dp" />
                     <TextView android:layout_width="0dp" android:layout_height="wrap_content"
                         android:layout_weight="1" android:text="我的收藏" android:textSize="16sp" android:textColor="#1F1F1F" />
                     <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
@@ -274,8 +274,8 @@
                     android:gravity="center_vertical"
                     android:paddingHorizontal="20dp"
                     android:background="?android:attr/selectableItemBackground">
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                        android:text="📦" android:textSize="18sp" android:layout_marginEnd="14dp" />
+                    <ImageView android:layout_width="18dp" android:layout_height="18dp"
+                        android:src="@mipmap/dingdan" android:layout_marginEnd="14dp" />
                     <TextView android:layout_width="0dp" android:layout_height="wrap_content"
                         android:layout_weight="1" android:text="我的订单" android:textSize="16sp" android:textColor="#1F1F1F" />
                     <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
@@ -293,8 +293,8 @@
                     android:gravity="center_vertical"
                     android:paddingHorizontal="20dp"
                     android:background="?android:attr/selectableItemBackground">
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                        android:text="🛒" android:textSize="18sp" android:layout_marginEnd="14dp" />
+                    <ImageView android:layout_width="18dp" android:layout_height="18dp"
+                        android:src="@mipmap/gouwuche" android:layout_marginEnd="14dp" />
                     <TextView android:layout_width="0dp" android:layout_height="wrap_content"
                         android:layout_weight="1" android:text="购物车" android:textSize="16sp" android:textColor="#1F1F1F" />
                     <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
@@ -327,8 +327,8 @@
                     android:gravity="center_vertical"
                     android:paddingHorizontal="20dp"
                     android:background="?android:attr/selectableItemBackground">
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                        android:text="⚙️" android:textSize="18sp" android:layout_marginEnd="14dp" />
+                    <ImageView android:layout_width="18dp" android:layout_height="18dp"
+                        android:src="@mipmap/shezhi" android:layout_marginEnd="14dp" />
                     <TextView android:layout_width="0dp" android:layout_height="wrap_content"
                         android:layout_weight="1" android:text="设置" android:textSize="16sp" android:textColor="#1F1F1F" />
                     <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
