@@ -32,7 +32,8 @@ public class ArticleDetailActivity extends AppCompatActivity {
     private CommentAdapter commentAdapter;
 
     // Views
-    private TextView tvLikeBtn, tvLikeCount, tvCommentCount, tvCommentCountBar;
+    private TextView tvLikeCount, tvCommentCount, tvCommentCountBar;
+    private ImageView ivLikeBtn;
     private LinearLayout llNoComments;
     private NestedScrollView nestedScroll;
 
@@ -107,41 +108,8 @@ public class ArticleDetailActivity extends AppCompatActivity {
             });
         }
 
-        // Cover
-        ImageView ivCover = findViewById(R.id.ivDetailCover);
-        if (article.coverUri != null) {
-            try {
-                ivCover.setImageURI(Uri.parse(article.coverUri));
-                ivCover.setVisibility(View.VISIBLE);
-            } catch (Exception ignored) {
-            }
-        } else {
-            // Hardcode cover for seed articles
-            switch (article.id) {
-                case 5: // admin
-                    ivCover.setImageResource(R.mipmap.text1);
-                    ivCover.setVisibility(View.VISIBLE);
-                    break;
-                case 4: // user1
-                    ivCover.setImageResource(R.mipmap.text2);
-                    ivCover.setVisibility(View.VISIBLE);
-                    break;
-                case 3: // user2
-                    ivCover.setImageResource(R.mipmap.text3);
-                    ivCover.setVisibility(View.VISIBLE);
-                    break;
-                case 2: // user3
-                    ivCover.setImageResource(R.mipmap.text4);
-                    ivCover.setVisibility(View.VISIBLE);
-                    break;
-                case 1: // user4
-                    ivCover.setImageResource(R.mipmap.text5);
-                    ivCover.setVisibility(View.VISIBLE);
-                    break;
-                default:
-                    ivCover.setVisibility(View.GONE);
-            }
-        }
+        // Cover image is intentionally not shown in detail view
+        // (the same image already appears in the article body via rvArticleImages)
 
         // Title + content
         ((TextView) findViewById(R.id.tvDetailTitle)).setText(article.title);
@@ -314,7 +282,7 @@ public class ArticleDetailActivity extends AppCompatActivity {
     // ─── Bottom bar (like + comment input) ───────────────────────────────────
 
     private void setupBottomBar() {
-        tvLikeBtn = findViewById(R.id.tvLikeBtn);
+        ivLikeBtn = findViewById(R.id.tvLikeBtn);
         tvLikeCount = findViewById(R.id.tvLikeCount);
         refreshLikeUI();
 
@@ -330,8 +298,8 @@ public class ArticleDetailActivity extends AppCompatActivity {
             } else {
                 dm.likeArticle(currentUser, articleId);
                 // Heart-beat animation
-                tvLikeBtn.animate().scaleX(1.35f).scaleY(1.35f).setDuration(130)
-                        .withEndAction(() -> tvLikeBtn.animate().scaleX(1f).scaleY(1f).setDuration(100).start())
+                ivLikeBtn.animate().scaleX(1.35f).scaleY(1.35f).setDuration(130)
+                        .withEndAction(() -> ivLikeBtn.animate().scaleX(1f).scaleY(1f).setDuration(100).start())
                         .start();
             }
             refreshLikeUI();
@@ -361,8 +329,7 @@ public class ArticleDetailActivity extends AppCompatActivity {
     private void refreshLikeUI() {
         boolean liked = currentUser != null && dm.isArticleLiked(currentUser, articleId);
         int count = dm.getArticleLikeCount(articleId);
-        tvLikeBtn.setText(liked ? "♥" : "♡");
-        tvLikeBtn.setTextColor(liked ? 0xFFE53935 : 0xFFAAAAAA);
+        ivLikeBtn.setImageResource(liked ? R.mipmap.dianzan : R.mipmap.weidianzan);
         tvLikeCount.setText(count > 0 ? String.valueOf(count) : "");
     }
 
@@ -397,7 +364,7 @@ public class ArticleDetailActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         // Refresh like count in case user navigated away and back
-        if (tvLikeBtn != null)
+        if (ivLikeBtn != null)
             refreshLikeUI();
     }
 }

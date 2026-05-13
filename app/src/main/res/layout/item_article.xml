@@ -60,7 +60,7 @@
                 android:textSize="14sp"
                 android:textStyle="bold"
                 android:textColor="#1F1F1F"
-                android:text="作�? />
+                android:text="作者" />
 
             <TextView
                 android:id="@+id/tvArticleTime"
@@ -242,4 +242,3 @@
         android:background="#F2F2F7" />
 
 </LinearLayout>
-

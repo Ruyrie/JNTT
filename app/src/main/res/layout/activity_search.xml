@@ -27,11 +27,9 @@
             android:paddingHorizontal="10dp">
 
             <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
                 android:src="@mipmap/sousuo"
-                android:textSize="13sp"
-                android:textColor="#8E8E93"
                 android:layout_marginEnd="6dp" />
 
             <EditText
@@ -145,10 +143,9 @@
             android:visibility="gone">
 
             <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
                 android:src="@mipmap/sousuo"
-                android:textSize="52sp"
                 android:layout_marginBottom="16dp" />
 
             <TextView

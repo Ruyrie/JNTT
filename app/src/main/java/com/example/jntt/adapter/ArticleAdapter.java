@@ -134,7 +134,7 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.VH> {
             h.layoutTopComment.setVisibility(View.GONE);
             h.tvItemLikeCount.setText("");
             h.tvItemCommentCount.setText("");
-            h.ivItemLikeIcon.setImageResource(R.drawable.ic_like_outline);
+            h.ivItemLikeIcon.setImageResource(R.mipmap.weidianzan);
         }
 
         // Deleted UI
@@ -202,7 +202,7 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.VH> {
     private void refreshItemLike(VH h, Article a) {
         boolean liked = dm.isArticleLiked(currentUser, a.id);
         int count = dm.getArticleLikeCount(a.id);
-        h.ivItemLikeIcon.setImageResource(liked ? R.drawable.ic_like_filled : R.drawable.ic_like_outline);
+        h.ivItemLikeIcon.setImageResource(liked ? R.mipmap.dianzan : R.mipmap.weidianzan);
         h.tvItemLikeCount.setText(count > 0 ? String.valueOf(count) : "");
     }
 

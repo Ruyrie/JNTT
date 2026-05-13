@@ -1,11 +1,11 @@
 package com.example.jntt;
 
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.CompoundButton;
 import android.widget.LinearLayout;
-import android.widget.Switch;
+import androidx.appcompat.widget.SwitchCompat;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import com.example.jntt.data.DataManager;
@@ -29,8 +29,14 @@ public class SettingsActivity extends AppCompatActivity {
 
         findViewById(R.id.tvLogout).setOnClickListener(v -> confirmLogout());
 
-        Switch swAdmin = findViewById(R.id.swAdminMode);
+        SwitchCompat swAdmin = findViewById(R.id.swAdminMode);
         layoutAdminOptions = findViewById(R.id.layoutAdminOptions);
+
+        // Green when ON, gray when OFF
+        int[][] states = { new int[]{ android.R.attr.state_checked }, new int[]{ -android.R.attr.state_checked } };
+        int[] trackColors = { 0xFF008000, 0xFFE5E5EA };
+        swAdmin.setTrackTintList(new ColorStateList(states, trackColors));
+
         swAdmin.setChecked(dm.isAdminMode());
         updateAdminVisibility(dm.isAdminMode());
 
