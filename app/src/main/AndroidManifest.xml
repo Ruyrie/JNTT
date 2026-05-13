@@ -85,6 +85,18 @@
         <!-- 编辑资料 -->
         <activity android:name=".ProfileEditActivity" />
 
+        <!-- 商品评价列表 -->
+        <activity android:name=".ProductCommentsActivity" />
+
+        <!-- 发表商品评价 -->
+        <activity android:name=".AddProductCommentActivity" />
+
+        <!-- uCrop 裁剪 Activity -->
+        <activity
+            android:name="com.yalantis.ucrop.UCropActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"

@@ -105,17 +105,20 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.VH> {
             h.ivThumb.setImageURI(Uri.parse(a.coverUri));
         } else {
             switch (a.id) {
-                case 1:
+                case 5: // admin
                     h.ivThumb.setImageResource(R.mipmap.text1);
                     break;
-                case 2:
+                case 4: // user1
                     h.ivThumb.setImageResource(R.mipmap.text2);
                     break;
-                case 3:
+                case 3: // user2
                     h.ivThumb.setImageResource(R.mipmap.text3);
                     break;
-                case 4:
+                case 2: // user3
                     h.ivThumb.setImageResource(R.mipmap.text4);
+                    break;
+                case 1: // user4
+                    h.ivThumb.setImageResource(R.mipmap.text5);
                     break;
                 default:
                     h.ivThumb.setBackgroundColor(THUMB_COLORS[position % THUMB_COLORS.length]);
@@ -131,7 +134,7 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.VH> {
             h.layoutTopComment.setVisibility(View.GONE);
             h.tvItemLikeCount.setText("");
             h.tvItemCommentCount.setText("");
-            h.ivItemLikeIcon.setImageResource(R.drawable.ic_like_outline);
+            h.ivItemLikeIcon.setImageResource(R.mipmap.weidianzan);
         }
 
         // Deleted UI
@@ -199,7 +202,7 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.VH> {
     private void refreshItemLike(VH h, Article a) {
         boolean liked = dm.isArticleLiked(currentUser, a.id);
         int count = dm.getArticleLikeCount(a.id);
-        h.ivItemLikeIcon.setImageResource(liked ? R.drawable.ic_like_filled : R.drawable.ic_like_outline);
+        h.ivItemLikeIcon.setImageResource(liked ? R.mipmap.dianzan : R.mipmap.weidianzan);
         h.tvItemLikeCount.setText(count > 0 ? String.valueOf(count) : "");
     }
 

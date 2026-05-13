@@ -4,7 +4,6 @@ import android.animation.ValueAnimator;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewTreeObserver;
-import android.view.animation.PathInterpolator;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -30,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
     private ImageView[] icons;
     private TextView[] labels;
     private int currentIndex = 0;
+    private ValueAnimator pillAnimator;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,11 +38,10 @@ public class MainActivity extends AppCompatActivity {
 
         View fragmentContainer = findViewById(R.id.fragmentContainer);
         BlurBehindView navBlur = findViewById(R.id.navBlur);
-        BlurBehindView pillBlur = findViewById(R.id.pillBlur);
-        navBlur.setSourceView(fragmentContainer);
-        navBlur.setBlurRadius(28f);
-        pillBlur.setSourceView(fragmentContainer);
-        pillBlur.setBlurRadius(18f);
+        if (navBlur != null) {
+            navBlur.setSourceView(fragmentContainer);
+            navBlur.setBlurRadius(28f);
+        }
 
         glassPill = findViewById(R.id.glassPill);
         tabBar = findViewById(R.id.glassTabBar);
@@ -75,13 +74,13 @@ public class MainActivity extends AppCompatActivity {
                         tabBar.getViewTreeObserver().removeOnGlobalLayoutListener(this);
                         int tabWidth = tabs[0].getWidth();
                         float density = getResources().getDisplayMetrics().density;
-                        int dp12 = (int) (12 * density);
-                        float dp6 = 6 * density;
+                        int dp24 = (int) (24 * density);
+                        float dp12 = 12 * density;
 
                         FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) glassPill.getLayoutParams();
-                        lp.width = tabWidth - dp12;
+                        lp.width = tabWidth - dp24;
                         glassPill.setLayoutParams(lp);
-                        glassPill.setTranslationX(tabs[currentIndex].getLeft() + dp6);
+                        glassPill.setTranslationX(tabs[currentIndex].getLeft() + dp12);
                     }
                 });
 
@@ -94,19 +93,58 @@ public class MainActivity extends AppCompatActivity {
         if (idx == currentIndex)
             return;
 
+        if (pillAnimator != null && pillAnimator.isRunning()) {
+            pillAnimator.cancel();
+        }
+
         float density = getResources().getDisplayMetrics().density;
-        float dp6 = 6 * density;
+        float dp12 = 12 * density;
 
         // 滑动液态药丸
-        float targetX = tabs[idx].getLeft() + dp6;
-        if (animate) {
-            ValueAnimator anim = ValueAnimator.ofFloat(glassPill.getTranslationX(), targetX);
-            anim.setDuration(420);
-            anim.setInterpolator(new PathInterpolator(0.34f, 1.56f, 0.64f, 1f));
-            anim.addUpdateListener(a -> glassPill.setTranslationX((float) a.getAnimatedValue()));
-            anim.start();
+        float startX = glassPill.getTranslationX();
+        float targetX = tabs[idx].getLeft() + dp12;
+        // 强行使用当前 tab 的实际标准宽度，不依赖 getWidth，防止连点时变长变扁
+        float pillWidth = tabs[idx].getWidth() - 24 * density;
 
-            // 图标颜色渐变 + 轻微缩放（液态形变感）
+        if (animate) {
+            // 根据跨越的标签数量动态调整动画时长，确保不同距离的滑动速度视觉上一致
+            long duration = 350 + Math.abs(idx - currentIndex) * 80L;
+            pillAnimator = ValueAnimator.ofFloat(0f, 1f);
+            pillAnimator.setDuration(duration);
+            pillAnimator.addUpdateListener(a -> {
+                float t = (float) a.getAnimatedValue();
+
+                // 头部(冲锋端)：Overshoot 过冲效果，超过再弹回
+                float tension = 1.5f;
+                float tHead = (t - 1.0f);
+                tHead = tHead * tHead * ((tension + 1) * tHead + tension) + 1.0f;
+
+                // 尾部(拖拽端)：平滑的 EaseInOut 曲线 (不再死死粘连，而是整体平滑跟进)
+                // 这样在滑动时，前后端速度差会产生自然的“变宽再恢复”的水滴感
+                float tTail = t * t * (3.0f - 2.0f * t);
+
+                float currentLeft, currentRight;
+                if (targetX > startX) { // 向右滑动
+                    // 头部是右边，冲出去
+                    currentRight = (startX + pillWidth) + (targetX - startX) * tHead;
+                    // 尾部是左边，慢慢跟上
+                    currentLeft = startX + (targetX - startX) * tTail;
+                } else { // 向左滑动
+                    // 头部是左边，向左冲出去 (注意 targetX - startX 是负数)
+                    currentLeft = startX + (targetX - startX) * tHead;
+                    // 尾部是右边，慢慢跟上
+                    currentRight = (startX + pillWidth) + (targetX - startX) * tTail;
+                }
+
+                // 纯横向的水滴拉伸和果冻反弹效果
+                glassPill.setTranslationX(currentLeft);
+                FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) glassPill.getLayoutParams();
+                lp.width = Math.max(1, (int) (currentRight - currentLeft));
+                glassPill.setLayoutParams(lp);
+            });
+            pillAnimator.start();
+
+            // 图标颜色渐变
             animateIconColor(icons[currentIndex], ACTIVE_COLOR, INACTIVE_COLOR);
             animateIconColor(icons[idx], INACTIVE_COLOR, ACTIVE_COLOR);
             labels[currentIndex].setTextColor(INACTIVE_COLOR);
@@ -116,6 +154,9 @@ public class MainActivity extends AppCompatActivity {
 
         } else {
             glassPill.setTranslationX(targetX);
+            FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) glassPill.getLayoutParams();
+            lp.width = (int) pillWidth;
+            glassPill.setLayoutParams(lp);
         }
 
         currentIndex = idx;
@@ -142,9 +183,6 @@ public class MainActivity extends AppCompatActivity {
 
     private void switchFragment(Fragment f, boolean first) {
         FragmentTransaction tx = getSupportFragmentManager().beginTransaction();
-        if (!first) {
-            tx.setCustomAnimations(R.anim.ios_fade_scale_in, R.anim.ios_fade_out);
-        }
         tx.replace(R.id.fragmentContainer, f).commit();
     }
 }

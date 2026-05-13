@@ -66,6 +66,13 @@ public class DataManager {
         return prefs().getBoolean(KEY_ADMIN_MODE, false);
     }
 
+    public void hideUserFromHistory(String username) {
+        java.util.Set<String> hidden = new java.util.HashSet<>(
+                prefs().getStringSet("hidden_users", new java.util.HashSet<>()));
+        hidden.add(username);
+        prefs().edit().putStringSet("hidden_users", hidden).apply();
+    }
+
     private SharedPreferences prefs() {
         return ctx.getSharedPreferences(PREF_SESSION, Context.MODE_PRIVATE);
     }
@@ -74,9 +81,13 @@ public class DataManager {
 
     public List<User> getUsers() {
         List<User> list = new ArrayList<>();
+        java.util.Set<String> hidden = prefs().getStringSet("hidden_users", new java.util.HashSet<>());
         try (Cursor c = rdb().rawQuery("SELECT username,password,avatar_uri FROM users", null)) {
             while (c.moveToNext()) {
-                User u = new User(c.getString(0), c.getString(1));
+                String uName = c.getString(0);
+                if (hidden.contains(uName))
+                    continue;
+                User u = new User(uName, c.getString(1));
                 u.avatarUri = c.getString(2);
                 list.add(u);
             }
@@ -142,8 +153,15 @@ public class DataManager {
         try (Cursor c = rdb().rawQuery(
                 "SELECT username,password FROM users WHERE (username=? OR phone=?) AND password=?",
                 new String[] { usernameOrPhone, usernameOrPhone, password })) {
-            if (c.moveToFirst())
-                return new User(c.getString(0), c.getString(1));
+            if (c.moveToFirst()) {
+                String uName = c.getString(0);
+                java.util.Set<String> hidden = new java.util.HashSet<>(
+                        prefs().getStringSet("hidden_users", new java.util.HashSet<>()));
+                if (hidden.remove(uName)) {
+                    prefs().edit().putStringSet("hidden_users", hidden).apply();
+                }
+                return new User(uName, c.getString(1));
+            }
         }
         return null;
     }
@@ -348,6 +366,57 @@ public class DataManager {
         wdb().delete("comments", "article_id=?", new String[] { String.valueOf(articleId) });
     }
 
+    // ─── 商品评价 ────────────────────────────────────────────────────────────────
+
+    public boolean hasPurchasedProduct(String username, int productId) {
+        if (username == null || username.isEmpty())
+            return false;
+        // Check if user has an order for this product
+        return queryCount("SELECT COUNT(*) FROM orders WHERE username=? AND product_id=?",
+                new String[] { username, String.valueOf(productId) }) > 0;
+    }
+
+    public com.example.jntt.model.ProductComment addProductComment(int productId, String username, String content,
+            String images) {
+        String time = now("MM-dd HH:mm");
+        ContentValues cv = new ContentValues();
+        cv.put("product_id", productId);
+        cv.put("username", username);
+        cv.put("content", content);
+        cv.put("images", images == null ? "" : images);
+        cv.put("time", time);
+        long id = wdb().insert("product_comments", null, cv);
+        return new com.example.jntt.model.ProductComment((int) id, productId, username, content, images, time);
+    }
+
+    public List<com.example.jntt.model.ProductComment> getProductComments(int productId) {
+        List<com.example.jntt.model.ProductComment> list = new ArrayList<>();
+        String sql = "SELECT c.id, c.product_id, c.username, c.content, c.images, c.time, u.nickname, u.avatar_uri " +
+                "FROM product_comments c " +
+                "LEFT JOIN users u ON c.username=u.username " +
+                "WHERE c.product_id=? ORDER BY c.id DESC";
+        try (Cursor c = rdb().rawQuery(sql, new String[] { String.valueOf(productId) })) {
+            while (c.moveToNext()) {
+                com.example.jntt.model.ProductComment pc = new com.example.jntt.model.ProductComment(
+                        c.getInt(0), c.getInt(1), c.getString(2),
+                        c.getString(3), c.getString(4), c.getString(5));
+                pc.nickname = c.getString(6);
+                pc.avatarUri = c.getString(7);
+                list.add(pc);
+            }
+        }
+        return list;
+    }
+
+    public void deleteProductComment(int commentId) {
+        wdb().delete("product_comments", "id=?", new String[] { String.valueOf(commentId) });
+    }
+
+    public int getProductCommentCount(int productId) {
+        return queryCount("SELECT COUNT(*) FROM product_comments WHERE product_id=?",
+                String.valueOf(productId));
+    }
+
     // ─── 评论 ────────────────────────────────────────────────────────────────
 
     public Comment addComment(int articleId, String username, String content) {
@@ -430,14 +499,14 @@ public class DataManager {
 
     public boolean isFollowing(String follower, String following) {
         try (Cursor c = rdb().rawQuery(
-                "SELECT 1 FROM follows WHERE follower=? AND following=?",
+                "SELECT 1 FROM follows WHERE follower=? AND `following`=?",
                 new String[] { follower, following })) {
             return c.moveToFirst();
         }
     }
 
     public int getFollowersCount(String username) {
-        return queryCount("SELECT COUNT(*) FROM follows WHERE following=?", username);
+        return queryCount("SELECT COUNT(*) FROM follows WHERE `following`=?", username);
     }
 
     public int getFollowingCount(String username) {
@@ -468,7 +537,7 @@ public class DataManager {
     public List<String> getFollowers(String username) {
         List<String> list = new ArrayList<>();
         try (Cursor c = rdb().rawQuery(
-                "SELECT follower FROM follows WHERE following=? ORDER BY id DESC",
+                "SELECT follower FROM follows WHERE `following`=? ORDER BY id DESC",
                 new String[] { username })) {
             while (c.moveToNext())
                 list.add(c.getString(0));
@@ -480,7 +549,7 @@ public class DataManager {
     public List<String> getFollowing(String username) {
         List<String> list = new ArrayList<>();
         try (Cursor c = rdb().rawQuery(
-                "SELECT following FROM follows WHERE follower=? ORDER BY id DESC",
+                "SELECT `following` FROM follows WHERE follower=? ORDER BY id DESC",
                 new String[] { username })) {
             while (c.moveToNext())
                 list.add(c.getString(0));
@@ -514,7 +583,7 @@ public class DataManager {
     public List<Product> getProducts() {
         List<Product> list = new ArrayList<>();
         try (Cursor c = rdb().rawQuery(
-                "SELECT id,name,desc,price,cover_uri FROM products", null)) {
+                "SELECT id,name,`desc`,price,cover_uri FROM products", null)) {
             while (c.moveToNext())
                 list.add(new Product(c.getInt(0), c.getString(1), c.getString(2), c.getDouble(3), c.getString(4)));
         }
@@ -632,6 +701,12 @@ public class DataManager {
         }
     }
 
+    private int queryCount(String sql, String[] args) {
+        try (Cursor c = rdb().rawQuery(sql, args)) {
+            return c.moveToFirst() ? c.getInt(0) : 0;
+        }
+    }
+
     private int nextId(String table) {
         try (Cursor c = rdb().rawQuery(
                 "SELECT COALESCE(MAX(id),0)+1 FROM " + table, null)) {
@@ -646,30 +721,43 @@ public class DataManager {
     // ─── 种子数据（DB 空时初始化） ────────────────────────────────────────────
 
     private void seedDefaultData() {
-        // 已有数据则跳过
-        try (Cursor c = rdb().rawQuery("SELECT COUNT(*) FROM articles", null)) {
-            if (c.moveToFirst() && c.getInt(0) > 0)
-                return;
+        // 确保能刷新出 10 件初始商品和 5 篇文章
+        boolean needSeed = false;
+        try (Cursor c = rdb().rawQuery("SELECT COUNT(*) FROM products", null)) {
+            if (c.moveToFirst() && c.getInt(0) < 10) {
+                needSeed = true;
+            }
         }
+        if (!needSeed)
+            return;
+
+        SQLiteDatabase d = wdb();
+        // 清除旧数据，避免主键冲突
+        d.execSQL("DELETE FROM articles WHERE id <= 5");
+        d.execSQL("DELETE FROM products WHERE id <= 10");
 
         register("admin", "123456");
         register("user1", "123456");
+        register("user2", "123456");
+        register("user3", "123456");
+        register("user4", "123456");
 
-        SQLiteDatabase d = wdb();
-
-        // 示例文章
-        insertArticle(d, 1, "吉林科技学院举办科技节",
-                "本次科技节汇聚了来自全国各地的农业科技专家，展示了最新农业技术成果，吸引了众多师生参与。",
-                "admin", "2026-04-01 09:00", 15);
-        insertArticle(d, 2, "新型水稻品种研发成功",
-                "经过多年培育，我校农学院成功研发出高产、抗病新型水稻品种，亩产可达800公斤以上，为粮食安全提供有力保障。",
-                "admin", "2026-04-05 14:30", 8);
+        // 示例文章 (5个不同用户发布)
+        insertArticle(d, 5, "吉林科技学院举办科技节",
+                "本次科技节汇聚了来自全国各地的农业科技专家，展示了最新农业技术成果，吸引了众多师生参与。展览期间，多项智慧农业设备首次亮相，引起了广泛关注。专家们对这些技术的实际应用前景进行了深入探讨。",
+                "admin", "2026-04-20 09:00", 15);
+        insertArticle(d, 4, "新型水稻品种研发成功",
+                "经过多年培育，我校农学院成功研发出高产、抗病新型水稻品种，亩产可达800公斤以上，为粮食安全提供有力保障。该品种在抗倒伏和抗病虫害方面表现优异，有望在下个种植季大面积推广。",
+                "user1", "2026-04-15 14:30", 8);
         insertArticle(d, 3, "智慧农业实验基地投入使用",
-                "学校智慧农业实验基地正式投入使用，基地配备物联网传感器、无人机等先进设备，开创农业教育新模式。",
-                "admin", "2026-04-10 10:00", 12);
-        insertArticle(d, 4, "农业经济论坛成功举办",
-                "本届农业经济论坛围绕乡村振兴战略展开深入讨论，多位专家学者分享了最新研究成果和政策解读。",
-                "user1", "2026-04-15 16:00", 5);
+                "学校智慧农业实验基地正式投入使用，基地配备物联网传感器、无人机等先进设备，开创农业教育新模式。学生们现在可以在基地进行实地操作，将理论知识与现代农业技术完美结合。",
+                "user2", "2026-04-10 10:00", 12);
+        insertArticle(d, 2, "农业经济论坛成功举办",
+                "本届农业经济论坛围绕乡村振兴战略展开深入讨论，多位专家学者分享了最新研究成果和政策解读。会议指出，特色农产品品牌化和电商化将是未来农村经济发展的重要驱动力。",
+                "user3", "2026-04-05 16:00", 5);
+        insertArticle(d, 1, "长白山野生菌类采摘季开启",
+                "随着雨季的到来，长白山地区的野生菌类迎来了丰收季。当地农户严格遵守可持续采摘原则，确保生态平衡。同时，新鲜的羊肚菌、鹿茸菇等珍稀菌类已开始陆续供应市场。",
+                "user4", "2026-04-01 08:30", 20);
 
         // 示例商品
         insertProduct(d, 1, "东北大米（5kg）",
@@ -680,6 +768,18 @@ public class DataManager {
                 "纯天然百花蜂蜜，无任何添加剂，每瓶均经过质量检测，香甜可口。", 68.00);
         insertProduct(d, 4, "绿色蔬菜礼盒",
                 "精选时令新鲜蔬菜组合，产自有机农场，当日采摘，新鲜直达。", 99.00);
+        insertProduct(d, 5, "优质冬虫夏草（10g）",
+                "精选高原正宗冬虫夏草，根条饱满，色泽金黄，滋补佳品，送礼自用两相宜。", 880.00);
+        insertProduct(d, 6, "农家红薯（5kg）",
+                "沙地种植红心红薯，软糯香甜，富含膳食纤维，健康代餐好选择。", 29.90);
+        insertProduct(d, 7, "新鲜铁棍山药（2.5kg）",
+                "正宗温县铁棍山药，质地细腻，口感绵甜，营养价值极高，煲汤佳品。", 55.00);
+        insertProduct(d, 8, "野生羊肚菌（100g）",
+                "深山野生采摘羊肚菌，香味浓郁，肉质厚实，炖汤鲜美无比，营养滋补。", 128.00);
+        insertProduct(d, 9, "鲜货鹿茸菇（250g）",
+                "新鲜采摘鹿茸菇，口感脆滑，香味独特，富含多种氨基酸，适合炒菜或炖汤。", 45.00);
+        insertProduct(d, 10, "散养土鹅蛋（10枚）",
+                "农家林地散养大白鹅产蛋，蛋黄大而橙红，营养丰富，天然无公害。", 65.00);
     }
 
     private void insertArticle(SQLiteDatabase d, int id, String title, String content,

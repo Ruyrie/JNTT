@@ -36,8 +36,12 @@ public class AddArticleActivity extends AppCompatActivity {
                 if (uri == null)
                     return;
                 coverUri = uri;
-                getContentResolver().takePersistableUriPermission(uri,
-                        Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                try {
+                    getContentResolver().takePersistableUriPermission(uri,
+                            Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                } catch (SecurityException e) {
+                    e.printStackTrace();
+                }
                 ivCover.setImageURI(uri);
                 llCoverHint.setVisibility(View.GONE);
             });
@@ -47,8 +51,12 @@ public class AddArticleActivity extends AppCompatActivity {
                 if (uri == null)
                     return;
                 contentImageUri = uri;
-                getContentResolver().takePersistableUriPermission(uri,
-                        Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                try {
+                    getContentResolver().takePersistableUriPermission(uri,
+                            Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                } catch (SecurityException e) {
+                    e.printStackTrace();
+                }
                 ivContentImage.setImageURI(uri);
                 ivContentImage.setVisibility(View.VISIBLE);
                 tvRemoveContentImg.setVisibility(View.VISIBLE);

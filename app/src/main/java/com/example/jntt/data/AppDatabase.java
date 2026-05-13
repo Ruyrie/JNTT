@@ -11,7 +11,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class AppDatabase extends SQLiteOpenHelper {
 
         private static final String DB_NAME = "jntt.db";
-        private static final int DB_VERSION = 3;
+        private static final int DB_VERSION = 4;
 
         private static AppDatabase instance;
 
@@ -106,11 +106,21 @@ public class AppDatabase extends SQLiteOpenHelper {
                                 "following TEXT NOT NULL," +
                                 "UNIQUE(follower, following))");
 
+                // 商品评价表
+                db.execSQL("CREATE TABLE product_comments (" +
+                                "id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                                "product_id INTEGER NOT NULL," +
+                                "username TEXT NOT NULL," +
+                                "content TEXT NOT NULL," +
+                                "images TEXT," +
+                                "time TEXT NOT NULL)");
+
                 // 创建常用查询索引
                 db.execSQL("CREATE INDEX idx_articles_author ON articles(author)");
                 db.execSQL("CREATE INDEX idx_comments_article ON comments(article_id)");
                 db.execSQL("CREATE INDEX idx_article_likes_article ON article_likes(article_id)");
                 db.execSQL("CREATE INDEX idx_follows_following ON follows(following)");
+                db.execSQL("CREATE INDEX idx_product_comments_product ON product_comments(product_id)");
         }
 
         @Override
@@ -122,6 +132,16 @@ public class AppDatabase extends SQLiteOpenHelper {
                 }
                 if (oldVersion < 3) {
                         db.execSQL("ALTER TABLE products ADD COLUMN cover_uri TEXT");
+                }
+                if (oldVersion < 4) {
+                        db.execSQL("CREATE TABLE IF NOT EXISTS product_comments (" +
+                                        "id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                                        "product_id INTEGER NOT NULL," +
+                                        "username TEXT NOT NULL," +
+                                        "content TEXT NOT NULL," +
+                                        "images TEXT," +
+                                        "time TEXT NOT NULL)");
+                        db.execSQL("CREATE INDEX IF NOT EXISTS idx_product_comments_product ON product_comments(product_id)");
                 }
         }
 }

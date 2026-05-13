@@ -56,15 +56,15 @@ public class ImageUtils {
                 return null;
 
             // Compress and scale down to avoid large Base64 strings (Cursor window limit)
-            int maxWidth = 300;
-            int maxHeight = 300;
+            int maxWidth = 500;
+            int maxHeight = 500;
             float ratio = Math.min((float) maxWidth / bitmap.getWidth(), (float) maxHeight / bitmap.getHeight());
             int width = Math.round((float) ratio * bitmap.getWidth());
             int height = Math.round((float) ratio * bitmap.getHeight());
 
             Bitmap scaledBitmap = Bitmap.createScaledBitmap(bitmap, width, height, true);
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            scaledBitmap.compress(Bitmap.CompressFormat.JPEG, 70, baos);
+            scaledBitmap.compress(Bitmap.CompressFormat.JPEG, 85, baos);
             byte[] bytes = baos.toByteArray();
 
             return "data:image/jpeg;base64," + Base64.encodeToString(bytes, Base64.NO_WRAP);

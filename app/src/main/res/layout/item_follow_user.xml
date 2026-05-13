@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="64dp"
     android:orientation="horizontal"
@@ -8,29 +9,37 @@
     android:background="?android:attr/selectableItemBackground">
 
     <!-- Avatar circle -->
-    <FrameLayout
+    <com.google.android.material.card.MaterialCardView
         android:layout_width="44dp"
         android:layout_height="44dp"
-        android:layout_marginEnd="14dp">
+        android:layout_marginEnd="14dp"
+        app:cardCornerRadius="22dp"
+        app:cardElevation="0dp"
+        app:strokeWidth="0dp">
 
-        <ImageView
-            android:id="@+id/ivFollowUserAvatar"
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:scaleType="centerCrop"
-            android:background="@drawable/bg_auth_logo"
-            android:visibility="gone" />
+            android:layout_height="match_parent">
 
-        <TextView
-            android:id="@+id/tvFollowUserAvatar"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center"
-            android:textSize="16sp"
-            android:textColor="@color/white"
-            android:textStyle="bold"
-            android:background="@drawable/bg_auth_logo" />
-    </FrameLayout>
+            <ImageView
+                android:id="@+id/ivFollowUserAvatar"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                android:background="@drawable/bg_auth_logo"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/tvFollowUserAvatar"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:textSize="16sp"
+                android:textColor="@color/white"
+                android:textStyle="bold"
+                android:background="@drawable/bg_auth_logo" />
+        </FrameLayout>
+    </com.google.android.material.card.MaterialCardView>
 
     <!-- Username -->
     <TextView

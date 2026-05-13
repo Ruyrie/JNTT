@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
@@ -8,29 +9,37 @@
     android:background="@color/white">
 
     <!-- Author avatar circle -->
-    <FrameLayout
+    <com.google.android.material.card.MaterialCardView
         android:layout_width="38dp"
         android:layout_height="38dp"
-        android:layout_marginTop="2dp">
-        
-        <ImageView
-            android:id="@+id/ivCommentAvatar"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:scaleType="centerCrop"
-            android:background="@drawable/bg_auth_logo"
-            android:visibility="gone" />
+        android:layout_marginTop="2dp"
+        app:cardCornerRadius="19dp"
+        app:cardElevation="0dp"
+        app:strokeWidth="0dp">
 
-        <TextView
-            android:id="@+id/tvCommentAvatar"
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center"
-            android:textSize="14sp"
-            android:textColor="@color/white"
-            android:textStyle="bold"
-            android:background="@drawable/bg_auth_logo" />
-    </FrameLayout>
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:id="@+id/ivCommentAvatar"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                android:background="@drawable/bg_auth_logo"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/tvCommentAvatar"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:textSize="14sp"
+                android:textColor="@color/white"
+                android:textStyle="bold"
+                android:background="@drawable/bg_auth_logo" />
+        </FrameLayout>
+    </com.google.android.material.card.MaterialCardView>
 
     <!-- Comment body -->
     <LinearLayout
@@ -40,7 +49,7 @@
         android:orientation="vertical"
         android:layout_marginStart="12dp">
 
-        <!-- Username row + delete -->
+        <!-- Username row: name | like | delete -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -57,6 +66,33 @@
                 android:textColor="#1F1F1F"
                 android:text="用户名" />
 
+            <!-- Like (left of delete) -->
+            <LinearLayout
+                android:id="@+id/layoutCommentLike"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingEnd="6dp"
+                android:background="@null">
+
+                <ImageView
+                    android:id="@+id/tvCommentLikeBtn"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:src="@mipmap/weidianzan"
+                    android:scaleType="fitCenter" />
+
+                <TextView
+                    android:id="@+id/tvCommentLikeCount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="10sp"
+                    android:textColor="#AAAAAA"
+                    android:layout_marginStart="3dp"
+                    android:text="0" />
+            </LinearLayout>
+
             <TextView
                 android:id="@+id/tvDeleteComment"
                 android:layout_width="wrap_content"
@@ -64,8 +100,8 @@
                 android:text="删除"
                 android:textSize="11sp"
                 android:textColor="#AAAAAA"
-                android:paddingStart="8dp"
-                android:paddingEnd="8dp"
+                android:paddingStart="4dp"
+                android:paddingEnd="4dp"
                 android:paddingVertical="4dp"
                 android:background="@null"
                 android:visibility="gone" />
@@ -91,38 +127,6 @@
             android:textColor="#AAAAAA"
             android:layout_marginTop="5dp"
             android:text="时间" />
-    </LinearLayout>
-
-    <!-- Like section (right, Douyin style) -->
-    <LinearLayout
-        android:id="@+id/layoutCommentLike"
-        android:layout_width="40dp"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:gravity="center"
-        android:layout_marginStart="4dp"
-        android:paddingTop="2dp"
-        android:background="@null"
-        android:focusable="false">
-
-        <TextView
-            android:id="@+id/tvCommentLikeBtn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="♡"
-            android:textSize="18sp"
-            android:textColor="#CCCCCC"
-            android:gravity="center" />
-
-        <TextView
-            android:id="@+id/tvCommentLikeCount"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="10sp"
-            android:textColor="#AAAAAA"
-            android:gravity="center"
-            android:layout_marginTop="2dp"
-            android:text="0" />
     </LinearLayout>
 
 </LinearLayout>

@@ -44,6 +44,10 @@ public class RegisterActivity extends AppCompatActivity {
             Toast.makeText(this, "用户名和密码不能为空", Toast.LENGTH_SHORT).show();
             return;
         }
+        if (!username.matches("^[a-zA-Z0-9\\-@_.]+$")) {
+            Toast.makeText(this, "用户名只能包含字母、数字及-@_.", Toast.LENGTH_SHORT).show();
+            return;
+        }
         if (password.length() < 6) {
             Toast.makeText(this, "密码至少6位", Toast.LENGTH_SHORT).show();
             return;

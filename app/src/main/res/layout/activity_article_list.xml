@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -12,20 +12,18 @@
         android:layout_height="56dp"
         android:orientation="horizontal"
         android:gravity="center_vertical"
-        android:paddingStart="12dp"
         android:paddingEnd="12dp"
         android:background="#FFFFFF"
         android:elevation="4dp">
 
-        <TextView
+        <ImageView
             android:id="@+id/tvBack"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="←"
-            android:textSize="22sp"
-            android:textColor="#333333"
-            android:padding="8dp"
-            android:background="?attr/selectableItemBackgroundBorderless" />
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@mipmap/fanhui"
+            android:scaleType="fitCenter"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp" />
 
         <TextView
             android:layout_width="0dp"
@@ -101,3 +99,4 @@
         </LinearLayout>
     </FrameLayout>
 </LinearLayout>
+

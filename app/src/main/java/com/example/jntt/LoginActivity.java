@@ -48,9 +48,39 @@ public class LoginActivity extends AppCompatActivity {
             Toast.makeText(this, "用户名和密码不能为空", Toast.LENGTH_SHORT).show();
             return;
         }
+
+        // 检查账号是否存在
+        String targetUsername = dm.findUsernameByAccount(username);
+        if (targetUsername == null || targetUsername.isEmpty()) {
+            // 未注册账号 - 使用自定义美化弹窗
+            android.view.View view = getLayoutInflater().inflate(R.layout.dialog_confirm, null);
+            android.widget.TextView tvTitle = view.findViewById(R.id.tvDialogTitle);
+            android.widget.TextView tvMessage = view.findViewById(R.id.tvDialogMessage);
+            tvTitle.setText("账号未注册");
+            tvMessage.setText("该账号 (" + username + ") 尚未注册\n是否立即前往注册？");
+
+            androidx.appcompat.app.AlertDialog dialog = new androidx.appcompat.app.AlertDialog.Builder(this)
+                    .setView(view)
+                    .create();
+            if (dialog.getWindow() != null)
+                dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+
+            android.widget.TextView btnConfirm = view.findViewById(R.id.btnDialogConfirm);
+            btnConfirm.setText("立即注册");
+            btnConfirm.setBackgroundResource(R.drawable.bg_auth_button);
+
+            view.findViewById(R.id.btnDialogCancel).setOnClickListener(btn -> dialog.dismiss());
+            btnConfirm.setOnClickListener(btn -> {
+                dialog.dismiss();
+                startActivity(new Intent(this, RegisterActivity.class));
+            });
+            dialog.show();
+            return;
+        }
+
         User user = dm.login(username, password);
         if (user == null) {
-            Toast.makeText(this, "用户名或密码错误", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "密码错误", Toast.LENGTH_SHORT).show();
         } else {
             dm.setLoggedUser(user.username);
             goMain();

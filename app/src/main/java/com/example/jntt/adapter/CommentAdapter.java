@@ -5,6 +5,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.ImageView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.jntt.R;
@@ -112,11 +113,9 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.VH> {
 
     private void applyLikeState(VH h, boolean liked) {
         if (liked) {
-            h.tvLikeBtn.setText("♥");
-            h.tvLikeBtn.setTextColor(0xFFE53935);
+            h.ivLikeBtn.setImageResource(R.mipmap.dianzan);
         } else {
-            h.tvLikeBtn.setText("♡");
-            h.tvLikeBtn.setTextColor(0xFFCCCCCC);
+            h.ivLikeBtn.setImageResource(R.mipmap.weidianzan);
         }
     }
 
@@ -127,7 +126,8 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.VH> {
 
     static class VH extends RecyclerView.ViewHolder {
         TextView tvAvatar, tvUsername, tvContent, tvTime, tvDelete;
-        TextView tvLikeBtn, tvLikeCount;
+        ImageView ivLikeBtn;
+        TextView tvLikeCount;
         LinearLayout layoutLike;
         android.widget.ImageView ivAvatarImg;
 
@@ -139,7 +139,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.VH> {
             tvContent = v.findViewById(R.id.tvCommentContent);
             tvTime = v.findViewById(R.id.tvCommentTime);
             tvDelete = v.findViewById(R.id.tvDeleteComment);
-            tvLikeBtn = v.findViewById(R.id.tvCommentLikeBtn);
+            ivLikeBtn = v.findViewById(R.id.tvCommentLikeBtn);
             tvLikeCount = v.findViewById(R.id.tvCommentLikeCount);
             layoutLike = v.findViewById(R.id.layoutCommentLike);
         }

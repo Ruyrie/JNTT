@@ -15,7 +15,8 @@ public class ChangePasswordActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_change_password);
-        setTitle("修改密码");
+
+        findViewById(R.id.tvBack).setOnClickListener(v -> finish());
 
         String username = getIntent().getStringExtra("username");
         DataManager dm = DataManager.getInstance(this);

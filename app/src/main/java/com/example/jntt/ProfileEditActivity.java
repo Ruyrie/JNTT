@@ -27,35 +27,69 @@ public class ProfileEditActivity extends AppCompatActivity {
 
     private Uri currentCameraUri;
 
+    private final ActivityResultLauncher<Intent> uCropLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(), result -> {
+                if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+                    Uri resultUri = com.yalantis.ucrop.UCrop.getOutput(result.getData());
+                    if (resultUri != null) {
+                        processDirectImage(resultUri);
+                    }
+                } else if (result.getResultCode() == com.yalantis.ucrop.UCrop.RESULT_ERROR
+                        && result.getData() != null) {
+                    Throwable cropError = com.yalantis.ucrop.UCrop.getError(result.getData());
+                    if (cropError != null)
+                        cropError.printStackTrace();
+                    Toast.makeText(this, "裁剪出错", Toast.LENGTH_SHORT).show();
+                }
+            });
+
+    private void processDirectImage(Uri uri) {
+        pendingAvatarUri = uri.toString();
+        pendingAvatarBase64 = com.example.jntt.utils.ImageUtils.uriToBase64(this, uri);
+        ImageView iv = findViewById(R.id.ivAvatarPreview);
+        if (pendingAvatarBase64 != null) {
+            com.example.jntt.utils.ImageUtils.setAvatarFromBase64(iv, pendingAvatarBase64);
+        } else {
+            iv.setImageURI(uri);
+        }
+        iv.setBackground(null);
+    }
+
+    private void startCrop(Uri sourceUri) {
+        try {
+            Uri destinationUri = Uri.fromFile(new File(getCacheDir(), "crop_" + System.currentTimeMillis() + ".jpg"));
+            com.yalantis.ucrop.UCrop uCrop = com.yalantis.ucrop.UCrop.of(sourceUri, destinationUri)
+                    .withAspectRatio(1, 1)
+                    .withMaxResultSize(500, 500); // 提高清晰度
+
+            com.yalantis.ucrop.UCrop.Options options = new com.yalantis.ucrop.UCrop.Options();
+            options.setCircleDimmedLayer(true); // 显示圆形遮罩
+            options.setShowCropGrid(false);
+            options.setHideBottomControls(false); // 允许缩放和旋转
+            uCrop.withOptions(options);
+
+            Intent intent = uCrop.getIntent(this);
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+            uCropLauncher.launch(intent);
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(this, "启动裁剪失败", Toast.LENGTH_SHORT).show();
+            processDirectImage(sourceUri);
+        }
+    }
+
     private final ActivityResultLauncher<String> pickImage = registerForActivityResult(
             new ActivityResultContracts.GetContent(), uri -> {
                 if (uri != null) {
-                    getContentResolver().takePersistableUriPermission(uri,
-                            Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                    pendingAvatarUri = uri.toString();
-                    pendingAvatarBase64 = com.example.jntt.utils.ImageUtils.uriToBase64(this, uri);
-                    ImageView iv = findViewById(R.id.ivAvatarPreview);
-                    if (pendingAvatarBase64 != null) {
-                        com.example.jntt.utils.ImageUtils.setAvatarFromBase64(iv, pendingAvatarBase64);
-                    } else {
-                        iv.setImageURI(uri);
-                    }
-                    iv.setBackground(null);
+                    startCrop(uri);
                 }
             });
 
     private final ActivityResultLauncher<Uri> takePicture = registerForActivityResult(
             new ActivityResultContracts.TakePicture(), success -> {
                 if (success && currentCameraUri != null) {
-                    pendingAvatarUri = currentCameraUri.toString();
-                    pendingAvatarBase64 = com.example.jntt.utils.ImageUtils.uriToBase64(this, currentCameraUri);
-                    ImageView iv = findViewById(R.id.ivAvatarPreview);
-                    if (pendingAvatarBase64 != null) {
-                        com.example.jntt.utils.ImageUtils.setAvatarFromBase64(iv, pendingAvatarBase64);
-                    } else {
-                        iv.setImageURI(currentCameraUri);
-                    }
-                    iv.setBackground(null);
+                    startCrop(currentCameraUri);
                 }
             });
 
@@ -130,9 +164,43 @@ public class ProfileEditActivity extends AppCompatActivity {
             }
         });
 
-        findViewById(R.id.layoutAvatar).setOnClickListener(v -> showImagePickerDialog());
+        findViewById(R.id.layoutAvatar).setOnClickListener(v -> showAvatarPreviewDialog());
 
         tvBindPhoneBtn.setOnClickListener(v -> showBindPhoneDialog());
+    }
+
+    private void showAvatarPreviewDialog() {
+        android.app.Dialog dialog = new android.app.Dialog(this, android.R.style.Theme_Black_NoTitleBar_Fullscreen);
+        dialog.setContentView(R.layout.dialog_avatar_preview);
+
+        ImageView ivPreview = dialog.findViewById(R.id.ivFullscreenAvatar);
+        // 加载当前显示的头像（与主界面一致）
+        String currentUri = pendingAvatarBase64 != null ? pendingAvatarBase64
+                : (pendingAvatarUri != null ? pendingAvatarUri : dm.getAvatarUri(username));
+
+        if (currentUri != null) {
+            try {
+                if (currentUri.startsWith("data:image")) {
+                    com.example.jntt.utils.ImageUtils.setAvatarFromBase64(ivPreview, currentUri);
+                } else {
+                    ivPreview.setImageURI(Uri.parse(currentUri));
+                }
+            } catch (Exception e) {
+                ivPreview.setImageResource(R.mipmap.ic_launcher);
+            }
+        } else {
+            ivPreview.setImageResource(R.mipmap.ic_launcher);
+        }
+
+        dialog.findViewById(R.id.btnChangeAvatar).setOnClickListener(v -> {
+            dialog.dismiss();
+            showImagePickerDialog();
+        });
+
+        dialog.findViewById(R.id.ivClosePreview).setOnClickListener(v -> dialog.dismiss());
+        ivPreview.setOnClickListener(v -> dialog.dismiss());
+
+        dialog.show();
     }
 
     private Uri createImageFile() {

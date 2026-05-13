@@ -5,46 +5,55 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.FrameLayout;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import com.example.jntt.adapter.ImagePickerAdapter;
 import com.example.jntt.data.DataManager;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /** 添加商品界面（仅管理员可见） */
 public class AddProductActivity extends AppCompatActivity {
 
-    private Uri coverUri;
-    private ImageView ivCover;
-    private LinearLayout llCoverHint;
+    private List<Uri> coverUris = new ArrayList<>();
+    private ImagePickerAdapter adapter;
+    private RecyclerView rvProductImages;
 
     private Uri currentCameraUri;
 
     private final ActivityResultLauncher<String> pickCover = registerForActivityResult(
-            new ActivityResultContracts.GetContent(), uri -> {
-                if (uri == null)
-                    return;
-                coverUri = uri;
-                getContentResolver().takePersistableUriPermission(uri,
-                        Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                ivCover.setImageURI(uri);
-                ivCover.setVisibility(View.VISIBLE);
-                llCoverHint.setVisibility(View.GONE);
+            new ActivityResultContracts.GetMultipleContents(), uris -> {
+                if (uris != null && !uris.isEmpty()) {
+                    for (Uri uri : uris) {
+                        try {
+                            getContentResolver().takePersistableUriPermission(uri,
+                                    Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                        } catch (SecurityException e) {
+                            e.printStackTrace();
+                        }
+                        if (coverUris.size() < 9) {
+                            coverUris.add(uri);
+                        }
+                    }
+                    adapter.notifyDataSetChanged();
+                }
             });
 
     private final ActivityResultLauncher<Uri> takePicture = registerForActivityResult(
             new ActivityResultContracts.TakePicture(), success -> {
                 if (success && currentCameraUri != null) {
-                    coverUri = currentCameraUri;
-                    ivCover.setImageURI(currentCameraUri);
-                    ivCover.setVisibility(View.VISIBLE);
-                    llCoverHint.setVisibility(View.GONE);
+                    if (coverUris.size() < 9) {
+                        coverUris.add(currentCameraUri);
+                        adapter.notifyDataSetChanged();
+                    }
                 }
             });
 
@@ -61,11 +70,22 @@ public class AddProductActivity extends AppCompatActivity {
         EditText etPrice = findViewById(R.id.etProductPrice);
         TextView btnSubmit = findViewById(R.id.btnSubmitProduct);
 
-        ivCover = findViewById(R.id.ivProductCover);
-        llCoverHint = findViewById(R.id.llProductCoverHint);
-        FrameLayout flCover = findViewById(R.id.flProductCoverPicker);
+        rvProductImages = findViewById(R.id.rvProductImages);
+        rvProductImages.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+        adapter = new ImagePickerAdapter(coverUris, 9, new ImagePickerAdapter.OnImagePickerClickListener() {
+            @Override
+            public void onAddClick() {
+                showImagePickerDialog();
+            }
 
-        flCover.setOnClickListener(v -> showImagePickerDialog(pickCover));
+            @Override
+            public void onDeleteClick(int position) {
+                coverUris.remove(position);
+                adapter.notifyDataSetChanged();
+            }
+        });
+        rvProductImages.setAdapter(adapter);
+
         tvBack.setOnClickListener(v -> finish());
 
         DataManager dm = DataManager.getInstance(this);
@@ -85,7 +105,10 @@ public class AddProductActivity extends AppCompatActivity {
                 Toast.makeText(this, "价格格式不正确", Toast.LENGTH_SHORT).show();
                 return;
             }
-            String cover = coverUri != null ? coverUri.toString() : null;
+            String cover = null;
+            if (!coverUris.isEmpty()) {
+                cover = coverUris.stream().map(Uri::toString).collect(Collectors.joining(","));
+            }
             dm.addProduct(name, desc, price, cover);
             Toast.makeText(this, "商品添加成功", Toast.LENGTH_SHORT).show();
             finish();
@@ -100,7 +123,7 @@ public class AddProductActivity extends AppCompatActivity {
         return FileProvider.getUriForFile(this, getPackageName() + ".fileprovider", newFile);
     }
 
-    private void showImagePickerDialog(ActivityResultLauncher<String> launcher) {
+    private void showImagePickerDialog() {
         com.example.jntt.utils.ImageUtils.showImagePickerDialog(this, "添加商品图片",
                 new com.example.jntt.utils.ImageUtils.OnImagePickerListener() {
                     @Override
@@ -111,7 +134,7 @@ public class AddProductActivity extends AppCompatActivity {
 
                     @Override
                     public void onPickFromGallery() {
-                        launcher.launch("image/*");
+                        pickCover.launch("image/*");
                     }
                 });
     }
