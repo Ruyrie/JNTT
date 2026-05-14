@@ -91,9 +91,9 @@
         <!-- 发表商品评价 -->
         <activity android:name=".AddProductCommentActivity" />
 
-        <!-- uCrop 裁剪 Activity -->
+        <!-- uCrop 裁剪 Activity（子类，用于正确处理 Android 16 edge-to-edge insets） -->
         <activity
-            android:name="com.yalantis.ucrop.UCropActivity"
+            android:name=".UCropCompatActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.UCrop"/>
 

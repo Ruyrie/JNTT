@@ -69,6 +69,7 @@ public class ProfileEditActivity extends AppCompatActivity {
             uCrop.withOptions(options);
 
             Intent intent = uCrop.getIntent(this);
+            intent.setClass(this, UCropCompatActivity.class);
             intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
             intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
             uCropLauncher.launch(intent);
