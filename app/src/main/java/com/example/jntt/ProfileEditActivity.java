@@ -38,7 +38,7 @@ public class ProfileEditActivity extends AppCompatActivity {
                         && result.getData() != null) {
                     Throwable cropError = com.yalantis.ucrop.UCrop.getError(result.getData());
                     if (cropError != null)
-                        cropError.printStackTrace();
+                        android.util.Log.e("ProfileEdit", "裁剪出错", cropError);
                     Toast.makeText(this, "裁剪出错", Toast.LENGTH_SHORT).show();
                 }
             });
@@ -73,7 +73,7 @@ public class ProfileEditActivity extends AppCompatActivity {
             intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
             uCropLauncher.launch(intent);
         } catch (Exception e) {
-            e.printStackTrace();
+            android.util.Log.e("ProfileEdit", "启动裁剪失败", e);
             Toast.makeText(this, "启动裁剪失败", Toast.LENGTH_SHORT).show();
             processDirectImage(sourceUri);
         }
@@ -104,7 +104,7 @@ public class ProfileEditActivity extends AppCompatActivity {
         EditText etNickname = findViewById(R.id.etNickname);
         EditText etSignature = findViewById(R.id.etSignature);
         ImageView ivAvatar = findViewById(R.id.ivAvatarPreview);
-        TextView tvBack = findViewById(R.id.tvBack);
+        ImageView tvBack = findViewById(R.id.tvBack);
         TextView tvSave = findViewById(R.id.tvSave);
         tvPhone = findViewById(R.id.tvPhone);
         tvBindPhoneBtn = findViewById(R.id.tvBindPhoneBtn);
@@ -205,8 +205,8 @@ public class ProfileEditActivity extends AppCompatActivity {
 
     private Uri createImageFile() {
         File imagePath = new File(getCacheDir(), "images");
-        if (!imagePath.exists())
-            imagePath.mkdirs();
+        if (!imagePath.exists() && !imagePath.mkdirs())
+            android.util.Log.w("ProfileEdit", "Failed to create image cache dir");
         File newFile = new File(imagePath, "avatar_" + System.currentTimeMillis() + ".jpg");
         return FileProvider.getUriForFile(this, getPackageName() + ".fileprovider", newFile);
     }

@@ -3,7 +3,11 @@
     "allow": [
       "Bash(find /d/Android_Program/JNTT/app/src/main/res/mipmap-* -type f)",
       "Bash(find /d/Android_Program/JNTT/app/src/main/res/mipmap-* -type f -name \"*.webp\" -o -type f -name \"*.jpg\" -o -type f -name \"*.xml\")",
-      "Bash(find *)"
+      "Bash(find *)",
+      "Bash(xargs grep -l \"profile\\\\|mine\\\\|edit.*info\\\\|modify\" -i)",
+      "Bash(./gradlew :app:compileDebugJavaWithJavac)",
+      "Bash(./gradlew dependencies *)",
+      "Bash(./gradlew :app:dependencies --configuration releaseRuntimeClasspath)"
     ]
   }
 }
