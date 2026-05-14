@@ -68,4 +68,9 @@
         <item name="android:background">@android:color/transparent</item>
     </style>
 
+    <!-- UCrop 裁剪界面：退出 Android 15+ 强制 edge-to-edge，避免工具栏与状态栏重叠 -->
+    <style name="Theme.UCrop" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:windowOptOutEdgeToEdgeEnforcement">true</item>
+    </style>
+
 </resources>
