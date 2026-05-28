@@ -1,12 +1,16 @@
 package com.example.jntt;
 
+import android.app.Dialog;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.TextView;
 import android.widget.Toast;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -39,7 +43,7 @@ public class CartActivity extends AppCompatActivity {
         rv.setLayoutManager(new LinearLayoutManager(this));
 
         adapter = new CartAdapter(items);
-        adapter.setOnChangeListener(this::refreshBottomBar);
+        adapter.setOnChangeListener(this::persistCartState);
         rv.setAdapter(adapter);
 
         cbSelectAll = findViewById(R.id.cbSelectAll);
@@ -52,17 +56,48 @@ public class CartActivity extends AppCompatActivity {
 
         btnCheckout.setOnClickListener(v -> checkout());
 
-        tvClear.setOnClickListener(v -> new AlertDialog.Builder(this)
-                .setTitle("清空购物车")
-                .setMessage("确定要清空所有商品吗？")
-                .setPositiveButton("清空", (d, w) -> {
-                    adapter.clearAll();
-                    dm.saveCartPublic(username, items);
-                    refreshBottomBar();
-                })
-                .setNegativeButton("取消", null)
-                .show());
+        tvClear.setOnClickListener(v -> showClearCartDialog());
 
+        refreshBottomBar();
+    }
+
+    private void showClearCartDialog() {
+        if (items.isEmpty()) {
+            Toast.makeText(this, "购物车已经是空的", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        Dialog dialog = new Dialog(this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.dialog_clear_cart);
+        dialog.setCanceledOnTouchOutside(true);
+
+        TextView btnCancel = dialog.findViewById(R.id.btnClearCancel);
+        TextView btnConfirm = dialog.findViewById(R.id.btnClearConfirm);
+        TextView tvMessage = dialog.findViewById(R.id.tvClearMessage);
+        tvMessage.setText("将移除当前 " + items.size() + " 件商品，退出后也不会恢复。");
+
+        btnCancel.setOnClickListener(v -> dialog.dismiss());
+        btnConfirm.setOnClickListener(v -> {
+            adapter.clearAll();
+            dialog.dismiss();
+            Toast.makeText(this, "购物车已清空", Toast.LENGTH_SHORT).show();
+        });
+
+        dialog.setOnShowListener(d -> {
+            Window shownWindow = dialog.getWindow();
+            if (shownWindow != null) {
+                shownWindow.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                shownWindow.setLayout(
+                        (int) (getResources().getDisplayMetrics().widthPixels * 0.86f),
+                        WindowManager.LayoutParams.WRAP_CONTENT);
+            }
+        });
+        dialog.show();
+    }
+
+    private void persistCartState() {
+        dm.saveCartPublic(username, items);
         refreshBottomBar();
     }
 

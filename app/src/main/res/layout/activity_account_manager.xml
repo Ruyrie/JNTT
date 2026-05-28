@@ -5,7 +5,7 @@
     android:orientation="vertical"
     android:background="#F2F2F7">
 
-    <!-- 顶部标题栏 -->
+    <!-- 顶部标题栏状态 -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

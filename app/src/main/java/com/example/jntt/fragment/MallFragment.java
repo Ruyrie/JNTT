@@ -113,10 +113,14 @@ public class MallFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        DataManager dm = DataManager.getInstance(requireContext());
         if (adapter != null) {
             allProducts.clear();
-            allProducts.addAll(DataManager.getInstance(requireContext()).getProducts());
+            allProducts.addAll(dm.getProducts());
             filter("");
+        }
+        if (getView() != null) {
+            refreshBadge(getView(), dm);
         }
     }
 }
