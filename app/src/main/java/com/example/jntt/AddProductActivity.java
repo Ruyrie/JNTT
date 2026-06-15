@@ -64,7 +64,7 @@ public class AddProductActivity extends AppCompatActivity {
         if (getSupportActionBar() != null)
             getSupportActionBar().hide();
 
-        TextView tvBack = findViewById(R.id.tvBack);
+        View tvBack = findViewById(R.id.tvBack);
         EditText etName = findViewById(R.id.etProductName);
         EditText etDesc = findViewById(R.id.etProductDesc);
         EditText etPrice = findViewById(R.id.etProductPrice);

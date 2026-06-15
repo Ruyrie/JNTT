@@ -42,58 +42,63 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.VH> {
         return new VH(v);
     }
 
-    @Override
-    public void onBindViewHolder(@NonNull VH holder, int position) {
-        Product p = data.get(position);
+    /** Resolve a product's thumbnail (seed products map to bundled images, others use cover_uri). */
+    public static void bindProductImage(ImageView iv, Product p) {
         switch (p.id) {
             case 1:
-                holder.ivProduct.setImageResource(R.mipmap.dami1);
+                iv.setImageResource(R.mipmap.dami1);
                 break; // 东北大米
             case 2:
-                holder.ivProduct.setImageResource(R.mipmap.muer);
+                iv.setImageResource(R.mipmap.muer);
                 break; // 有机黑木耳
             case 3:
-                holder.ivProduct.setImageResource(R.mipmap.fengmi1);
+                iv.setImageResource(R.mipmap.fengmi1);
                 break; // 农家蜂蜜
             case 4:
-                holder.ivProduct.setImageResource(R.mipmap.shucai1);
+                iv.setImageResource(R.mipmap.shucai1);
                 break; // 绿色蔬菜礼盒
             case 5:
-                holder.ivProduct.setImageResource(R.mipmap.dongchongxiacao1);
+                iv.setImageResource(R.mipmap.dongchongxiacao1);
                 break; // 冬虫夏草
             case 6:
-                holder.ivProduct.setImageResource(R.mipmap.hongshu1);
+                iv.setImageResource(R.mipmap.hongshu1);
                 break; // 红薯
             case 7:
-                holder.ivProduct.setImageResource(R.mipmap.shanyao1);
+                iv.setImageResource(R.mipmap.shanyao1);
                 break; // 山药
             case 8:
-                holder.ivProduct.setImageResource(R.mipmap.yangdujun1);
+                iv.setImageResource(R.mipmap.yangdujun1);
                 break; // 羊肚菌
             case 9:
-                holder.ivProduct.setImageResource(R.mipmap.luronggu1);
+                iv.setImageResource(R.mipmap.luronggu1);
                 break; // 鹿茸菇
             case 10:
-                holder.ivProduct.setImageResource(R.mipmap.tuedan1);
+                iv.setImageResource(R.mipmap.tuedan1);
                 break; // 土鹅蛋
             default:
                 if (p.coverUri != null && !p.coverUri.isEmpty()) {
                     String firstUri = p.coverUri.split(",")[0];
                     try {
-                        holder.ivProduct.setImageURI(android.net.Uri.parse(firstUri));
+                        iv.setImageURI(android.net.Uri.parse(firstUri));
                     } catch (Exception e) {
-                        holder.ivProduct.setImageResource(R.drawable.ic_product_placeholder);
+                        iv.setImageResource(R.drawable.ic_product_placeholder);
                     }
                 } else {
-                    holder.ivProduct.setImageResource(R.drawable.ic_product_placeholder);
+                    iv.setImageResource(R.drawable.ic_product_placeholder);
                 }
         }
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull VH holder, int position) {
+        Product p = data.get(position);
+        bindProductImage(holder.ivProduct, p);
         holder.tvName.setText(p.name);
         holder.tvDesc.setText(p.desc);
         // Show price without ¥ prefix (¥ is a separate TextView in XML)
-        holder.tvPrice.setText(String.valueOf((long) p.price % 1 == 0
-                ? String.format("%d", (long) p.price)
-                : String.format("%.2f", p.price)));
+        holder.tvPrice.setText(p.price == Math.floor(p.price)
+                ? String.format("%,d", (long) p.price)
+                : String.format("%,.2f", p.price));
         holder.itemView.setOnClickListener(v -> clickListener.onItemClick(p));
         holder.btnAddCart.setOnClickListener(v -> {
             if (addCartListener != null)

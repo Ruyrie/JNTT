@@ -23,6 +23,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.VH> {
 
     private final List<CartItem> data;
     private final Set<Integer> checkedIds = new HashSet<>(); // use productId as key
+    private Set<Integer> availableIds = null; // null = availability unknown, treat all as available
     private OnChangeListener listener;
 
     public CartAdapter(List<CartItem> data) {
@@ -33,11 +34,22 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.VH> {
         this.listener = l;
     }
 
+    /** Supply the set of product ids that still exist; delisted items are flagged "商品已下架". */
+    public void setAvailableIds(Set<Integer> ids) {
+        this.availableIds = ids;
+        notifyDataSetChanged();
+    }
+
+    private boolean isAvailable(CartItem c) {
+        return availableIds == null || availableIds.contains(c.productId);
+    }
+
     public void setAllChecked(boolean val) {
         checkedIds.clear();
         if (val) {
             for (CartItem c : data)
-                checkedIds.add(c.productId);
+                if (isAvailable(c)) // delisted items cannot be selected
+                    checkedIds.add(c.productId);
         }
         notifyDataSetChanged();
         if (listener != null)
@@ -45,18 +57,21 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.VH> {
     }
 
     public boolean areAllChecked() {
-        if (data.isEmpty())
-            return false;
-        for (CartItem c : data)
+        boolean anyAvailable = false;
+        for (CartItem c : data) {
+            if (!isAvailable(c))
+                continue;
+            anyAvailable = true;
             if (!checkedIds.contains(c.productId))
                 return false;
-        return true;
+        }
+        return anyAvailable;
     }
 
     public double getSelectedTotal() {
         double total = 0;
         for (CartItem c : data)
-            if (checkedIds.contains(c.productId))
+            if (checkedIds.contains(c.productId) && isAvailable(c))
                 total += c.price * c.quantity;
         return total;
     }
@@ -100,8 +115,20 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.VH> {
     public void onBindViewHolder(@NonNull VH holder, int position) {
         CartItem c = data.get(position);
         holder.tvName.setText(c.name);
-        holder.tvPrice.setText(String.format("¥%.2f", c.price));
+        holder.tvPrice.setText(String.format("¥%,.2f", c.price));
         holder.tvQty.setText(String.valueOf(c.quantity));
+
+        boolean available = isAvailable(c);
+        if (!available)
+            checkedIds.remove(c.productId); // a delisted item can never stay selected
+        holder.tvUnavailable.setVisibility(available ? View.GONE : View.VISIBLE);
+        float alpha = available ? 1f : 0.45f;
+        holder.tvName.setAlpha(alpha);
+        holder.tvPrice.setAlpha(alpha);
+        holder.ivImage.setAlpha(alpha);
+        holder.cbItem.setEnabled(available);
+        holder.btnMinus.setEnabled(available);
+        holder.btnPlus.setEnabled(available);
 
         switch (c.productId) {
             case 1:
@@ -179,7 +206,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.VH> {
     static class VH extends RecyclerView.ViewHolder {
         CheckBox cbItem;
         ImageView ivImage;
-        TextView tvName, tvPrice, tvQty, btnMinus, btnPlus;
+        TextView tvName, tvPrice, tvQty, btnMinus, btnPlus, tvUnavailable;
 
         VH(View v) {
             super(v);
@@ -190,6 +217,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.VH> {
             tvQty = v.findViewById(R.id.tvCartQty);
             btnMinus = v.findViewById(R.id.btnMinus);
             btnPlus = v.findViewById(R.id.btnPlus);
+            tvUnavailable = v.findViewById(R.id.tvCartUnavailable);
         }
     }
 }

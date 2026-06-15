@@ -6,6 +6,7 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.ImageView;
+import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.jntt.R;
@@ -91,6 +92,14 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.VH> {
 
         // Like click
         h.layoutLike.setOnClickListener(v -> {
+            if (currentUser == null) {
+                Toast.makeText(v.getContext(), "请先登录", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            if (currentUser.equals(c.username)) {
+                Toast.makeText(v.getContext(), "不能给自己的评论点赞", Toast.LENGTH_SHORT).show();
+                return;
+            }
             if (c.isLikedByMe) {
                 dm.unlikeComment(currentUser, c.id);
                 c.likeCount = Math.max(0, c.likeCount - 1);

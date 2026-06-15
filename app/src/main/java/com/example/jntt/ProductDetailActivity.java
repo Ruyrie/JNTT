@@ -42,7 +42,7 @@ public class ProductDetailActivity extends AppCompatActivity {
         final Product product = target;
         String username = dm.getLoggedUser();
 
-        androidx.viewpager2.widget.ViewPager2 vpProductImage = findViewById(R.id.vpProductImage);
+        androidx.recyclerview.widget.RecyclerView vpProductImage = findViewById(R.id.vpProductImage);
         TextView tvImageIndicator = findViewById(R.id.tvImageIndicator);
 
         java.util.List<Object> images = new java.util.ArrayList<>();
@@ -116,7 +116,12 @@ public class ProductDetailActivity extends AppCompatActivity {
 
         com.example.jntt.adapter.ProductImageAdapter imageAdapter = new com.example.jntt.adapter.ProductImageAdapter(
                 images);
+        androidx.recyclerview.widget.LinearLayoutManager imageLayoutManager =
+                new androidx.recyclerview.widget.LinearLayoutManager(this,
+                        androidx.recyclerview.widget.LinearLayoutManager.HORIZONTAL, false);
+        vpProductImage.setLayoutManager(imageLayoutManager);
         vpProductImage.setAdapter(imageAdapter);
+        new androidx.recyclerview.widget.PagerSnapHelper().attachToRecyclerView(vpProductImage);
 
         if (images.size() <= 1) {
             tvImageIndicator.setVisibility(android.view.View.GONE);
@@ -125,10 +130,16 @@ public class ProductDetailActivity extends AppCompatActivity {
             tvImageIndicator.setText("1/" + images.size());
         }
 
-        vpProductImage.registerOnPageChangeCallback(new androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback() {
+        vpProductImage.addOnScrollListener(new androidx.recyclerview.widget.RecyclerView.OnScrollListener() {
             @Override
-            public void onPageSelected(int position) {
-                if (images.size() > 1) {
+            public void onScrollStateChanged(@androidx.annotation.NonNull androidx.recyclerview.widget.RecyclerView recyclerView,
+                                             int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+                if (images.size() > 1 && newState == androidx.recyclerview.widget.RecyclerView.SCROLL_STATE_IDLE) {
+                    int position = imageLayoutManager.findFirstCompletelyVisibleItemPosition();
+                    if (position == androidx.recyclerview.widget.RecyclerView.NO_POSITION) {
+                        position = imageLayoutManager.findFirstVisibleItemPosition();
+                    }
                     tvImageIndicator.setText((position + 1) + "/" + images.size());
                 }
             }

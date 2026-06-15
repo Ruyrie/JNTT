@@ -1,5 +1,6 @@
 package com.example.jntt;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -114,6 +115,11 @@ public class FollowListActivity extends AppCompatActivity {
             }
 
             h.tvUsername.setText(nickname != null && !nickname.isEmpty() ? nickname : username);
+            h.itemView.setOnClickListener(v -> {
+                Intent intent = new Intent(v.getContext(), MyArticlesActivity.class);
+                intent.putExtra("username", username);
+                v.getContext().startActivity(intent);
+            });
 
             // Hide follow button for self
             if (username.equals(currentUser)) {

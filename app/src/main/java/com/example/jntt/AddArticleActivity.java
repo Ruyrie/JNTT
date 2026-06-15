@@ -93,7 +93,7 @@ public class AddArticleActivity extends AppCompatActivity {
         tvRemoveContentImg = findViewById(R.id.tvRemoveContentImg);
         FrameLayout flCover = findViewById(R.id.flCoverPicker);
         FrameLayout flContentImage = findViewById(R.id.flContentImagePicker);
-        TextView tvBack = findViewById(R.id.tvBack);
+        View tvBack = findViewById(R.id.tvBack);
 
         flCover.setOnClickListener(v -> showImagePickerDialog(pickCover, true));
         flContentImage.setOnClickListener(v -> showImagePickerDialog(pickContentImage, false));

@@ -1,0 +1,3077 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>吉农头条 JNTT 项目功能逻辑与代码实现分析报告</title>
+  <style>
+    :root {
+      --bg: #f6f8fb;
+      --paper: #ffffff;
+      --ink: #172033;
+      --muted: #667085;
+      --line: #d9e2ec;
+      --brand: #168a55;
+      --brand-2: #2364aa;
+      --warn: #b54708;
+      --code: #102033;
+      --soft: #eef6f1;
+      --soft-blue: #eef4ff;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font: 15px/1.75 -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", Arial, sans-serif;
+    }
+    header {
+      background: linear-gradient(135deg, #0f7a47, #1d5f93);
+      color: white;
+      padding: 42px 48px 34px;
+    }
+    header h1 { margin: 0 0 10px; font-size: 30px; letter-spacing: 0; }
+    header p { margin: 4px 0; opacity: .94; max-width: 1100px; }
+    main { max-width: 1220px; margin: 0 auto; padding: 28px 24px 72px; }
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: rgba(246,248,251,.94);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--line);
+      padding: 12px 24px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .search-bar {
+      flex: 1 0 100%;
+      display: grid;
+      grid-template-columns: minmax(240px, 520px) auto auto auto;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+    .search-bar input {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 9px 12px;
+      color: var(--ink);
+      background: white;
+      font: inherit;
+      line-height: 1.3;
+    }
+    .search-bar button {
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 8px 10px;
+      color: #1f3d5a;
+      background: white;
+      cursor: pointer;
+      font: inherit;
+      line-height: 1.3;
+    }
+    .search-bar button:hover,
+    nav a:hover { border-color: var(--brand-2); color: #0f5132; }
+    .search-count { color: var(--muted); font-size: 13px; white-space: nowrap; }
+    .search-results {
+      flex: 1 0 100%;
+      display: none;
+      max-height: 260px;
+      overflow: auto;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: white;
+      box-shadow: 0 8px 24px rgba(16,24,40,.12);
+    }
+    .search-results.show { display: block; }
+    .search-result {
+      display: block;
+      width: 100%;
+      padding: 9px 12px;
+      border: 0;
+      border-bottom: 1px solid var(--line);
+      background: white;
+      color: var(--ink);
+      text-align: left;
+      cursor: pointer;
+      font: inherit;
+    }
+    .search-result:last-child { border-bottom: 0; }
+    .search-result:hover,
+    .search-result.active { background: #eef6f1; }
+    .search-result small { display: block; color: var(--muted); margin-top: 2px; }
+    .source-ref { margin: 10px 0 6px; padding: 8px 10px; border-left: 4px solid var(--brand-2); background: #f3f8ff; border-radius: 6px; color: #24364b; font-size: 13px; }
+    .source-ref b { color: #12385b; }
+    .search-hit {
+      outline: 3px solid rgba(22,138,85,.35);
+      background: #f1fbf5;
+      scroll-margin-top: 150px;
+    }
+    nav a {
+      color: var(--brand-2);
+      text-decoration: none;
+      background: white;
+      border: 1px solid var(--line);
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 13px;
+    }
+    @media (max-width: 720px) {
+      .search-bar { grid-template-columns: 1fr 1fr 1fr; }
+      .search-bar input { grid-column: 1 / -1; }
+      .search-count { grid-column: 1 / -1; }
+    }
+    section {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 24px;
+      margin: 18px 0;
+      box-shadow: 0 1px 2px rgba(16,24,40,.04);
+    }
+    h2 { margin: 0 0 14px; font-size: 24px; color: #0f5132; }
+    h3 { margin: 22px 0 10px; font-size: 19px; color: #12385b; }
+    h4 { margin: 16px 0 8px; font-size: 16px; color: #344054; }
+    p { margin: 8px 0; }
+    ul { margin: 8px 0 8px 22px; padding: 0; }
+    li { margin: 4px 0; }
+    table { width: 100%; border-collapse: collapse; margin: 12px 0 18px; }
+    th, td { border: 1px solid var(--line); padding: 9px 10px; vertical-align: top; }
+    th { background: #f1f5f9; text-align: left; color: #24364b; }
+    code { background: #eef2f6; padding: 1px 5px; border-radius: 4px; font-family: Consolas, "Cascadia Mono", monospace; }
+    pre {
+      background: var(--code);
+      color: #e7edf5;
+      padding: 14px 16px;
+      border-radius: 8px;
+      overflow: auto;
+      line-height: 1.55;
+      font-size: 13px;
+    }
+    pre code { background: transparent; padding: 0; color: inherit; }
+    .note { background: var(--soft); border-left: 4px solid var(--brand); padding: 12px 14px; border-radius: 6px; }
+    .warn { background: #fff7ed; border-left: 4px solid var(--warn); padding: 12px 14px; border-radius: 6px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+    .card { border: 1px solid var(--line); border-radius: 8px; padding: 14px; background: #fbfdff; }
+    .tag { display: inline-block; padding: 2px 8px; border-radius: 999px; background: var(--soft-blue); color: #1d4e89; font-size: 12px; margin-right: 5px; }
+    .path { color: #344054; font-family: Consolas, "Cascadia Mono", monospace; font-size: 13px; }
+    .mermaid {
+      background: #fbfdff;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 14px;
+      margin: 14px 0;
+      overflow: auto;
+    }
+    details { border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; margin: 10px 0; background: #fbfdff; }
+    summary { cursor: pointer; font-weight: 700; color: #12385b; }
+  </style>
+</head>
+<body>
+<header>
+  <h1>《吉农头条》JNTT 项目功能逻辑与代码实现分析报告</h1>
+</header>
+
+<nav>
+  <div class="search-bar" role="search">
+    <input id="pageSearch" type="search" placeholder="搜索功能、表名、类名或方法名，例如：购物车、cart、DataManager、登录" autocomplete="off" />
+    <button id="searchPrev" type="button">上一个</button>
+    <button id="searchNext" type="button">下一个</button>
+    <button id="searchClear" type="button">清空</button>
+    <span id="searchCount" class="search-count">输入关键词快速定位报告内容</span>
+  </div>
+  <div id="searchResults" class="search-results" aria-live="polite"></div>
+  <a href="#summary">总览</a>
+  <a href="#architecture">整体架构</a>
+  <a href="#database">数据库与数据位置</a>
+  <a href="#requirements">需求对照</a>
+  <a href="#auth">注册登录</a>
+  <a href="#main">主界面</a>
+  <a href="#article">头条文章</a>
+  <a href="#mall">商城商品</a>
+  <a href="#cart">购物车</a>
+  <a href="#order">订单</a>
+  <a href="#mine">个人中心</a>
+  <a href="#settings">设置与管理</a>
+  <a href="#media">图片与 UI</a>
+  <a href="#adapters">Adapter 细化</a>
+  <a href="#models">模型层</a>
+  <a href="#activity-map">页面跳转表</a>
+  <a href="#seed">初始数据</a>
+  <a href="#layout-map">布局资源</a>
+  <a href="#full-flows">完整流程补图</a>
+  <a href="#datamanager-map">DataManager 总表</a>
+  <a href="#project-config">工程配置</a>
+  <a href="#code-walkthrough">完整代码逻辑</a>
+  <a href="#all-feature-deep-dive">全功能深度代码讲解</a>
+  <a href="#notes">实现差异</a>
+</nav>
+
+<main>
+  <section id="summary">
+    <h2>一、项目总览</h2>
+    <p>这是一个 Java 原生 Android 应用，包名是 <code>com.example.jntt</code>。启动页是 <code>LoginActivity</code>，登录后进入 <code>MainActivity</code>，主界面用三个 Fragment 承载“头条、商城、我的”。</p>
+    <div class="grid">
+      <div class="card"><b>界面层</b><br><span class="path">Activity / Fragment / XML layout</span><br>负责展示页面、监听按钮点击、跳转页面。</div>
+      <div class="card"><b>列表适配层</b><br><span class="path">adapter/*.java</span><br>负责 RecyclerView 每一行如何显示、勾选、点赞、加减数量。</div>
+      <div class="card"><b>数据层</b><br><span class="path">DataManager.java</span><br>所有业务数据读写入口，封装 SQLite SQL 与 SharedPreferences。</div>
+      <div class="card"><b>数据库层</b><br><span class="path">AppDatabase.java</span><br>创建本地 SQLite 数据库 <code>jntt.db</code> 和业务表。</div>
+    </div>
+    <p class="note">核心结论：当前项目没有连接远程后端、MySQL 或 REST API。所有用户、文章、商品、购物车、订单、点赞、评论、关注、商品评价都保存在手机本地 SQLite 数据库 <code>jntt.db</code>；登录态与管理员开关保存在本地 <code>SharedPreferences</code>。</p>
+  </section>
+
+  <section id="architecture">
+    <h2>二、整体架构与代码串联</h2>
+    <div class="mermaid">
+flowchart TD
+  A["LoginActivity<br/>App 启动页"] -->|登录成功 / 已登录| B["MainActivity<br/>底部导航容器"]
+  A -->|去注册| C["RegisterActivity"]
+  C -->|注册成功 setLoggedUser| B
+  B --> D["HeadlineFragment<br/>头条列表"]
+  B --> E["MallFragment<br/>商城列表"]
+  B --> F["MineFragment<br/>个人中心"]
+  D --> G["ArticleAdapter<br/>文章卡片"]
+  D --> H["SearchActivity<br/>文章搜索"]
+  G --> I["ArticleDetailActivity<br/>文章详情/点赞/评论/关注"]
+  E --> J["ProductAdapter<br/>商品卡片"]
+  J --> K["ProductDetailActivity<br/>商品详情/加购/购买"]
+  E --> L["CartActivity<br/>购物车"]
+  K --> L
+  F --> M["ProfileEditActivity<br/>资料头像手机号"]
+  F --> N["MyArticlesActivity<br/>我的文章"]
+  F --> O["MyFavoritesActivity<br/>我的收藏"]
+  F --> P["MyOrdersActivity<br/>我的订单"]
+  F --> Q["SettingsActivity<br/>设置"]
+  Q --> R["AccountManagerActivity<br/>账号管理"]
+  Q --> S["AddArticleActivity<br/>添加文章"]
+  Q --> T["AddProductActivity<br/>添加商品"]
+  I --> X["DataManager<br/>统一数据入口"]
+  K --> X
+  L --> X
+  M --> X
+  P --> X
+  X --> Y["AppDatabase<br/>SQLiteOpenHelper"]
+  Y --> Z[("jntt.db<br/>本地 SQLite")]
+  X --> SP[("pref_session<br/>SharedPreferences")]
+    </div>
+    <p>所有页面都不直接操作数据库文件，而是调用 <code>DataManager.getInstance(context)</code> 拿到单例，再调用具体方法。例如：文章列表调用 <code>getArticles()</code>，商品列表调用 <code>getProducts()</code>，购物车调用 <code>getCart()</code>/<code>saveCartPublic()</code>，订单调用 <code>addOrder()</code>/<code>getOrders()</code>。</p>
+  </section>
+
+  <section id="database">
+    <h2>三、数据库是什么内容，数据存在了哪里</h2>
+    <h3>3.1 真实存储位置</h3>
+    <table>
+      <tr><th>数据类型</th><th>存储方式</th><th>代码位置</th><th>实际内容</th></tr>
+      <tr><td>业务数据</td><td>SQLite 数据库 <code>jntt.db</code></td><td><span class="path">AppDatabase.java:13-14</span></td><td>用户、文章、商品、购物车、订单、点赞、评论、关注、商品评价。</td></tr>
+      <tr><td>登录会话</td><td>SharedPreferences <code>pref_session</code></td><td><span class="path">DataManager.java:27-77</span></td><td><code>logged_user</code> 当前登录账号；<code>admin_mode</code> 管理员模式开关；<code>hidden_users</code> 本机隐藏账号记录。</td></tr>
+      <tr><td>用户头像</td><td>SQLite 的 <code>users.avatar_uri</code></td><td><span class="path">ProfileEditActivity.java:154-158</span></td><td>优先保存压缩后的 Base64 字符串，也可能保存图片 Uri。</td></tr>
+      <tr><td>商品/文章图片</td><td>资源图片或 Uri 字符串</td><td><span class="path">ProductDetailActivity.java:50-115</span>、<span class="path">AddProductActivity.java:108-112</span></td><td>初始商品/文章使用 <code>mipmap</code> 固定图片；用户添加商品保存逗号分隔 Uri。</td></tr>
+    </table>
+
+    <h3>3.2 数据库表结构</h3>
+    <p><code>AppDatabase.onCreate()</code> 创建 10 张表，并创建常用索引。数据库版本是 <code>DB_VERSION = 4</code>。</p>
+    <table>
+      <tr><th>表</th><th>主要字段</th><th>用途</th><th>关键约束</th></tr>
+      <tr><td><code>users</code></td><td>id, username, password, nickname, avatar_uri, signature, phone</td><td>账号、密码、昵称、头像、签名、手机号</td><td>username 唯一，phone 唯一</td></tr>
+      <tr><td><code>articles</code></td><td>id, title, content, author, time, read_count, cover_uri</td><td>文章正文和阅读量</td><td>id 主键</td></tr>
+      <tr><td><code>products</code></td><td>id, name, desc, cover_uri, price</td><td>商品名称、介绍、图片、价格</td><td>id 主键</td></tr>
+      <tr><td><code>cart</code></td><td>username, product_id, name, price, quantity</td><td>购物车数据，按用户隔离</td><td><code>UNIQUE(username, product_id)</code> 防止同一商品重复行</td></tr>
+      <tr><td><code>orders</code></td><td>order_id, username, product_id, name, price, quantity, time, status</td><td>订单记录</td><td>order_id 唯一</td></tr>
+      <tr><td><code>article_likes</code></td><td>username, article_id</td><td>文章点赞；项目里也复用成“我的收藏”来源</td><td><code>UNIQUE(username, article_id)</code></td></tr>
+      <tr><td><code>comments</code></td><td>article_id, username, content, time</td><td>文章评论</td><td>按 article_id 查询</td></tr>
+      <tr><td><code>comment_likes</code></td><td>username, comment_id</td><td>评论点赞</td><td><code>UNIQUE(username, comment_id)</code></td></tr>
+      <tr><td><code>follows</code></td><td>follower, following</td><td>关注/粉丝关系</td><td><code>UNIQUE(follower, following)</code></td></tr>
+      <tr><td><code>product_comments</code></td><td>product_id, username, content, images, time</td><td>商品评价和评价图片</td><td>按 product_id 查询</td></tr>
+    </table>
+
+    <div class="mermaid">
+erDiagram
+  users ||--o{ articles : "author=username"
+  users ||--o{ cart : "username"
+  users ||--o{ orders : "username"
+  users ||--o{ article_likes : "username"
+  users ||--o{ comments : "username"
+  users ||--o{ comment_likes : "username"
+  users ||--o{ follows : "follower/following"
+  users ||--o{ product_comments : "username"
+  articles ||--o{ article_likes : "article_id"
+  articles ||--o{ comments : "article_id"
+  comments ||--o{ comment_likes : "comment_id"
+  products ||--o{ cart : "product_id"
+  products ||--o{ orders : "product_id"
+  products ||--o{ product_comments : "product_id"
+    </div>
+
+    <details open>
+      <summary>建表核心代码</summary>
+      <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/data/AppDatabase.java</span>，第 1-148 行</div>
+<pre><code>DB_NAME = &quot;jntt.db&quot;; DB_VERSION = 4
+
+CREATE TABLE users (... username TEXT UNIQUE NOT NULL, password TEXT NOT NULL, nickname TEXT, avatar_uri TEXT, signature TEXT, phone TEXT UNIQUE)
+CREATE TABLE articles (id INTEGER PRIMARY KEY, title TEXT, content TEXT, author TEXT, time TEXT, read_count INTEGER DEFAULT 0, cover_uri TEXT)
+CREATE TABLE products (id INTEGER PRIMARY KEY, name TEXT, desc TEXT, cover_uri TEXT, price REAL)
+CREATE TABLE cart (... username TEXT, product_id INTEGER, name TEXT, price REAL, quantity INTEGER DEFAULT 1, UNIQUE(username, product_id))
+CREATE TABLE orders (... order_id TEXT UNIQUE, username TEXT, product_id INTEGER, name TEXT, price REAL, quantity INTEGER, time TEXT, status TEXT)
+CREATE TABLE article_likes (... username TEXT, article_id INTEGER, UNIQUE(username, article_id))
+CREATE TABLE comments (... article_id INTEGER, username TEXT, content TEXT, time TEXT)
+CREATE TABLE comment_likes (... username TEXT, comment_id INTEGER, UNIQUE(username, comment_id))
+CREATE TABLE follows (... follower TEXT, following TEXT, UNIQUE(follower, following))
+CREATE TABLE product_comments (... product_id INTEGER, username TEXT, content TEXT, images TEXT, time TEXT)</code></pre>
+    </details>
+  </section>
+
+  <section id="requirements">
+    <h2>四、需求文档功能对照</h2>
+    <table>
+      <tr><th>需求文档功能</th><th>已实现代码</th><th>说明</th></tr>
+      <tr><td>登录/注册，未注册跳注册，注册成功自动登录</td><td><span class="path">LoginActivity.java</span>、<span class="path">RegisterActivity.java</span>、<span class="path">DataManager.register/login/setLoggedUser</span></td><td>支持用户名/手机号登录，手机号格式校验，注册后进入主界面。</td></tr>
+      <tr><td>主界面：头条、商城、我的</td><td><span class="path">MainActivity.java</span>、<span class="path">activity_main.xml</span></td><td>底部玻璃导航切换三个 Fragment。</td></tr>
+      <tr><td>头条列表、文章详情</td><td><span class="path">HeadlineFragment.java</span>、<span class="path">ArticleAdapter.java</span>、<span class="path">ArticleDetailActivity.java</span></td><td>列表显示作者、时间、阅读量、标题、内容、封面；详情显示完整内容和互动。</td></tr>
+      <tr><td>商城列表、商品详情、购物车入口</td><td><span class="path">MallFragment.java</span>、<span class="path">ProductAdapter.java</span>、<span class="path">ProductDetailActivity.java</span></td><td>商品瀑布流、搜索、轮播图、详情、加入购物车、立即购买。</td></tr>
+      <tr><td>我的：个人信息、我的文章、我的订单、购物车、设置</td><td><span class="path">MineFragment.java</span></td><td>个人中心还额外实现了粉丝/关注/获赞统计与资料编辑入口。</td></tr>
+      <tr><td>设置：账号管理、退出登录、管理员模式</td><td><span class="path">SettingsActivity.java</span></td><td>管理员模式打开后显示添加文章、添加商品入口。</td></tr>
+      <tr><td>账号管理：短按改密码，长按删除账号，添加账号复用注册页</td><td><span class="path">AccountManagerActivity.java</span>、<span class="path">UserAdapter.java</span></td><td>长按实际是“从本机登录历史移除”，不删除数据库账号本身。</td></tr>
+      <tr><td>购物车和订单</td><td><span class="path">CartActivity.java</span>、<span class="path">CartAdapter.java</span>、<span class="path">MyOrdersActivity.java</span>、<span class="path">OrderDetailActivity.java</span></td><td>支持勾选、数量加减、合计金额、结算成订单、支付/取消/超时。</td></tr>
+    </table>
+  </section>
+
+  <section id="auth">
+    <h2>五、注册、登录、找回密码</h2>
+    <h3>5.1 注册功能</h3>
+    <p>注册页读取用户名、密码、手机号，先做前端校验，再调用 <code>DataManager.register(username, password, phone)</code> 写入 <code>users</code> 表。成功后调用 <code>setLoggedUser(username)</code> 写入登录态，并跳转 <code>MainActivity</code>。</p>
+    <div class="mermaid">
+flowchart TD
+  A["用户进入 RegisterActivity"] --> B["输入 username/password/phone"]
+  B --> C{"用户名和密码为空？"}
+  C -- 是 --> C1["Toast: 用户名和密码不能为空"]
+  C -- 否 --> D{"用户名格式是否合法？"}
+  D -- 否 --> D1["Toast: 只能包含字母数字及 -@_."]
+  D -- 是 --> E{"密码长度 >= 6？"}
+  E -- 否 --> E1["Toast: 密码至少6位"]
+  E -- 是 --> F{"手机号为空？"}
+  F -- 否 --> G{"手机号为 11 位且符合规则且未绑定？"}
+  G -- 否 --> G1["Toast: 手机号无效/已注册"]
+  F -- 是 --> H["DataManager.register"]
+  G -- 是 --> H
+  H --> I["INSERT users(username,password,nickname,phone)"]
+  I --> J{"插入成功？"}
+  J -- 否 --> J1["Toast: 用户名已被使用"]
+  J -- 是 --> K["SharedPreferences.logged_user=username"]
+  K --> L["跳转 MainActivity"]
+    </div>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/RegisterActivity.java</span>，第 53-99 行</div>
+<pre><code>boolean ok = dm.register(username, password, phone);
+if (!ok) { Toast.makeText(this, &quot;该用户名已被使用，请更换用户名&quot;, Toast.LENGTH_SHORT).show(); return; }
+dm.setLoggedUser(username);
+startActivity(new Intent(this, MainActivity.class));</code></pre>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/data/DataManager.java</span>，第 99-111 行</div>
+<pre><code>ContentValues cv = new ContentValues();
+cv.put(&quot;username&quot;, username);
+cv.put(&quot;password&quot;, password);
+cv.put(&quot;nickname&quot;, username);
+cv.put(&quot;phone&quot;, phone);
+wdb().insertWithOnConflict(&quot;users&quot;, null, cv, SQLiteDatabase.CONFLICT_IGNORE);</code></pre>
+
+    <h3>5.2 登录功能</h3>
+    <p>登录页先用 <code>findUsernameByAccount()</code> 判断用户名或手机号是否存在。不存在就显示“账号未注册”弹窗；存在后用 <code>login()</code> 查询 <code>users</code> 表中账号/手机号和密码是否匹配。匹配后写入 <code>pref_session.logged_user</code>。</p>
+    <div class="mermaid">
+flowchart TD
+  A["LoginActivity.onCreate"] --> B{"pref_session.logged_user 已存在？"}
+  B -- 是 --> M["直接进入 MainActivity"]
+  B -- 否 --> C["用户输入账号和密码"]
+  C --> D["findUsernameByAccount(account)"]
+  D --> E{"users 表是否存在该 username/phone？"}
+  E -- 否 --> F["显示未注册弹窗，可跳 RegisterActivity"]
+  E -- 是 --> G["DataManager.login(account,password)"]
+  G --> H{"SQL 查到账号？"}
+  H -- 否 --> I["Toast: 密码错误"]
+  H -- 是 --> J["setLoggedUser(user.username)"]
+  J --> M
+    </div>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/data/DataManager.java</span>，第 152-166 行</div>
+<pre><code>SELECT username,password FROM users
+WHERE (username=? OR phone=?) AND password=?</code></pre>
+
+    <h3>5.3 忘记密码/重置密码/修改密码</h3>
+    <p><code>ForgotPasswordActivity</code> 生成图片验证码，用户输入账号和验证码后进入 <code>ResetPasswordActivity</code>；重置页与设置里的 <code>ChangePasswordActivity</code> 都调用 <code>DataManager.changePassword()</code> 更新 <code>users.password</code>。</p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/data/DataManager.java</span>，第 190-193 行</div>
+<pre><code>ContentValues cv = new ContentValues();
+cv.put(&quot;password&quot;, newPassword);
+wdb().update(&quot;users&quot;, cv, &quot;username=?&quot;, new String[] { username });</code></pre>
+  </section>
+
+  <section id="main">
+    <h2>六、主界面与底部导航</h2>
+    <p><code>MainActivity</code> 的职责是容器和导航，不负责业务数据。它在 <code>activity_main.xml</code> 中放置 <code>fragmentContainer</code> 和三个 tab；点击 tab 后执行 <code>selectTab()</code>，把 Fragment 替换成 <code>HeadlineFragment</code>、<code>MallFragment</code> 或 <code>MineFragment</code>。</p>
+    <div class="mermaid">
+flowchart LR
+  A["tabHeadline 点击"] --> D["selectTab(0)"] --> G["switchFragment(new HeadlineFragment())"]
+  B["tabMall 点击"] --> E["selectTab(1)"] --> H["switchFragment(new MallFragment())"]
+  C["tabMine 点击"] --> F["selectTab(2)"] --> I["switchFragment(new MineFragment())"]
+  D --> J["glassPill 位移动画"]
+  E --> J
+  F --> J
+    </div>
+    <p>UI 风格由 <code>BlurBehindView</code>、<code>RoundedClipFrame</code>、<code>MainActivity.animateIconColor()</code> 组合实现：底部导航有玻璃模糊、药丸滑动和图标颜色渐变。</p>
+  </section>
+
+  <section id="article">
+    <h2>七、头条文章功能</h2>
+    <h3>7.1 文章列表</h3>
+    <p><code>HeadlineFragment</code> 在 <code>onViewCreated()</code> 中调用 <code>dm.getArticles()</code> 读取所有文章，传给 <code>ArticleAdapter</code>。点击文章卡片后把 <code>article_id</code> 放进 Intent，打开 <code>ArticleDetailActivity</code>。</p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/fragment/HeadlineFragment.java</span>，第 38-49 行</div>
+<pre><code>allArticles = dm.getArticles();
+adapter = new ArticleAdapter(displayed, article -&gt; {
+    Intent intent = new Intent(getContext(), ArticleDetailActivity.class);
+    intent.putExtra(&quot;article_id&quot;, article.id);
+    startActivity(intent);
+}, dm, dm.getLoggedUser());</code></pre>
+    <p><code>DataManager.getArticles()</code> 不只查文章表，还左连接 <code>users</code> 表，把作者昵称和头像也带出来。</p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/data/DataManager.java</span>，第 243-246 行</div>
+<pre><code>SELECT a.id,a.title,a.content,a.author,a.time,a.read_count,a.cover_uri,
+       u.nickname,u.avatar_uri
+FROM articles a LEFT JOIN users u ON a.author=u.username
+ORDER BY a.id DESC</code></pre>
+
+    <h3>7.2 文章搜索</h3>
+    <p><code>SearchActivity</code> 是全屏搜索。它启动时读取 <code>dm.getArticles()</code>，输入框每次变化时调用 <code>performSearch()</code>，在内存里过滤标题、内容、作者包含关键字的文章。</p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/SearchActivity.java</span>，第 109-124 行</div>
+<pre><code>for (Article a : allArticles) {
+    if (a.title.contains(query) || a.content.contains(query) || a.author.contains(query)) {
+        results.add(a);
+    }
+}
+searchAdapter.notifyDataSetChanged();</code></pre>
+
+    <h3>7.3 文章详情、阅读量、删除</h3>
+    <p>进入详情页后先调用 <code>incrementReadCount(articleId)</code>，把 <code>articles.read_count</code> 加 1。再通过 <code>dm.getArticles()</code> 找到当前文章对象并绑定标题、正文、作者、时间、阅读量、图片。若当前用户就是作者，右上角出现删除按钮，删除时调用 <code>deleteArticle()</code>。</p>
+    <div class="mermaid">
+flowchart TD
+  A["点击文章卡片"] --> B["Intent: article_id"]
+  B --> C["ArticleDetailActivity.onCreate"]
+  C --> D["dm.incrementReadCount(articleId)"]
+  D --> E["UPDATE articles SET read_count=read_count+1"]
+  E --> F["dm.getArticles() 找到目标文章"]
+  F --> G["bindViews 展示标题/作者/时间/正文/阅读量"]
+  G --> H{"currentUser == article.author?"}
+  H -- 是 --> I["显示删除按钮"]
+  I --> J["dm.deleteArticle(articleId)"]
+  J --> K["DELETE articles; DELETE comments"]
+  H -- 否 --> L["显示关注按钮"]
+    </div>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/data/DataManager.java</span>，第 367-371 行</div>
+<pre><code>wdb().delete(&quot;articles&quot;, &quot;id=?&quot;, new String[] { String.valueOf(articleId) });
+// 不删除 article_likes，收藏列表可显示“稿件已被删除”
+wdb().delete(&quot;comments&quot;, &quot;article_id=?&quot;, new String[] { String.valueOf(articleId) });</code></pre>
+
+    <h3>7.4 点赞/我的收藏</h3>
+    <p>项目里“文章点赞”和“我的收藏”共用 <code>article_likes</code> 表：点击点赞会插入或删除一行 <code>(username, article_id)</code>；<code>MyFavoritesActivity</code> 调用 <code>getLikedArticles(username)</code>，把用户点过赞的文章作为“我的收藏”展示。</p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/ArticleDetailActivity.java</span>，第 299-309 行</div>
+<pre><code>boolean nowLiked = dm.isArticleLiked(currentUser, articleId);
+if (nowLiked) dm.unlikeArticle(currentUser, articleId);
+else dm.likeArticle(currentUser, articleId);
+refreshLikeUI();</code></pre>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/data/DataManager.java</span>，第 302-308 行</div>
+<pre><code>if (username == null || username.equals(getArticleAuthor(articleId))) return;
+INSERT OR IGNORE INTO article_likes(username, article_id)</code></pre>
+
+    <h3>7.5 评论、评论点赞、删除评论</h3>
+    <p>详情页底部输入框监听键盘“发送”。发送后调用 <code>dm.addComment()</code> 写入 <code>comments</code> 表，然后把返回的 Comment 加到当前列表，局部刷新 UI。评论点赞写入 <code>comment_likes</code> 表，自己不能给自己的评论点赞。评论删除会同时删除评论点赞记录。</p>
+    <div class="mermaid">
+flowchart TD
+  A["用户在 etComment 输入文字"] --> B["键盘发送 IME_ACTION_SEND"]
+  B --> C{"currentUser 是否为空？"}
+  C -- 是 --> C1["Toast: 请先登录"]
+  C -- 否 --> D{"内容为空？"}
+  D -- 是 --> D1["不处理"]
+  D -- 否 --> E["dm.addComment(articleId,user,text)"]
+  E --> F["INSERT comments(article_id,username,content,time)"]
+  F --> G["comments.add(c); notifyItemInserted"]
+  G --> H["更新评论数量并滚动到底部"]
+  I["点击评论点赞"] --> J{"是否自己的评论？"}
+  J -- 是 --> J1["Toast: 不能给自己的评论点赞"]
+  J -- 否 --> K["INSERT/DELETE comment_likes"]
+    </div>
+
+    <h3>7.6 关注作者、粉丝/关注/获赞</h3>
+    <p>文章详情里，如果不是看自己的文章，会显示关注按钮。点击后根据 <code>isFollowing()</code> 判断当前状态，执行 <code>followUser()</code> 或 <code>unfollowUser()</code>。个人中心统计粉丝数、关注数、获赞数时都从 <code>follows</code> 或 <code>article_likes</code> 表查询。</p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/data/DataManager.java</span>，第 497-522 行</div>
+<pre><code>followUser: INSERT OR IGNORE INTO follows(follower, following)
+unfollowUser: DELETE FROM follows WHERE follower=? AND following=?
+getFollowersCount: SELECT COUNT(*) FROM follows WHERE following=?
+getFollowingCount: SELECT COUNT(*) FROM follows WHERE follower=?</code></pre>
+
+    <h3>7.7 发布文章</h3>
+    <p><code>AddArticleActivity</code> 支持选择封面图、拍照、填写标题和正文。提交时调用 <code>DataManager.addArticle()</code>，作者来自当前登录用户，时间由 <code>now("yyyy-MM-dd HH:mm")</code> 生成，阅读量从 0 开始。</p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/data/DataManager.java</span>，第 255-266 行</div>
+<pre><code>cv.put(&quot;id&quot;, nextId(&quot;articles&quot;));
+cv.put(&quot;title&quot;, title);
+cv.put(&quot;content&quot;, content);
+cv.put(&quot;author&quot;, getLoggedUser());
+cv.put(&quot;time&quot;, now(&quot;yyyy-MM-dd HH:mm&quot;));
+cv.put(&quot;read_count&quot;, 0);
+cv.put(&quot;cover_uri&quot;, coverUri);
+wdb().insert(&quot;articles&quot;, null, cv);</code></pre>
+  </section>
+
+  <section id="mall">
+    <h2>八、商城商品功能</h2>
+    <h3>8.1 商品列表与搜索</h3>
+    <p><code>MallFragment</code> 读取 <code>dm.getProducts()</code>，使用 <code>ProductAdapter</code> 渲染商品卡片。搜索框用 <code>TextWatcher</code> 实时过滤商品名或描述。</p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/fragment/MallFragment.java</span>，第 84-95 行</div>
+<pre><code>displayed.clear();
+for (Product p : allProducts) {
+    if (p.name.contains(query) || p.desc.contains(query)) displayed.add(p);
+}
+adapter.notifyDataSetChanged();</code></pre>
+
+    <h3>8.2 商品详情</h3>
+    <p>点击商品卡片后，<code>product_id</code> 进入 <code>ProductDetailActivity</code>。详情页从 <code>dm.getProducts()</code> 中找到目标商品，按商品 id 绑定固定资源图，或对后台添加的商品使用 <code>cover_uri</code> 的 Uri 列表。底部有购物车图标、加入购物车、立即购买按钮。</p>
+    <div class="mermaid">
+flowchart TD
+  A["MallFragment 商品卡片"] --> B["ProductDetailActivity(product_id)"]
+  B --> C["dm.getProducts 找目标 Product"]
+  C --> D["绑定商品名/介绍/价格"]
+  C --> E["根据 id 或 coverUri 生成图片列表"]
+  E --> F["ProductImageAdapter + PagerSnapHelper 轮播"]
+  B --> G["点击评价区域"]
+  G --> H["ProductCommentsActivity"]
+  B --> I["点击加入购物车"]
+  I --> J["dm.addToCart(username, product)"]
+  B --> K["点击立即购买"]
+  K --> L["dm.addOrder(username, product, quantity=1)"]
+    </div>
+
+    <h3>8.3 添加商品</h3>
+    <p>管理员模式开启后，设置页出现“添加商品”。<code>AddProductActivity</code> 支持最多 9 张图，提交时把图片 Uri 用逗号拼成字符串，写入 <code>products.cover_uri</code>。</p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/AddProductActivity.java</span>，第 93-114 行</div>
+<pre><code>String name = etName.getText().toString().trim();
+String desc = etDesc.getText().toString().trim();
+double price = Double.parseDouble(priceStr);
+String cover = coverUris.stream().map(Uri::toString).collect(Collectors.joining(&quot;,&quot;));
+dm.addProduct(name, desc, price, cover);</code></pre>
+
+    <h3>8.4 商品评价</h3>
+    <p><code>ProductCommentsActivity</code> 展示指定商品的评价。只有购买过该商品的用户或 admin 可以发表评价；判断依据是 <code>orders</code> 表中是否存在当前用户和商品 id 的订单。评价内容和图片写入 <code>product_comments</code> 表。</p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/data/DataManager.java</span>，第 376-381 行</div>
+<pre><code>SELECT COUNT(*) FROM orders WHERE username=? AND product_id=?</code></pre>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/data/DataManager.java</span>，第 384-394 行</div>
+<pre><code>INSERT INTO product_comments(product_id, username, content, images, time)</code></pre>
+  </section>
+
+  <section id="cart">
+    <h2>九、购物车功能：数据在哪里，如何结算</h2>
+    <p class="note">购物车数据在 SQLite 的 <code>cart</code> 表，不在内存，也不在远程服务器。每条记录带 <code>username</code>，所以每个账号看到自己的购物车。</p>
+    <h3>9.1 加入购物车</h3>
+    <p>商品列表和商品详情都能加入购物车。实际执行逻辑在 <code>DataManager.addToCart()</code>：先查当前用户是否已有该商品；有则数量 +1，没有则插入新行。</p>
+    <div class="mermaid">
+flowchart TD
+  A["点击加入购物车"] --> B["MallFragment/ProductDetailActivity"]
+  B --> C["dm.addToCart(username, product)"]
+  C --> D["SELECT quantity FROM cart WHERE username=? AND product_id=?"]
+  D --> E{"是否已有该商品？"}
+  E -- 是 --> F["UPDATE cart SET quantity = old + 1"]
+  E -- 否 --> G["INSERT cart(username,product_id,name,price,quantity=1)"]
+  F --> H["Toast: 已加入购物车"]
+  G --> H
+    </div>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/data/DataManager.java</span>，第 628-645 行</div>
+<pre><code>if (c.moveToFirst()) {
+    int qty = c.getInt(0) + 1;
+    UPDATE cart SET quantity=? WHERE username=? AND product_id=?
+} else {
+    INSERT INTO cart(username, product_id, name, price, quantity=1)
+}</code></pre>
+
+    <h3>9.2 购物车页面</h3>
+    <p><code>CartActivity.onCreate()</code> 进入页面时调用 <code>dm.getCart(username)</code>，得到当前用户购物车列表。<code>CartAdapter</code> 保存一个 <code>checkedIds</code> 集合表示勾选了哪些商品，并负责数量加减。</p>
+    <div class="mermaid">
+flowchart TD
+  A["进入 CartActivity"] --> B["username = dm.getLoggedUser()"]
+  B --> C["items = dm.getCart(username)"]
+  C --> D["CartAdapter(items)"]
+  D --> E["勾选商品: checkedIds add/remove productId"]
+  D --> F["点击 +: quantity++"]
+  D --> G["点击 -: quantity--，若到 0 则移除"]
+  E --> H["listener.onChange"]
+  F --> H
+  G --> H
+  H --> I["dm.saveCartPublic(username, items)"]
+  I --> J["先 DELETE cart WHERE username=?"]
+  J --> K["再把当前 items 全量 INSERT 回 cart"]
+  H --> L["refreshBottomBar 重新计算合计"]
+    </div>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/adapter/CartAdapter.java</span>，第 56-61 行</div>
+<pre><code>double total = 0;
+for (CartItem c : data)
+    if (checkedIds.contains(c.productId))
+        total += c.price * c.quantity;</code></pre>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/data/DataManager.java</span>，第 648-659 行</div>
+<pre><code>d.delete(&quot;cart&quot;, &quot;username=?&quot;, new String[] { username });
+for (CartItem item : items) {
+    INSERT INTO cart(username, product_id, name, price, quantity)
+}</code></pre>
+
+    <h3>9.3 结算生成订单</h3>
+    <p>点击结算后，<code>CartActivity.checkout()</code> 拿到所有已勾选商品，逐个调用 <code>dm.addOrder()</code> 写入 <code>orders</code> 表。然后 <code>adapter.removeChecked()</code> 从购物车内存列表移除已结算商品，再 <code>saveCartPublic()</code> 把剩余购物车保存回数据库。</p>
+    <div class="mermaid">
+flowchart TD
+  A["点击结算"] --> B["adapter.getCheckedItems()"]
+  B --> C{"是否为空？"}
+  C -- 是 --> C1["Toast: 请先选择商品"]
+  C -- 否 --> D["循环 checkedItems"]
+  D --> E["dm.addOrder(username, productId, name, price, quantity)"]
+  E --> F["INSERT orders(order_id,username,product_id,name,price,quantity,time,status=pending)"]
+  F --> G["adapter.removeChecked()"]
+  G --> H["dm.saveCartPublic(username, items) 保存剩余商品"]
+  H --> I["跳转 MyOrdersActivity"]
+    </div>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/CartActivity.java</span>，第 113-125 行</div>
+<pre><code>for (CartItem item : checkedItems) {
+    dm.addOrder(username, item.productId, item.name, item.price, item.quantity);
+}
+adapter.removeChecked();
+dm.saveCartPublic(username, items);
+startActivity(new Intent(this, MyOrdersActivity.class));</code></pre>
+  </section>
+
+  <section id="order">
+    <h2>十、订单功能</h2>
+    <p>订单数据保存在 <code>orders</code> 表。订单号是 <code>"JN" + System.currentTimeMillis()</code>，状态初始为 <code>pending</code>，支付后变 <code>paid</code>，取消或超时变 <code>cancelled</code>。</p>
+    <table>
+      <tr><th>状态</th><th>显示</th><th>触发代码</th></tr>
+      <tr><td><code>pending</code></td><td>待支付，显示 24 小时倒计时</td><td><span class="path">DataManager.addOrder()</span> 初始写入</td></tr>
+      <tr><td><code>paid</code></td><td>已完成/交易成功，可去评价</td><td><span class="path">MyOrdersActivity.onPay()</span>、<span class="path">OrderDetailActivity.btnPay</span></td></tr>
+      <tr><td><code>cancelled</code></td><td>已取消</td><td>用户取消，或 <code>Order.getRemainingMs() <= 0</code> 后页面判断超时</td></tr>
+    </table>
+    <div class="mermaid">
+stateDiagram-v2
+  [*] --> pending: addOrder()
+  pending --> paid: 点击支付
+  pending --> cancelled: 点击取消
+  pending --> cancelled: 超过24小时
+  paid --> [*]
+  cancelled --> [*]
+    </div>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/model/Order.java</span>，第 32-39 行</div>
+<pre><code>Date d = new SimpleDateFormat(&quot;yyyy-MM-dd HH:mm&quot;).parse(time);
+long deadline = d.getTime() + 24L * 60 * 60 * 1000;
+return deadline - System.currentTimeMillis();</code></pre>
+  </section>
+
+  <section id="mine">
+    <h2>十一、个人中心功能</h2>
+    <p><code>MineFragment</code> 每次显示或回到页面时调用 <code>bindViews()</code> 刷新个人资料、头像、签名和统计数据。点击入口跳转到资料编辑、我的文章、我的收藏、我的订单、购物车、设置。</p>
+    <div class="mermaid">
+flowchart TD
+  A["MineFragment.bindViews"] --> B["username = dm.getLoggedUser()"]
+  B --> C["dm.getNickname / getSignature / getAvatarUri"]
+  B --> D["dm.getFollowersCount"]
+  B --> E["dm.getFollowingCount"]
+  B --> F["dm.getTotalLikesReceived"]
+  A --> G["我的文章 -> MyArticlesActivity"]
+  A --> H["我的收藏 -> MyFavoritesActivity"]
+  A --> I["我的订单 -> MyOrdersActivity"]
+  A --> J["购物车 -> CartActivity"]
+  A --> K["设置 -> SettingsActivity"]
+  A --> L["资料卡 -> ProfileEditActivity"]
+    </div>
+    <h3>11.1 编辑资料</h3>
+    <p><code>ProfileEditActivity</code> 支持昵称、签名、手机号和头像。头像选择后通过 uCrop 裁剪，然后用 <code>ImageUtils.uriToBase64()</code> 压缩到 500x500、JPEG 85% 并保存到 <code>users.avatar_uri</code>。</p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/ProfileEditActivity.java</span>，第 147-158 行</div>
+<pre><code>if (!nick.equals(dm.getNickname(username))) success &amp;= dm.setNickname(username, nick);
+if (!sig.equals(dm.getSignature(username))) success &amp;= dm.updateSignature(username, sig);
+if (pendingAvatarBase64 != null) success &amp;= dm.setAvatarUri(username, pendingAvatarBase64);</code></pre>
+    <h3>11.2 我的文章、我的收藏、关注列表</h3>
+    <p><code>MyArticlesActivity</code> 调 <code>getArticlesByAuthor()</code>，显示当前用户或被点击用户发布的文章；<code>MyFavoritesActivity</code> 调 <code>getLikedArticles()</code>；粉丝/关注/获赞列表由 <code>FollowListActivity</code> 根据 Intent 的 <code>type</code> 选择 <code>getFollowers()</code>、<code>getFollowing()</code> 或 <code>getUsersWhoLikedMyArticles()</code>。</p>
+  </section>
+
+  <section id="settings">
+    <h2>十二、设置、管理员模式、账号管理</h2>
+    <h3>12.1 设置页与退出登录</h3>
+    <p><code>SettingsActivity</code> 读取 <code>dm.isAdminMode()</code> 设置开关状态。退出登录弹确认框，确认后调用 <code>dm.logout()</code> 删除 <code>pref_session.logged_user</code>，并清空任务栈回到登录页。</p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/data/DataManager.java</span>，第 57-58 行</div>
+<pre><code>prefs().edit().remove(KEY_LOGGED_USER).apply();</code></pre>
+
+    <h3>12.2 管理员模式</h3>
+    <p>管理员模式不是服务端权限，只是本地 SharedPreferences 开关 <code>admin_mode</code>。打开后 <code>layoutAdminOptions</code> 可见，显示添加文章和添加商品入口。</p>
+    <div class="mermaid">
+flowchart TD
+  A["SettingsActivity"] --> B["swAdmin.setChecked(dm.isAdminMode())"]
+  B --> C{"用户切换开关"}
+  C --> D["dm.setAdminMode(checked)"]
+  D --> E{"checked?"}
+  E -- true --> F["显示 AddArticle / AddProduct 入口"]
+  E -- false --> G["隐藏管理员入口"]
+    </div>
+
+    <h3>12.3 账号管理</h3>
+    <p><code>AccountManagerActivity</code> 显示 <code>dm.getUsers()</code> 返回的账号列表。短按账号进入 <code>ChangePasswordActivity</code>；长按当前账号会提示不能删除；长按其他账号实际调用 <code>hideUserFromHistory()</code>，只是把账号加入本机 <code>hidden_users</code>，不删除 <code>users</code> 表，所以该账号仍然可以登录。</p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/data/DataManager.java</span>，第 69-73 行</div>
+<pre><code>Set&lt;String&gt; hidden = new HashSet&lt;&gt;(prefs().getStringSet(&quot;hidden_users&quot;, new HashSet&lt;&gt;()));
+hidden.add(username);
+prefs().edit().putStringSet(&quot;hidden_users&quot;, hidden).apply();</code></pre>
+  </section>
+
+  <section id="media">
+    <h2>十三、图片、验证码、自定义 UI</h2>
+    <table>
+      <tr><th>功能</th><th>代码</th><th>说明</th></tr>
+      <tr><td>拍照/相册底部弹窗</td><td><span class="path">ImageUtils.showImagePickerDialog()</span></td><td>被添加文章、添加商品、资料头像、商品评价复用。</td></tr>
+      <tr><td>头像 Base64 压缩</td><td><span class="path">ImageUtils.uriToBase64()</span></td><td>把图片缩到 500x500 内，JPEG 85%，避免数据库 Cursor 窗口过大。</td></tr>
+      <tr><td>验证码</td><td><span class="path">CaptchaUtils.createBitmap()</span></td><td>生成 4 位字符验证码，绘制干扰线和干扰点，找回密码使用。</td></tr>
+      <tr><td>玻璃模糊</td><td><span class="path">BlurBehindView</span></td><td>抓取 sourceView 局部截图后用 RenderEffect 做模糊。</td></tr>
+      <tr><td>圆角裁剪</td><td><span class="path">RoundedClipFrame</span></td><td>给底部导航和药丸背景提供圆角裁剪。</td></tr>
+    </table>
+  </section>
+
+  <section id="adapters">
+    <h2>十四、列表 Adapter 细化补全</h2>
+    <p>Android 项目里很多功能并不直接写在 Activity 里，而是写在 RecyclerView 的 Adapter 中。Adapter 可以理解为“列表每一行怎么显示、每一行按钮怎么响应”的代码层。下面补齐各 Adapter 的职责和它们与 Activity/DataManager 的连接方式。</p>
+
+    <h3>14.1 ArticleAdapter：文章列表卡片、点赞、评论预览</h3>
+    <table>
+      <tr><th>代码位置</th><th>功能</th><th>调用的数据</th><th>说明</th></tr>
+      <tr><td><span class="path">adapter/ArticleAdapter.java:38-52</span></td><td>两个构造方法</td><td>文章列表、DataManager、当前用户</td><td>轻量模式用于“我的文章/我的收藏”；完整模式用于首页头条，可显示点赞和评论预览。</td></tr>
+      <tr><td><span class="path">ArticleAdapter.java:63-162</span></td><td>绑定文章卡片</td><td>Article 字段、作者头像、封面图</td><td>设置作者、时间、阅读量、标题、正文、封面。删除占位文章会显示遮罩，不允许进入详情。</td></tr>
+      <tr><td><span class="path">ArticleAdapter.java:164-205</span></td><td>首页点赞和评论预览</td><td><code>isArticleLiked</code>、<code>getArticleLikeCount</code>、<code>getCommentCount</code>、<code>getTopComment</code></td><td>点击列表里的点赞图标即可插入/删除 <code>article_likes</code>，并刷新图标和数字。</td></tr>
+    </table>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/adapter/ArticleAdapter.java</span>，第 177-188 行</div>
+<pre><code>if (dm.isArticleLiked(currentUser, a.id)) {
+    dm.unlikeArticle(currentUser, a.id);
+} else {
+    dm.likeArticle(currentUser, a.id);
+    h.ivItemLikeIcon.animate().scaleX(1.35f).scaleY(1.35f)...
+}
+refreshItemLike(h, a);</code></pre>
+    <div class="mermaid">
+flowchart TD
+  A["ArticleAdapter.onBindViewHolder"] --> B["绑定作者/时间/阅读量/标题/正文"]
+  B --> C{"coverUri 是否为空？"}
+  C -- 否 --> D["ImageView.setImageURI(coverUri)"]
+  C -- 是 --> E["按文章 id 使用 text1-text5 默认图"]
+  B --> F{"dm 和 currentUser 是否存在？"}
+  F -- 是 --> G["bindSocialRow"]
+  G --> H["查询点赞数和评论数"]
+  G --> I["查询 top comment 作为预览"]
+  G --> J["点赞按钮写入/删除 article_likes"]
+  F -- 否 --> K["隐藏互动区"]
+  B --> L["点击 item -> ArticleDetailActivity"]
+    </div>
+
+    <h3>14.2 CommentAdapter：文章评论、评论点赞、删除入口</h3>
+    <p><code>CommentAdapter</code> 接收评论列表、当前用户、文章作者、DataManager。它负责显示评论头像、昵称、内容、时间、点赞数，并判断是否显示“删除”。删除真正执行在 <code>ArticleDetailActivity</code> 的监听器里，Adapter 只把“用户点了删除哪个评论”传出去。</p>
+    <table>
+      <tr><th>判断</th><th>代码</th><th>结果</th></tr>
+      <tr><td>当前用户为空</td><td><code>currentUser == null</code></td><td>点赞时提示“请先登录”。</td></tr>
+      <tr><td>给自己的评论点赞</td><td><code>currentUser.equals(c.username)</code></td><td>提示“不能给自己的评论点赞”。</td></tr>
+      <tr><td>是否可删除</td><td><code>c.username.equals(currentUser) || articleAuthor.equals(currentUser)</code></td><td>评论作者本人或文章作者可以删评论。</td></tr>
+      <tr><td>点赞/取消点赞</td><td><code>dm.likeComment()</code> / <code>dm.unlikeComment()</code></td><td>写入或删除 <code>comment_likes</code> 表。</td></tr>
+    </table>
+
+    <h3>14.3 ProductAdapter：商品卡片和快捷加购</h3>
+    <p><code>ProductAdapter</code> 负责商城瀑布流每个商品卡片。它有两个回调：点击整张商品卡进入详情；点击加号按钮直接加入购物车。图片选择逻辑分两类：id 1-10 的默认商品使用项目内 <code>mipmap</code> 固定图片；管理员新增商品读取 <code>coverUri</code> 第一张图片。</p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/adapter/ProductAdapter.java</span>，第 97-101 行</div>
+<pre><code>holder.itemView.setOnClickListener(v -&gt; clickListener.onItemClick(p));
+holder.btnAddCart.setOnClickListener(v -&gt; {
+    if (addCartListener != null) addCartListener.onAddCart(p);
+});</code></pre>
+
+    <h3>14.4 ProductImageAdapter：商品详情轮播图</h3>
+    <p>商品详情页上方轮播图的数据类型是 <code>List&lt;Object&gt;</code>，里面既可以放 <code>Integer</code> 资源 id，也可以放 <code>String</code> 图片 Uri。Adapter 绑定时按类型区分：资源 id 用 <code>setImageResource</code>，Uri 用 <code>setImageURI</code>。</p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/adapter/ProductImageAdapter.java</span>，第 37-47 行</div>
+<pre><code>Object item = imageList.get(position);
+if (item instanceof Integer) {
+    holder.imageView.setImageResource((Integer) item);
+} else if (item instanceof String) {
+    holder.imageView.setImageURI(Uri.parse((String) item));
+}</code></pre>
+
+    <h3>14.5 CartAdapter：购物车勾选、数量和合计</h3>
+    <p><code>CartAdapter</code> 是购物车核心交互所在。它内部维护 <code>checkedIds</code>，这个集合只保存被勾选商品的 <code>productId</code>。Activity 底部合计金额不是从数据库实时算，而是 Adapter 根据当前内存列表和勾选状态计算，然后 Activity 再把变化持久化回数据库。</p>
+    <table>
+      <tr><th>操作</th><th>Adapter 方法</th><th>数据库何时更新</th></tr>
+      <tr><td>全选/取消全选</td><td><code>setAllChecked(boolean)</code></td><td>触发 <code>listener.onChange()</code>，CartActivity 调 <code>saveCartPublic()</code>。</td></tr>
+      <tr><td>计算合计</td><td><code>getSelectedTotal()</code></td><td>不写库，只算 <code>price * quantity</code>。</td></tr>
+      <tr><td>获取结算商品</td><td><code>getCheckedItems()</code></td><td>结算时逐个写入 <code>orders</code>。</td></tr>
+      <tr><td>删除已结算商品</td><td><code>removeChecked()</code></td><td>Activity 保存剩余购物车。</td></tr>
+      <tr><td>清空购物车</td><td><code>clearAll()</code></td><td>Activity 保存空列表，等价于删除该用户所有 cart 行。</td></tr>
+      <tr><td>数量 -</td><td><code>btnMinus</code></td><td>数量大于 1 就减 1；等于 1 再减则从列表移除。</td></tr>
+      <tr><td>数量 +</td><td><code>btnPlus</code></td><td>内存数量 +1，然后保存回 <code>cart</code> 表。</td></tr>
+    </table>
+
+    <h3>14.6 OrderAdapter：订单列表、支付取消、倒计时</h3>
+    <p><code>OrderAdapter</code> 显示订单列表卡片。待支付订单会启动一个每秒执行的 Runnable 计算剩余时间；如果剩余时间小于等于 0，界面状态改为取消。真正持久化状态更新主要由 <code>MyOrdersActivity</code> 和 <code>OrderDetailActivity</code> 调用 <code>updateOrderStatus()</code> 完成。</p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/adapter/OrderAdapter.java</span>，第 67-80 行</div>
+<pre><code>holder.countdownRunnable = new Runnable() {
+    public void run() {
+        long rem = o.getRemainingMs();
+        if (rem &lt;= 0) {
+            o.status = Order.STATUS_CANCELLED;
+            notifyItemChanged(holder.getAdapterPosition());
+            return;
+        }
+        handler.postDelayed(this, 1000);
+    }
+};</code></pre>
+    <p class="warn">注意：订单列表 Adapter 中超时后只改了内存对象 <code>o.status</code>，没有直接写数据库；订单详情页 <code>OrderDetailActivity</code> 进入时检测超时会调用 <code>dm.updateOrderStatus()</code> 写回数据库。</p>
+
+    <h3>14.7 ProductCommentAdapter：商品评价列表</h3>
+    <p>商品评价 Adapter 负责展示评价人头像、昵称、时间、内容和图片列表。评价图片保存在 <code>product_comments.images</code>，格式是多个 Uri 用英文逗号拼接。显示时 <code>split(",")</code> 后再创建一个横向 RecyclerView。</p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/adapter/ProductCommentAdapter.java</span>，第 71-107 行</div>
+<pre><code>if (c.images != null &amp;&amp; !c.images.isEmpty()) {
+    List&lt;String&gt; uris = Arrays.asList(c.images.split(&quot;,&quot;));
+    holder.rvCommentImages.setAdapter(new RecyclerView.Adapter&lt;...&gt;() {
+        onBindViewHolder(...) { iv.setImageURI(Uri.parse(uris.get(position))); }
+    });
+}</code></pre>
+
+    <h3>14.8 ImagePickerAdapter 和 UserAdapter</h3>
+    <p><code>ImagePickerAdapter</code> 被添加商品、商品评价复用。它把最后一个位置当作“添加图片”按钮，其余位置显示已选图片和删除按钮。<code>UserAdapter</code> 用于账号管理列表，短按回调修改密码，长按回调移除本机历史记录。</p>
+  </section>
+
+  <section id="models">
+    <h2>十五、模型层字段补全</h2>
+    <p>模型类是 Activity、Adapter、DataManager 之间传递数据的容器。它们本身不操作数据库，但字段基本对应数据库查询结果。</p>
+    <table>
+      <tr><th>模型类</th><th>字段</th><th>对应数据库/来源</th><th>用途</th></tr>
+      <tr><td><code>User</code></td><td>username, password, avatarUri</td><td><code>users</code></td><td>登录、账号管理列表。</td></tr>
+      <tr><td><code>Article</code></td><td>id, title, content, author, time, readCount, coverUri, isDeleted, authorNickname, authorAvatarUri</td><td><code>articles</code> 左连接 <code>users</code></td><td>文章列表、文章详情、我的文章、我的收藏。</td></tr>
+      <tr><td><code>Comment</code></td><td>id, articleId, username, nickname, avatarUri, content, time, likeCount, isLikedByMe</td><td><code>comments</code>、<code>comment_likes</code>、<code>users</code></td><td>评论列表和评论点赞状态。</td></tr>
+      <tr><td><code>Product</code></td><td>id, name, desc, price, coverUri</td><td><code>products</code></td><td>商城商品列表和商品详情。</td></tr>
+      <tr><td><code>CartItem</code></td><td>productId, name, price, quantity</td><td><code>cart</code></td><td>购物车列表、结算生成订单。</td></tr>
+      <tr><td><code>Order</code></td><td>orderId, productId, name, price, quantity, time, status</td><td><code>orders</code></td><td>订单列表、订单详情、倒计时。</td></tr>
+      <tr><td><code>ProductComment</code></td><td>id, productId, username, content, images, time, nickname, avatarUri</td><td><code>product_comments</code> 左连接 <code>users</code></td><td>商品评价列表。</td></tr>
+    </table>
+    <div class="mermaid">
+flowchart LR
+  DB[("SQLite 查询结果")] --> DM["DataManager<br/>把 Cursor 转成模型对象"]
+  DM --> A["Article / Product / Order / CartItem / Comment"]
+  A --> AD["Adapter<br/>绑定到列表 item"]
+  AD --> UI["屏幕上的卡片/列表行"]
+  UI --> ACT["用户点击"]
+  ACT --> DM
+    </div>
+  </section>
+
+  <section id="activity-map">
+    <h2>十六、页面跳转与 Intent 参数补全</h2>
+    <p>项目页面之间大量通过 Intent 传递 id 或类型。下面把每个入口、目标页面、传参和后续数据库动作补全。</p>
+    <table>
+      <tr><th>来源页面</th><th>用户动作</th><th>目标页面</th><th>Intent 参数</th><th>目标页面读取后做什么</th></tr>
+      <tr><td>LoginActivity</td><td>登录成功</td><td>MainActivity</td><td>无</td><td>显示三个主 Fragment。</td></tr>
+      <tr><td>LoginActivity</td><td>点注册/未注册弹窗确认</td><td>RegisterActivity</td><td>无</td><td>注册新账号。</td></tr>
+      <tr><td>RegisterActivity</td><td>注册成功</td><td>MainActivity</td><td>无</td><td>已写入 <code>logged_user</code>，直接进入主界面。</td></tr>
+      <tr><td>HeadlineFragment / SearchActivity / MyArticlesActivity / MyFavoritesActivity</td><td>点击文章</td><td>ArticleDetailActivity</td><td><code>article_id</code></td><td>阅读量 +1，查询文章，显示详情。</td></tr>
+      <tr><td>MallFragment</td><td>点击商品</td><td>ProductDetailActivity</td><td><code>product_id</code></td><td>查询商品，展示详情和评价预览。</td></tr>
+      <tr><td>MallFragment / ProductDetailActivity / MineFragment</td><td>点击购物车</td><td>CartActivity</td><td>无</td><td>用当前登录用户查询 <code>cart</code> 表。</td></tr>
+      <tr><td>CartActivity / ProductDetailActivity / MineFragment</td><td>结算/购买/我的订单</td><td>MyOrdersActivity</td><td>无</td><td>用当前用户查询 <code>orders</code> 表。</td></tr>
+      <tr><td>MyOrdersActivity</td><td>点击订单</td><td>OrderDetailActivity</td><td><code>order_id</code></td><td>在当前用户订单里找到对应订单并显示详情。</td></tr>
+      <tr><td>OrderDetailActivity</td><td>点评价</td><td>ProductCommentsActivity</td><td><code>product_id</code></td><td>显示该商品评价列表。</td></tr>
+      <tr><td>ProductCommentsActivity</td><td>写评价</td><td>AddProductCommentActivity</td><td><code>product_id</code></td><td>发布商品评价到 <code>product_comments</code> 表。</td></tr>
+      <tr><td>MineFragment</td><td>点头像资料卡</td><td>ProfileEditActivity</td><td>无</td><td>编辑当前用户资料。</td></tr>
+      <tr><td>MineFragment</td><td>点粉丝/关注/获赞</td><td>FollowListActivity</td><td><code>type</code>, <code>username</code></td><td>按 type 查询粉丝、关注或给我点赞的人。</td></tr>
+      <tr><td>MineFragment</td><td>我的文章</td><td>MyArticlesActivity</td><td>可选 <code>username</code></td><td>无 username 时显示当前用户文章；有 username 时显示指定用户文章。</td></tr>
+      <tr><td>MineFragment</td><td>我的收藏</td><td>MyFavoritesActivity</td><td>无</td><td>查询当前用户 <code>article_likes</code> 对应文章。</td></tr>
+      <tr><td>MineFragment</td><td>系统设置</td><td>SettingsActivity</td><td>无</td><td>账号管理、退出登录、管理员入口。</td></tr>
+      <tr><td>SettingsActivity</td><td>添加文章</td><td>AddArticleActivity</td><td>无</td><td>插入 <code>articles</code>。</td></tr>
+      <tr><td>SettingsActivity</td><td>添加商品</td><td>AddProductActivity</td><td>无</td><td>插入 <code>products</code>。</td></tr>
+      <tr><td>SettingsActivity</td><td>账号管理</td><td>AccountManagerActivity</td><td>无</td><td>展示 <code>users</code> 列表。</td></tr>
+      <tr><td>AccountManagerActivity</td><td>短按账号</td><td>ChangePasswordActivity</td><td><code>username</code></td><td>修改指定账号密码。</td></tr>
+      <tr><td>AccountManagerActivity</td><td>添加账号</td><td>RegisterActivity</td><td><code>add_mode=true</code></td><td>复用注册页面，添加成功后返回账号管理。</td></tr>
+      <tr><td>ForgotPasswordActivity</td><td>验证码通过</td><td>ResetPasswordActivity</td><td><code>username</code>, <code>display_account</code></td><td>修改密码后清空任务栈回登录页。</td></tr>
+    </table>
+  </section>
+
+  <section id="seed">
+    <h2>十七、初始种子数据补全</h2>
+    <p><code>DataManager</code> 构造时会调用 <code>seedDefaultData()</code>。如果 <code>products</code> 表商品数量小于 10，就注册 5 个默认账号、插入 5 篇默认文章、10 个默认商品。这解释了为什么第一次打开 App 就有文章和商品。</p>
+    <div class="mermaid">
+flowchart TD
+  A["DataManager 构造"] --> B["seedDefaultData()"]
+  B --> C["SELECT COUNT(*) FROM products"]
+  C --> D{"商品数 < 10？"}
+  D -- 否 --> E["不初始化，保留现有数据"]
+  D -- 是 --> F["删除 id<=5 的旧文章和 id<=10 的旧商品"]
+  F --> G["注册 admin/user1/user2/user3/user4"]
+  G --> H["插入 5 篇农业/校园资讯文章"]
+  H --> I["插入 10 个特色农产品"]
+    </div>
+    <table>
+      <tr><th>默认账号</th><th>默认密码</th><th>用途</th></tr>
+      <tr><td>admin</td><td>123456</td><td>默认管理员/示例文章作者。</td></tr>
+      <tr><td>user1-user4</td><td>123456</td><td>示例文章作者，形成多用户内容。</td></tr>
+    </table>
+    <table>
+      <tr><th>默认商品 id</th><th>商品名称</th><th>价格</th><th>默认图片逻辑</th></tr>
+      <tr><td>1</td><td>东北大米（5kg）</td><td>45.00</td><td><code>dami1/dami2/dami3</code></td></tr>
+      <tr><td>2</td><td>有机黑木耳（250g）</td><td>38.50</td><td><code>muer/muer2...</code></td></tr>
+      <tr><td>3</td><td>农家蜂蜜（500g）</td><td>68.00</td><td><code>fengmi1-3</code></td></tr>
+      <tr><td>4</td><td>绿色蔬菜礼盒</td><td>99.00</td><td><code>shucai1-4</code></td></tr>
+      <tr><td>5</td><td>优质冬虫夏草（100g）</td><td>880.00</td><td><code>dongchongxiacao1-3</code></td></tr>
+      <tr><td>6</td><td>农家红薯（5kg）</td><td>29.90</td><td><code>hongshu1-4</code></td></tr>
+      <tr><td>7</td><td>新鲜铁棍山药（2.5kg）</td><td>55.00</td><td><code>shanyao1-3</code></td></tr>
+      <tr><td>8</td><td>野生羊肚菌（100g）</td><td>128.00</td><td><code>yangdujun1-2</code></td></tr>
+      <tr><td>9</td><td>鲜货鹿茸菇（250g）</td><td>45.00</td><td><code>luronggu1-4</code></td></tr>
+      <tr><td>10</td><td>散养土鹅蛋（12枚）</td><td>65.00</td><td><code>tuedan1-4</code></td></tr>
+    </table>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/data/DataManager.java</span>，第 746-755 行</div>
+<pre><code>boolean needSeed = false;
+SELECT COUNT(*) FROM products
+if 商品数小于 10 -&gt; needSeed = true
+if (!needSeed) return;</code></pre>
+  </section>
+
+  <section id="layout-map">
+    <h2>十八、布局 XML 与代码绑定补全</h2>
+    <p>普通读者可以把 XML 理解成“页面长什么样”，Java 文件理解成“页面能做什么”。Java 通过 <code>findViewById(R.id.xxx)</code> 找到 XML 里的控件，然后设置文本、图片和点击事件。</p>
+    <table>
+      <tr><th>布局文件</th><th>Java 页面</th><th>关键控件 id</th><th>作用</th></tr>
+      <tr><td><code>activity_login.xml</code></td><td>LoginActivity</td><td><code>etLoginUsername</code>, <code>etLoginPassword</code>, <code>btnLogin</code></td><td>输入账号密码并提交登录。</td></tr>
+      <tr><td><code>activity_register.xml</code></td><td>RegisterActivity</td><td><code>etRegUsername</code>, <code>etRegPassword</code>, <code>etRegPhone</code>, <code>btnRegister</code></td><td>注册账号/添加账号。</td></tr>
+      <tr><td><code>activity_main.xml</code></td><td>MainActivity</td><td><code>fragmentContainer</code>, <code>tabHeadline</code>, <code>tabMall</code>, <code>tabMine</code></td><td>底部导航和 Fragment 容器。</td></tr>
+      <tr><td><code>fragment_headline.xml</code></td><td>HeadlineFragment</td><td><code>rvArticles</code>, <code>btnOpenSearch</code></td><td>文章列表和搜索入口。</td></tr>
+      <tr><td><code>item_article.xml</code></td><td>ArticleAdapter</td><td><code>tvArticleTitle</code>, <code>ivArticleThumb</code>, <code>layoutItemLike</code></td><td>文章卡片内容和列表点赞。</td></tr>
+      <tr><td><code>activity_article_detail.xml</code></td><td>ArticleDetailActivity</td><td><code>tvDetailTitle</code>, <code>tvFollowBtn</code>, <code>rvComments</code>, <code>etComment</code>, <code>layoutLike</code></td><td>文章详情、关注、评论、点赞。</td></tr>
+      <tr><td><code>fragment_mall.xml</code></td><td>MallFragment</td><td><code>etSearch</code>, <code>rvProducts</code>, <code>fabCart</code>, <code>tvCartBadge</code></td><td>商品搜索、商品列表、购物车角标。</td></tr>
+      <tr><td><code>item_product.xml</code></td><td>ProductAdapter</td><td><code>ivProductImage</code>, <code>tvProductName</code>, <code>tvProductPrice</code>, <code>btnAddCart</code></td><td>商品卡片与快捷加购。</td></tr>
+      <tr><td><code>activity_product_detail.xml</code></td><td>ProductDetailActivity</td><td><code>vpProductImage</code>, <code>tvDetailProductName</code>, <code>btnAddCart</code>, <code>btnBuy</code>, <code>ivCartIcon</code></td><td>商品详情、加购、购买、购物车入口。</td></tr>
+      <tr><td><code>activity_cart.xml</code></td><td>CartActivity</td><td><code>rvCart</code>, <code>cbSelectAll</code>, <code>tvCartTotal</code>, <code>btnCheckout</code>, <code>tvClearCart</code></td><td>购物车列表、全选、合计、结算、清空。</td></tr>
+      <tr><td><code>item_cart.xml</code></td><td>CartAdapter</td><td><code>cbCartItem</code>, <code>btnMinus</code>, <code>btnPlus</code>, <code>tvCartQty</code></td><td>购物车单项勾选和数量控制。</td></tr>
+      <tr><td><code>activity_order_list.xml</code></td><td>MyOrdersActivity</td><td><code>rvOrders</code></td><td>订单列表。</td></tr>
+      <tr><td><code>item_order.xml</code></td><td>OrderAdapter</td><td><code>tvOrderStatus</code>, <code>tvOrderCountdown</code>, <code>btnPayOrder</code>, <code>btnCancelOrder</code></td><td>订单状态、倒计时、支付取消。</td></tr>
+      <tr><td><code>activity_order_detail.xml</code></td><td>OrderDetailActivity</td><td><code>tvDetailStatus</code>, <code>btnDetailPay</code>, <code>btnDetailCancel</code>, <code>btnDetailComment</code></td><td>订单详情、支付、取消、评价入口。</td></tr>
+      <tr><td><code>fragment_mine.xml</code></td><td>MineFragment</td><td><code>layoutProfile</code>, <code>tvMyArticles</code>, <code>tvMyFavorites</code>, <code>tvMyOrders</code>, <code>tvSettings</code></td><td>个人中心资料和功能入口。</td></tr>
+      <tr><td><code>activity_profile_edit.xml</code></td><td>ProfileEditActivity</td><td><code>ivAvatarPreview</code>, <code>etNickname</code>, <code>etSignature</code>, <code>tvBindPhoneBtn</code></td><td>修改头像、昵称、签名、手机号。</td></tr>
+      <tr><td><code>activity_settings.xml</code></td><td>SettingsActivity</td><td><code>swAdminMode</code>, <code>layoutAdminOptions</code>, <code>tvAddArticle</code>, <code>tvAddProduct</code>, <code>tvLogout</code></td><td>管理员模式、添加入口、退出登录。</td></tr>
+      <tr><td><code>activity_account_manager.xml</code></td><td>AccountManagerActivity</td><td><code>rvUsers</code>, <code>btnAddAccount</code></td><td>账号列表和添加账号。</td></tr>
+      <tr><td><code>activity_add_article.xml</code></td><td>AddArticleActivity</td><td><code>etArticleTitle</code>, <code>etArticleContent</code>, <code>flCoverPicker</code>, <code>btnSubmitArticle</code></td><td>发布文章。</td></tr>
+      <tr><td><code>activity_add_product.xml</code></td><td>AddProductActivity</td><td><code>etProductName</code>, <code>etProductDesc</code>, <code>etProductPrice</code>, <code>rvProductImages</code></td><td>新增商品。</td></tr>
+      <tr><td><code>activity_product_comments.xml</code></td><td>ProductCommentsActivity</td><td><code>rvComments</code>, <code>tvWriteReview</code>, <code>tvEmptyHint</code></td><td>商品评价列表和发布评价入口。</td></tr>
+      <tr><td><code>activity_add_product_comment.xml</code></td><td>AddProductCommentActivity</td><td><code>etContent</code>, <code>rvCommentImages</code>, <code>btnSubmitComment</code></td><td>发表商品评价。</td></tr>
+    </table>
+  </section>
+
+  <section id="full-flows">
+    <h2>十九、完整流程补图</h2>
+    <h3>19.1 从启动到三大模块</h3>
+    <div class="mermaid">
+flowchart TD
+  A["用户点击 App 图标"] --> B["AndroidManifest 指定 LoginActivity 为 MAIN/LAUNCHER"]
+  B --> C["LoginActivity.onCreate"]
+  C --> D{"dm.getLoggedUser() 是否为空？"}
+  D -- 否 --> E["goMain -> MainActivity"]
+  D -- 是 --> F["显示登录页"]
+  F --> G["登录成功 setLoggedUser"]
+  G --> E
+  E --> H["默认加载 HeadlineFragment"]
+  E --> I["底部导航可切 MallFragment"]
+  E --> J["底部导航可切 MineFragment"]
+    </div>
+
+    <h3>19.2 文章发布到别人看到并互动</h3>
+    <div class="mermaid">
+sequenceDiagram
+  participant U as 作者用户
+  participant Add as AddArticleActivity
+  participant DM as DataManager
+  participant DB as SQLite articles/comments/likes/follows
+  participant Feed as HeadlineFragment/ArticleAdapter
+  participant Reader as 阅读用户
+  U->>Add: 输入标题、正文、选择封面
+  Add->>DM: addArticle(title, content, coverUri)
+  DM->>DB: INSERT articles(author=currentUser,time,read_count=0)
+  Reader->>Feed: 打开头条列表
+  Feed->>DM: getArticles()
+  DM->>DB: SELECT articles LEFT JOIN users
+  DB-->>Feed: 返回文章列表
+  Reader->>Feed: 点击文章
+  Feed->>Reader: 打开 ArticleDetailActivity(article_id)
+  Reader->>DM: incrementReadCount(article_id)
+  DM->>DB: UPDATE articles SET read_count=read_count+1
+  Reader->>DM: likeArticle / addComment / followUser
+  DM->>DB: 写 article_likes / comments / follows
+    </div>
+
+    <h3>19.3 商品从展示到购物车到订单到评价</h3>
+    <div class="mermaid">
+sequenceDiagram
+  participant U as 用户
+  participant Mall as MallFragment/ProductDetailActivity
+  participant Cart as CartActivity
+  participant Order as MyOrdersActivity/OrderDetailActivity
+  participant Comment as ProductCommentsActivity
+  participant DM as DataManager
+  participant DB as SQLite
+  U->>Mall: 浏览/搜索商品
+  Mall->>DM: getProducts()
+  DM->>DB: SELECT products
+  U->>Mall: 加入购物车
+  Mall->>DM: addToCart(username, product)
+  DM->>DB: INSERT cart 或 UPDATE quantity+1
+  U->>Cart: 打开购物车
+  Cart->>DM: getCart(username)
+  DM->>DB: SELECT cart WHERE username=?
+  U->>Cart: 勾选、加减数量、结算
+  Cart->>DM: addOrder(...) for each checked item
+  DM->>DB: INSERT orders(status=pending)
+  Cart->>DM: saveCartPublic(剩余商品)
+  DM->>DB: DELETE cart WHERE username=? 后重新 INSERT
+  U->>Order: 支付
+  Order->>DM: updateOrderStatus(paid)
+  DM->>DB: UPDATE orders SET status='paid'
+  U->>Comment: 发表评价
+  Comment->>DM: addProductComment(productId, username, content, images)
+  DM->>DB: INSERT product_comments
+    </div>
+
+    <h3>19.4 个人中心统计数据如何来</h3>
+    <div class="mermaid">
+flowchart TD
+  A["MineFragment.bindViews(username)"] --> B["显示头像/昵称/签名"]
+  B --> B1["users.nickname/avatar_uri/signature"]
+  A --> C["粉丝数"]
+  C --> C1["SELECT COUNT(*) FROM follows WHERE following=username"]
+  A --> D["关注数"]
+  D --> D1["SELECT COUNT(*) FROM follows WHERE follower=username"]
+  A --> E["获赞数"]
+  E --> E1["article_likes INNER JOIN articles<br/>WHERE articles.author=username<br/>AND liker != author"]
+  A --> F["我的文章"]
+  F --> F1["SELECT articles WHERE author=username"]
+  A --> G["我的收藏"]
+  G --> G1["SELECT article_likes LEFT JOIN articles<br/>WHERE article_likes.username=username"]
+  A --> H["我的订单"]
+  H --> H1["SELECT orders WHERE username=username"]
+    </div>
+  </section>
+
+  <section id="datamanager-map">
+    <h2>二十、DataManager 方法总表补全</h2>
+    <p><code>DataManager</code> 是全项目最核心的业务类。普通理解就是：页面想拿数据、改数据，都先找它；它再去 SQLite 或 SharedPreferences 里读写。下面按功能把所有关键方法补齐。</p>
+    <table>
+      <tr><th>功能组</th><th>方法</th><th>读写位置</th><th>被谁使用</th><th>说明</th></tr>
+      <tr><td>会话</td><td><code>setLoggedUser</code>, <code>getLoggedUser</code>, <code>logout</code></td><td><code>SharedPreferences pref_session</code></td><td>LoginActivity, RegisterActivity, MineFragment, SettingsActivity 等</td><td>保存、读取、清除当前登录账号。</td></tr>
+      <tr><td>管理员模式</td><td><code>setAdminMode</code>, <code>isAdminMode</code></td><td><code>SharedPreferences admin_mode</code></td><td>SettingsActivity</td><td>控制添加文章/商品入口是否显示。</td></tr>
+      <tr><td>账号列表</td><td><code>getUsers</code>, <code>hideUserFromHistory</code></td><td><code>users</code> + <code>hidden_users</code></td><td>AccountManagerActivity</td><td>显示账号管理列表；隐藏本机历史账号。</td></tr>
+      <tr><td>注册登录</td><td><code>register</code>, <code>login</code>, <code>findUsernameByAccount</code></td><td><code>users</code></td><td>RegisterActivity, LoginActivity, ForgotPasswordActivity</td><td>账号创建、账号/手机号查找、密码匹配。</td></tr>
+      <tr><td>手机号</td><td><code>isPhoneBound</code>, <code>getPhone</code>, <code>updatePhone</code></td><td><code>users.phone</code></td><td>RegisterActivity, ProfileEditActivity</td><td>手机号唯一性、资料页绑定/修改手机号。</td></tr>
+      <tr><td>密码</td><td><code>isSameAsOldPassword</code>, <code>changePassword</code></td><td><code>users.password</code></td><td>ChangePasswordActivity, ResetPasswordActivity</td><td>修改或重置密码。</td></tr>
+      <tr><td>个人资料</td><td><code>getNickname</code>, <code>setNickname</code>, <code>getSignature</code>, <code>updateSignature</code>, <code>getAvatarUri</code>, <code>setAvatarUri</code></td><td><code>users.nickname/signature/avatar_uri</code></td><td>MineFragment, ProfileEditActivity, Adapter 头像显示</td><td>资料展示和编辑。</td></tr>
+      <tr><td>文章</td><td><code>getArticles</code>, <code>getArticlesByAuthor</code>, <code>addArticle</code>, <code>incrementReadCount</code>, <code>deleteArticle</code></td><td><code>articles</code></td><td>HeadlineFragment, SearchActivity, ArticleDetailActivity, AddArticleActivity, MyArticlesActivity</td><td>文章查询、发布、阅读量、删除。</td></tr>
+      <tr><td>文章点赞/收藏</td><td><code>likeArticle</code>, <code>unlikeArticle</code>, <code>isArticleLiked</code>, <code>getArticleLikeCount</code>, <code>getLikedArticles</code>, <code>clearInvalidLikedArticles</code></td><td><code>article_likes</code></td><td>ArticleAdapter, ArticleDetailActivity, MyFavoritesActivity</td><td>点赞和我的收藏复用同一张表。</td></tr>
+      <tr><td>文章评论</td><td><code>addComment</code>, <code>getComments</code>, <code>deleteComment</code>, <code>getCommentCount</code>, <code>getTopComment</code></td><td><code>comments</code>, <code>comment_likes</code>, <code>users</code></td><td>ArticleDetailActivity, ArticleAdapter</td><td>评论列表、评论数量、首页评论预览。</td></tr>
+      <tr><td>评论点赞</td><td><code>likeComment</code>, <code>unlikeComment</code>, <code>isCommentLiked</code></td><td><code>comment_likes</code></td><td>CommentAdapter</td><td>评论点赞/取消点赞。</td></tr>
+      <tr><td>关注</td><td><code>followUser</code>, <code>unfollowUser</code>, <code>isFollowing</code>, <code>getFollowersCount</code>, <code>getFollowingCount</code>, <code>getFollowers</code>, <code>getFollowing</code></td><td><code>follows</code></td><td>ArticleDetailActivity, MineFragment, FollowListActivity</td><td>关注作者、粉丝/关注列表和统计。</td></tr>
+      <tr><td>获赞</td><td><code>getTotalLikesReceived</code>, <code>getUsersWhoLikedMyArticles</code></td><td><code>article_likes</code> join <code>articles</code></td><td>MineFragment, FollowListActivity</td><td>个人中心获赞数和获赞用户列表。</td></tr>
+      <tr><td>商品</td><td><code>getProducts</code>, <code>addProduct</code></td><td><code>products</code></td><td>MallFragment, ProductDetailActivity, AddProductActivity</td><td>商品列表、详情、新增商品。</td></tr>
+      <tr><td>购物车</td><td><code>getCart</code>, <code>addToCart</code>, <code>saveCartPublic</code></td><td><code>cart</code></td><td>MallFragment, ProductDetailActivity, CartActivity</td><td>读取购物车、加购、保存加减数量/删除后的购物车。</td></tr>
+      <tr><td>订单</td><td><code>getOrders</code>, <code>addOrder</code>, <code>updateOrderStatus</code></td><td><code>orders</code></td><td>CartActivity, ProductDetailActivity, MyOrdersActivity, OrderDetailActivity</td><td>生成订单、显示订单、支付/取消/超时状态更新。</td></tr>
+      <tr><td>商品评价</td><td><code>hasPurchasedProduct</code>, <code>addProductComment</code>, <code>getProductComments</code>, <code>deleteProductComment</code>, <code>getProductCommentCount</code></td><td><code>orders</code>, <code>product_comments</code></td><td>ProductDetailActivity, ProductCommentsActivity, AddProductCommentActivity</td><td>购买后评价、评价列表、评价删除。</td></tr>
+      <tr><td>内部工具</td><td><code>rdb</code>, <code>wdb</code>, <code>queryCount</code>, <code>nextId</code>, <code>now</code>, <code>seedDefaultData</code></td><td>SQLite / 时间</td><td>DataManager 内部</td><td>读写数据库、计数、生成 id、生成时间、初始化默认数据。</td></tr>
+    </table>
+  </section>
+
+  <section id="project-config">
+    <h2>二十一、工程配置与 Android 组件补全</h2>
+    <h3>21.1 Manifest 注册了哪些页面</h3>
+    <p><code>AndroidManifest.xml</code> 把 <code>LoginActivity</code> 声明为启动页，并注册了项目所有 Activity。没有在 Manifest 注册的 Activity 无法被系统正常启动。</p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/build/intermediates/merged_manifest/debug/processDebugMainManifest/AndroidManifest.xml</span>，第 1-162 行</div>
+<pre><code>LoginActivity: MAIN + LAUNCHER，App 启动入口
+RegisterActivity / MainActivity / ArticleDetailActivity / SearchActivity
+ProductDetailActivity / CartActivity / MyArticlesActivity / MyOrdersActivity
+SettingsActivity / AccountManagerActivity / ChangePasswordActivity
+ForgotPasswordActivity / ResetPasswordActivity
+AddArticleActivity / AddProductActivity / OrderDetailActivity
+ProfileEditActivity / ProductCommentsActivity / AddProductCommentActivity
+UCropCompatActivity</code></pre>
+    <h3>21.2 FileProvider 为什么存在</h3>
+    <p>添加文章、添加商品、修改头像、商品评价都支持拍照。Android 不允许直接把私有文件路径暴露给相机应用，所以项目用 <code>FileProvider</code> 生成安全 Uri。对应配置在 Manifest 的 <code>provider</code> 和 <code>res/xml/file_paths.xml</code>。</p>
+    <div class="mermaid">
+flowchart TD
+  A["用户点击拍照"] --> B["createImageFile() 在 cache/images 创建文件"]
+  B --> C["FileProvider.getUriForFile"]
+  C --> D["ActivityResultContracts.TakePicture.launch(uri)"]
+  D --> E["系统相机把照片写入该 Uri"]
+  E --> F["页面把 Uri 保存到 coverUri / imageUris / pendingAvatarUri"]
+  F --> G["提交时写入 SQLite 或转换 Base64"]
+    </div>
+    <h3>21.3 Gradle 依赖和版本</h3>
+    <table>
+      <tr><th>配置</th><th>值</th><th>影响</th></tr>
+      <tr><td><code>applicationId</code></td><td><code>com.example.jntt</code></td><td>App 包名，也是 FileProvider authorities 的基础。</td></tr>
+      <tr><td><code>compileSdk</code></td><td>36.1</td><td>编译使用的 Android SDK。</td></tr>
+      <tr><td><code>minSdk</code></td><td>31</td><td>最低运行 Android 12；这与需求文档“Android 8.0+”不同。</td></tr>
+      <tr><td>主要依赖</td><td>AppCompat, Material, Activity, ConstraintLayout, RecyclerView, uCrop</td><td>界面组件、列表、底部弹窗、图片裁剪等功能。</td></tr>
+    </table>
+  </section>
+
+  <section id="code-walkthrough">
+    <h2>二十二、完整代码逻辑逐段讲解版</h2>
+    <p class="note">本节不再只告诉“代码在哪里”，而是按功能把实际参与代码串起来解释。每个功能都按同一个顺序看：界面代码负责接收用户操作，Adapter 负责列表项交互，DataManager 负责业务判断和数据库读写，AppDatabase 定义数据最终存到哪里。</p>
+
+    <h3>22.1 注册功能完整代码逻辑</h3>
+    <p><b>用户做了什么：</b>在注册页输入用户名、密码、手机号，点击注册。</p>
+    <p><b>第一段：RegisterActivity 收集输入并做格式校验。</b>这段代码放在 Activity 中，因为它处理的是“界面输入是否合法”，比如输入框空不空、手机号格式对不对。校验放在写数据库之前，可以避免无效数据进入数据库。</p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/RegisterActivity.java</span>，第 53-74 行</div>
+<pre><code>private void doRegister() {
+    String username = etUsername.getText().toString().trim();
+    String password = etPassword.getText().toString().trim();
+    String phone = etPhone.getText().toString().trim();
+
+    if (username.isEmpty() || password.isEmpty()) {
+        Toast.makeText(this, "用户名和密码不能为空", Toast.LENGTH_SHORT).show();
+        return;
+    }
+    if (!username.matches("^[a-zA-Z0-9\\-@_.]+$")) {
+        Toast.makeText(this, "用户名只能包含字母、数字及-@_.", Toast.LENGTH_SHORT).show();
+        return;
+    }
+    if (password.length() < 6) {
+        Toast.makeText(this, "密码至少6位", Toast.LENGTH_SHORT).show();
+        return;
+    }
+    if (!phone.isEmpty()) {
+        if (phone.length() != 11 || !phone.matches("^1[3-9]\\d{9}$") || phone.matches("^(\\d)\\1{10}$")) {
+            Toast.makeText(this, "请输入有效的11位手机号", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (dm.isPhoneBound(phone)) {
+            Toast.makeText(this, "该手机号已被注册或绑定，请更换手机号", Toast.LENGTH_SHORT).show();
+            return;
+        }
+    }
+
+    boolean ok = dm.register(username, password, phone);
+    if (!ok) {
+        Toast.makeText(this, "该用户名已被使用，请更换用户名", Toast.LENGTH_SHORT).show();
+        return;
+    }
+    Toast.makeText(this, "注册成功", Toast.LENGTH_SHORT).show();
+
+    if (isAddMode) {
+        finish();
+    } else {
+        dm.setLoggedUser(username);
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+    }
+}</code></pre>
+    <p><b>为什么这样做：</b><code>trim()</code> 去掉首尾空格，防止用户不小心输入空格导致账号难以识别；<code>return</code> 让每次发现错误立刻停止；<code>isAddMode</code> 让同一个注册页面复用成“添加账号”页面。</p>
+    <p><b>第二段：DataManager 判断手机号唯一并写入 users 表。</b>真正的注册写库不放在 Activity，而放在 DataManager，是因为所有数据操作集中在一个类里，后续别的页面也能复用。</p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/data/DataManager.java</span>，第 99-112 行</div>
+<pre><code>public boolean register(String username, String password, String phone) {
+    if (phone != null && !phone.isEmpty()) {
+        if (isPhoneBound(phone))
+            return false;
+    }
+    ContentValues cv = new ContentValues();
+    cv.put("username", username);
+    cv.put("password", password);
+    cv.put("nickname", username);
+    if (phone != null && !phone.isEmpty()) {
+        cv.put("phone", phone);
+    }
+    return wdb().insertWithOnConflict("users", null, cv, SQLiteDatabase.CONFLICT_IGNORE) != -1;
+}</code></pre>
+    <p><b>为什么这样做：</b><code>ContentValues</code> 是 Android SQLite 推荐的键值写入方式；<code>insertWithOnConflict(..., CONFLICT_IGNORE)</code> 利用数据库唯一约束处理重复用户名，不需要手写复杂判断；默认 <code>nickname=username</code> 是为了个人中心没有昵称时也能显示名称。</p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/data/DataManager.java</span>，第 118-122 行</div>
+<pre><code>public boolean isPhoneBound(String phone) {
+    try (Cursor c = rdb().rawQuery("SELECT 1 FROM users WHERE phone=?", new String[] { phone })) {
+        return c.moveToFirst();
+    }
+}</code></pre>
+    <p><b>为什么用 <code>?</code> 占位符：</b>可以防止把用户输入直接拼进 SQL，避免特殊字符破坏 SQL 语句，也更安全。</p>
+    <p><b>最终数据存储：</b>注册成功后，账号数据进入 <code>jntt.db</code> 的 <code>users</code> 表；如果不是添加账号模式，还会把当前登录用户写入 <code>SharedPreferences.pref_session.logged_user</code>。</p>
+
+    <h3>22.2 登录功能完整代码逻辑</h3>
+    <p><b>用户做了什么：</b>输入用户名或手机号、密码，点击登录。</p>
+    <p><b>第一段：启动登录页时，如果已经登录则直接进入主界面。</b></p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/LoginActivity.java</span>，第 20-41 行</div>
+<pre><code>protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    dm = DataManager.getInstance(this);
+
+    if (dm.getLoggedUser() != null) {
+        goMain();
+        return;
+    }
+
+    setContentView(R.layout.activity_login);
+    etUsername = findViewById(R.id.etLoginUsername);
+    etPassword = findViewById(R.id.etLoginPassword);
+    btnLogin.setOnClickListener(v -> doLogin());
+}</code></pre>
+    <p><b>为什么这样做：</b>登录状态属于轻量会话数据，保存在 SharedPreferences。App 再次启动时先检查会话，可以省去重复登录。</p>
+    <p><b>第二段：登录按钮逻辑。</b>它先检查账号是否存在，再验证密码。这样可以分别提示“账号未注册”和“密码错误”。</p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/LoginActivity.java</span>，第 38-43 行</div>
+<pre><code>private void doLogin() {
+    String username = etUsername.getText().toString().trim();
+    String password = etPassword.getText().toString().trim();
+
+    if (username.isEmpty() || password.isEmpty()) {
+        Toast.makeText(this, "用户名和密码不能为空", Toast.LENGTH_SHORT).show();
+        return;
+    }
+
+    String targetUsername = dm.findUsernameByAccount(username);
+    if (targetUsername == null || targetUsername.isEmpty()) {
+        // 弹窗提示账号未注册，并可跳转 RegisterActivity
+        ...
+        return;
+    }
+
+    User user = dm.login(username, password);
+    if (user == null) {
+        Toast.makeText(this, "密码错误", Toast.LENGTH_SHORT).show();
+    } else {
+        dm.setLoggedUser(user.username);
+        goMain();
+    }
+}</code></pre>
+    <p><b>第三段：DataManager 查账号和密码。</b></p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/data/DataManager.java</span>，第 169-178 行</div>
+<pre><code>public String findUsernameByAccount(String account) {
+    try (Cursor c = rdb().rawQuery(
+            "SELECT username FROM users WHERE username=? OR phone=?",
+            new String[] { account, account })) {
+        if (c.moveToFirst()) {
+            return c.getString(0);
+        }
+    }
+    return null;
+}
+
+public User login(String usernameOrPhone, String password) {
+    try (Cursor c = rdb().rawQuery(
+            "SELECT username,password FROM users WHERE (username=? OR phone=?) AND password=?",
+            new String[] { usernameOrPhone, usernameOrPhone, password })) {
+        if (c.moveToFirst()) {
+            String uName = c.getString(0);
+            return new User(uName, c.getString(1));
+        }
+    }
+    return null;
+}</code></pre>
+    <p><b>为什么登录 SQL 同时查 username 和 phone：</b>这样用户既能用用户名登录，也能用绑定手机号登录；查出来后统一返回真实 username，后续购物车、订单、文章都以 username 作为归属字段。</p>
+
+    <h3>22.3 主界面导航完整代码逻辑</h3>
+    <p><b>用户做了什么：</b>登录成功后进入主界面，点击底部“头条/商城/我的”。</p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/MainActivity.java</span>，第 87-89 行</div>
+<pre><code>if (savedInstanceState == null) {
+    switchFragment(new HeadlineFragment(), true);
+}
+
+private void selectTab(int idx, boolean animate) {
+    if (idx == currentIndex) return;
+    ...
+    currentIndex = idx;
+    Fragment f;
+    if (idx == 0)
+        f = new HeadlineFragment();
+    else if (idx == 1)
+        f = new MallFragment();
+    else
+        f = new MineFragment();
+    switchFragment(f, false);
+}
+
+private void switchFragment(Fragment f, boolean first) {
+    FragmentTransaction tx = getSupportFragmentManager().beginTransaction();
+    tx.replace(R.id.fragmentContainer, f).commit();
+}</code></pre>
+    <p><b>为什么这样做：</b><code>MainActivity</code> 只做“外壳”，不直接写头条、商城、我的业务。三个模块拆成 Fragment，可以让每个模块单独维护自己的列表和点击逻辑，代码边界更清楚。</p>
+
+    <h3>22.4 头条文章列表完整代码逻辑</h3>
+    <p><b>用户做了什么：</b>进入头条页，看到文章列表，点击文章进入详情。</p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/fragment/HeadlineFragment.java</span>，第 37-54 行</div>
+<pre><code>public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+    DataManager dm = DataManager.getInstance(requireContext());
+    allArticles = dm.getArticles();
+    displayed = new ArrayList<>(allArticles);
+
+    RecyclerView rv = view.findViewById(R.id.rvArticles);
+    rv.setLayoutManager(new LinearLayoutManager(getContext()));
+    adapter = new ArticleAdapter(displayed, article -> {
+        Intent intent = new Intent(getContext(), ArticleDetailActivity.class);
+        intent.putExtra("article_id", article.id);
+        startActivity(intent);
+    }, dm, dm.getLoggedUser());
+    rv.setAdapter(adapter);
+
+    view.findViewById(R.id.btnOpenSearch).setOnClickListener(v ->
+            startActivity(new Intent(getContext(), SearchActivity.class)));
+}</code></pre>
+    <p><b>为什么列表用 RecyclerView：</b>文章数量可能增加，RecyclerView 只创建屏幕可见的卡片，滑动时复用旧卡片，比一次性创建所有 View 更省内存。</p>
+    <p><b>DataManager 取文章时为什么 LEFT JOIN users：</b>文章表只存作者 username，但界面需要显示昵称和头像，所以查询文章时顺便把用户表的昵称头像带出来。</p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/ArticleDetailActivity.java</span>，第 53-58 行</div>
+<pre><code>public List&lt;Article&gt; getArticles() {
+    return queryArticles(
+        "SELECT a.id,a.title,a.content,a.author,a.time,a.read_count,a.cover_uri,u.nickname,u.avatar_uri " +
+        "FROM articles a LEFT JOIN users u ON a.author=u.username ORDER BY a.id DESC",
+        null);
+}</code></pre>
+    <p><b>queryArticles 为什么把 Cursor 转成 Article 对象：</b>数据库返回的是一行一行的 Cursor，不方便界面直接使用。转成 Article 对象后，Adapter 可以直接用 <code>a.title</code>、<code>a.content</code>、<code>a.coverUri</code> 绑定 UI。</p>
+
+    <h3>22.5 文章详情、阅读量、删除完整代码逻辑</h3>
+    <p><b>用户做了什么：</b>点击文章卡片进入详情页。</p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/ArticleDetailActivity.java</span>，第 41-66 行</div>
+<pre><code>protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    setContentView(R.layout.activity_article_detail);
+
+    dm = DataManager.getInstance(this);
+    currentUser = dm.getLoggedUser();
+    articleId = getIntent().getIntExtra("article_id", -1);
+
+    dm.incrementReadCount(articleId);
+
+    for (Article a : dm.getArticles()) {
+        if (a.id == articleId) {
+            article = a;
+            break;
+        }
+    }
+    if (article == null) {
+        finish();
+        return;
+    }
+
+    bindViews();
+    setupComments();
+    setupBottomBar();
+}</code></pre>
+    <p><b>为什么先读 Intent 的 article_id：</b>列表页只需要传一个 id，详情页再按 id 查完整文章。这样 Intent 很轻，页面之间不用传大段正文和图片。</p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/data/DataManager.java</span>，第 269-272 行</div>
+<pre><code>public void incrementReadCount(int articleId) {
+    wdb().execSQL("UPDATE articles SET read_count = read_count + 1 WHERE id=?",
+            new Object[] { articleId });
+}</code></pre>
+    <p><b>为什么阅读量在详情页增加：</b>只有用户真正进入详情页才算一次阅读，列表展示不算阅读。</p>
+    <p><b>删除文章逻辑：</b>只有作者本人看自己的文章时才显示删除按钮。</p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/ArticleDetailActivity.java</span>，第 78-109 行</div>
+<pre><code>TextView tvDelete = findViewById(R.id.tvDeleteBtn);
+if (currentUser != null && article.author.equals(currentUser)) {
+    tvDelete.setVisibility(View.VISIBLE);
+    tvDelete.setOnClickListener(v -> {
+        // 弹确认框
+        btnConfirm.setOnClickListener(btn -> {
+            dialog.dismiss();
+            dm.deleteArticle(articleId);
+            Toast.makeText(this, "作品已删除", Toast.LENGTH_SHORT).show();
+            finish();
+        });
+    });
+}</code></pre>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/ArticleDetailActivity.java</span>，第 103-123 行</div>
+<pre><code>public void deleteArticle(int articleId) {
+    wdb().delete("articles", "id=?", new String[] { String.valueOf(articleId) });
+    // 不删除 article_likes，让收藏列表能显示“稿件已被删除”
+    wdb().delete("comments", "article_id=?", new String[] { String.valueOf(articleId) });
+}</code></pre>
+    <p><b>为什么删除文章不删除 article_likes：</b>这样用户收藏/点赞列表里仍能看到“该稿件已被删除”的占位提示，体验上知道不是自己的收藏丢了，而是原作者删除了内容。</p>
+
+    <h3>22.6 文章点赞、收藏、评论、关注完整代码逻辑</h3>
+    <p><b>点赞代码链路：</b>点击详情页底部点赞区域，Activity 判断是否登录、是否给自己的文章点赞，再调用 DataManager 插入或删除 <code>article_likes</code>。</p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/ArticleDetailActivity.java</span>，第 290-310 行</div>
+<pre><code>findViewById(R.id.layoutLike).setOnClickListener(v -> {
+    if (currentUser == null) {
+        Toast.makeText(this, "请先登录", Toast.LENGTH_SHORT).show();
+        return;
+    }
+    if (currentUser.equals(article.author)) {
+        Toast.makeText(this, "不能给自己的文章点赞", Toast.LENGTH_SHORT).show();
+        return;
+    }
+    boolean nowLiked = dm.isArticleLiked(currentUser, articleId);
+    if (nowLiked) {
+        dm.unlikeArticle(currentUser, articleId);
+    } else {
+        dm.likeArticle(currentUser, articleId);
+        ivLikeBtn.animate().scaleX(1.35f).scaleY(1.35f)...
+    }
+    refreshLikeUI();
+});</code></pre>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/data/DataManager.java</span>，第 302-309 行</div>
+<pre><code>public void likeArticle(String username, int articleId) {
+    if (username == null || username.equals(getArticleAuthor(articleId)))
+        return;
+    ContentValues cv = new ContentValues();
+    cv.put("username", username);
+    cv.put("article_id", articleId);
+    wdb().insertWithOnConflict("article_likes", null, cv, SQLiteDatabase.CONFLICT_IGNORE);
+}</code></pre>
+    <p><b>为什么 article_likes 同时承担“收藏”：</b>当前项目没有独立 favorites 表，我的收藏页调用 <code>getLikedArticles(username)</code>。也就是说“点赞过的文章”就是“我的收藏”。这是实现简化，但报告已在差异中说明。</p>
+    <p><b>评论发送代码链路：</b></p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/ArticleDetailActivity.java</span>，第 316-323 行</div>
+<pre><code>private void submitComment(EditText et) {
+    if (currentUser == null) {
+        Toast.makeText(this, "请先登录", Toast.LENGTH_SHORT).show();
+        return;
+    }
+    String text = et.getText().toString().trim();
+    if (text.isEmpty()) return;
+
+    Comment c = dm.addComment(articleId, currentUser, text);
+    c.nickname = dm.getNickname(currentUser);
+    c.isLikedByMe = false;
+    comments.add(c);
+    commentAdapter.notifyItemInserted(comments.size() - 1);
+    et.setText("");
+    updateCommentCountUI();
+    nestedScroll.post(() -> nestedScroll.fullScroll(View.FOCUS_DOWN));
+}</code></pre>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/data/DataManager.java</span>，第 427-436 行</div>
+<pre><code>public Comment addComment(int articleId, String username, String content) {
+    String time = now("MM-dd HH:mm");
+    ContentValues cv = new ContentValues();
+    cv.put("article_id", articleId);
+    cv.put("username", username);
+    cv.put("content", content);
+    cv.put("time", time);
+    long id = wdb().insert("comments", null, cv);
+    return new Comment((int) id, articleId, username, content, time, 0);
+}</code></pre>
+    <p><b>为什么插入后马上把 Comment 加到列表：</b>不需要重新打开页面或重新查询全部评论，界面立即显示最新评论，用户反馈更快。</p>
+    <p><b>关注作者代码链路：</b></p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/ArticleDetailActivity.java</span>，第 208-219 行</div>
+<pre><code>if (currentUser != null && !article.author.equals(currentUser)) {
+    tvFollow.setVisibility(View.VISIBLE);
+    refreshFollowBtn(tvFollow);
+    tvFollow.setOnClickListener(v -> {
+        if (dm.isFollowing(currentUser, article.author)) {
+            dm.unfollowUser(currentUser, article.author);
+        } else {
+            dm.followUser(currentUser, article.author);
+        }
+        refreshFollowBtn(tvFollow);
+    });
+}</code></pre>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/data/DataManager.java</span>，第 497-502 行</div>
+<pre><code>public void followUser(String follower, String following) {
+    ContentValues cv = new ContentValues();
+    cv.put("follower", follower);
+    cv.put("following", following);
+    wdb().insertWithOnConflict("follows", null, cv, SQLiteDatabase.CONFLICT_IGNORE);
+}</code></pre>
+    <p><b>为什么 follows 表要有 follower 和 following：</b>关注关系是两个用户之间的关系。<code>follower</code> 是“谁关注别人”，<code>following</code> 是“被关注的人”。粉丝数查 following，关注数查 follower。</p>
+
+    <h3>22.7 文章搜索和发布文章完整代码逻辑</h3>
+    <p><b>搜索：</b>SearchActivity 启动时一次性读取文章列表，用户每输入一个字就过滤内存列表。</p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/SearchActivity.java</span>，第 109-133 行</div>
+<pre><code>private void performSearch(String query) {
+    if (query.isEmpty()) {
+        rvResults.setVisibility(View.GONE);
+        llNoResults.setVisibility(View.GONE);
+        llHome.setVisibility(View.VISIBLE);
+        return;
+    }
+
+    llHome.setVisibility(View.GONE);
+    results.clear();
+    for (Article a : allArticles) {
+        if (a.title.contains(query) || a.content.contains(query) || a.author.contains(query)) {
+            results.add(a);
+        }
+    }
+    searchAdapter.notifyDataSetChanged();
+}</code></pre>
+    <p><b>为什么搜索没有直接查数据库：</b>文章数量较少，本地内存过滤实现简单且响应快；如果未来文章很多，可以改成 SQL <code>LIKE</code> 查询。</p>
+    <p><b>发布文章：</b></p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/AddArticleActivity.java</span>，第 108-119 行</div>
+<pre><code>findViewById(R.id.btnSubmitArticle).setOnClickListener(v -> {
+    String title = etTitle.getText().toString().trim();
+    String content = etContent.getText().toString().trim();
+    if (title.isEmpty() || content.isEmpty()) {
+        Toast.makeText(this, "标题和内容不能为空", Toast.LENGTH_SHORT).show();
+        return;
+    }
+    String cover = coverUri != null ? coverUri.toString() : null;
+    DataManager.getInstance(this).addArticle(title, content, cover);
+    Toast.makeText(this, "文章发布成功", Toast.LENGTH_SHORT).show();
+    finish();
+});</code></pre>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/AddArticleActivity.java</span>，第 116-122 行</div>
+<pre><code>public void addArticle(String title, String content, String coverUri) {
+    int newId = nextId("articles");
+    ContentValues cv = new ContentValues();
+    cv.put("id", newId);
+    cv.put("title", title);
+    cv.put("content", content);
+    cv.put("author", getLoggedUser());
+    cv.put("time", now("yyyy-MM-dd HH:mm"));
+    cv.put("read_count", 0);
+    if (coverUri != null) cv.put("cover_uri", coverUri);
+    wdb().insert("articles", null, cv);
+}</code></pre>
+    <p><b>为什么作者不从输入框来：</b>作者必须是当前登录用户，不能让用户手填，否则任何人都能冒充别人发文章。</p>
+
+    <h3>22.8 商城列表、商品详情、加入购物车完整代码逻辑</h3>
+    <p><b>商城列表：</b></p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/fragment/MallFragment.java</span>，第 45-62 行</div>
+<pre><code>DataManager dm = DataManager.getInstance(requireContext());
+allProducts = dm.getProducts();
+displayed = new ArrayList<>(allProducts);
+
+adapter = new ProductAdapter(displayed, product -> {
+    Intent intent = new Intent(getContext(), ProductDetailActivity.class);
+    intent.putExtra("product_id", product.id);
+    startActivity(intent);
+});
+adapter.setOnAddCartListener(product -> {
+    dm.addToCart(dm.getLoggedUser(), product);
+    Toast.makeText(getContext(), "已加入购物车", Toast.LENGTH_SHORT).show();
+    refreshBadge(view, dm);
+});</code></pre>
+    <p><b>为什么商品列表里也能直接加购：</b>这是快捷操作，用户不必进入详情页也能把商品加入购物车。</p>
+    <p><b>商品详情：</b></p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/ProductDetailActivity.java</span>，第 26-40 行</div>
+<pre><code>productId = getIntent().getIntExtra("product_id", -1);
+Product target = null;
+for (Product p : dm.getProducts()) {
+    if (p.id == productId) {
+        target = p;
+        break;
+    }
+}
+if (target == null) {
+    finish();
+    return;
+}</code></pre>
+    <p><b>为什么详情页通过 product_id 找商品：</b>列表只传商品 id，详情页自己读取完整商品数据，避免 Intent 传复杂对象。</p>
+    <p><b>加入购物车真正写库：</b></p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/data/DataManager.java</span>，第 628-646 行</div>
+<pre><code>public void addToCart(String username, Product product) {
+    try (Cursor c = rdb().rawQuery(
+            "SELECT quantity FROM cart WHERE username=? AND product_id=?",
+            new String[] { username, String.valueOf(product.id) })) {
+        if (c.moveToFirst()) {
+            int qty = c.getInt(0) + 1;
+            wdb().execSQL("UPDATE cart SET quantity=? WHERE username=? AND product_id=?",
+                    new Object[] { qty, username, product.id });
+        } else {
+            ContentValues cv = new ContentValues();
+            cv.put("username", username);
+            cv.put("product_id", product.id);
+            cv.put("name", product.name);
+            cv.put("price", product.price);
+            cv.put("quantity", 1);
+            wdb().insert("cart", null, cv);
+        }
+    }
+}</code></pre>
+    <p><b>为什么 cart 表保存 name 和 price，而不只保存 product_id：</b>购物车和订单需要显示当时商品名称价格。即使以后商品表内容变了，购物车/订单仍能保留加入时的名称和价格快照。</p>
+
+    <h3>22.9 购物车完整代码逻辑</h3>
+    <p><b>进入购物车时先按当前用户读取 cart 表：</b></p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/CartActivity.java</span>，第 38-47 行</div>
+<pre><code>dm = DataManager.getInstance(this);
+username = dm.getLoggedUser();
+items = dm.getCart(username);
+
+adapter = new CartAdapter(items);
+adapter.setOnChangeListener(this::persistCartState);
+rv.setAdapter(adapter);</code></pre>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/data/DataManager.java</span>，第 617-626 行</div>
+<pre><code>public List&lt;CartItem&gt; getCart(String username) {
+    List&lt;CartItem&gt; list = new ArrayList&lt;&gt;();
+    try (Cursor c = rdb().rawQuery(
+            "SELECT product_id,name,price,quantity FROM cart WHERE username=?",
+            new String[] { username })) {
+        while (c.moveToNext())
+            list.add(new CartItem(c.getInt(0), c.getString(1), c.getDouble(2), c.getInt(3)));
+    }
+    return list;
+}</code></pre>
+    <p><b>为什么购物车按 username 查询：</b>同一台手机可以有多个账号，每个账号购物车必须互不影响。</p>
+    <p><b>数量加减和合计在 CartAdapter：</b></p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/adapter/CartAdapter.java</span>，第 56-62 行</div>
+<pre><code>public double getSelectedTotal() {
+    double total = 0;
+    for (CartItem c : data)
+        if (checkedIds.contains(c.productId))
+            total += c.price * c.quantity;
+    return total;
+}
+
+holder.btnMinus.setOnClickListener(v -> {
+    CartItem item = data.get(holder.getAdapterPosition());
+    if (item.quantity > 1) {
+        item.quantity--;
+        notifyItemChanged(holder.getAdapterPosition());
+    } else {
+        checkedIds.remove(item.productId);
+        data.remove(holder.getAdapterPosition());
+        notifyDataSetChanged();
+    }
+    if (listener != null) listener.onChange();
+});
+
+holder.btnPlus.setOnClickListener(v -> {
+    data.get(holder.getAdapterPosition()).quantity++;
+    notifyItemChanged(holder.getAdapterPosition());
+    if (listener != null) listener.onChange();
+});</code></pre>
+    <p><b>为什么 Adapter 改完数量要回调 Activity：</b>Adapter 只知道列表显示，不应该直接操作数据库；Activity 收到 onChange 后调用 DataManager 保存，职责更清楚。</p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/CartActivity.java</span>，第 99-111 行</div>
+<pre><code>private void persistCartState() {
+    dm.saveCartPublic(username, items);
+    refreshBottomBar();
+}
+
+private void refreshBottomBar() {
+    double total = adapter.getSelectedTotal();
+    tvTotal.setText(String.format("¥%.2f", total));
+    tvCount.setText("共 " + items.size() + " 件");
+}</code></pre>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/data/DataManager.java</span>，第 648-660 行</div>
+<pre><code>public void saveCartPublic(String username, List&lt;CartItem&gt; items) {
+    SQLiteDatabase d = wdb();
+    d.delete("cart", "username=?", new String[] { username });
+    for (CartItem item : items) {
+        ContentValues cv = new ContentValues();
+        cv.put("username", username);
+        cv.put("product_id", item.productId);
+        cv.put("name", item.name);
+        cv.put("price", item.price);
+        cv.put("quantity", item.quantity);
+        d.insert("cart", null, cv);
+    }
+}</code></pre>
+    <p><b>为什么保存购物车时先删再插：</b>购物车列表可能发生数量变化、删除、清空。先删除当前用户旧数据，再插入当前内存列表，逻辑简单，不容易漏掉被删除的商品。</p>
+
+    <h3>22.10 购物车结算和订单完整代码逻辑</h3>
+    <p><b>点击结算：</b></p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/CartActivity.java</span>，第 57-64 行</div>
+<pre><code>private void checkout() {
+    List&lt;CartItem&gt; checkedItems = adapter.getCheckedItems();
+    if (checkedItems.isEmpty()) {
+        Toast.makeText(this, "请先选择商品", Toast.LENGTH_SHORT).show();
+        return;
+    }
+    for (CartItem item : checkedItems) {
+        dm.addOrder(username, item.productId, item.name, item.price, item.quantity);
+    }
+    adapter.removeChecked();
+    dm.saveCartPublic(username, items);
+    startActivity(new Intent(this, MyOrdersActivity.class));
+    finish();
+}</code></pre>
+    <p><b>为什么先生成订单再删除购物车商品：</b>结算的本质是“购物车条目转换成订单”。先写订单，成功后再把已结算商品从购物车删除，逻辑顺序符合业务。</p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/data/DataManager.java</span>，第 677-688 行</div>
+<pre><code>public void addOrder(String username, int productId, String name, double price, int quantity) {
+    ContentValues cv = new ContentValues();
+    cv.put("order_id", "JN" + System.currentTimeMillis());
+    cv.put("username", username);
+    cv.put("product_id", productId);
+    cv.put("name", name);
+    cv.put("price", price);
+    cv.put("quantity", quantity);
+    cv.put("time", now("yyyy-MM-dd HH:mm"));
+    cv.put("status", Order.STATUS_PENDING);
+    wdb().insert("orders", null, cv);
+}</code></pre>
+    <p><b>为什么订单号用当前时间毫秒：</b>实现简单，通常能保证短时间内唯一；但如果同一毫秒循环创建多个订单，有极小概率重复。当前购物车循环可能连续创建多个订单，这一点后续可改为毫秒 + 商品 id 或 UUID。</p>
+    <p><b>订单列表支付/取消：</b></p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/MyOrdersActivity.java</span>，第 43-75 行</div>
+<pre><code>adapter.setOnActionListener(new OrderAdapter.OnActionListener() {
+    public void onPay(Order order) {
+        dm.updateOrderStatus(username, order.orderId, Order.STATUS_PAID);
+        refresh();
+        Toast.makeText(MyOrdersActivity.this, "支付成功！", Toast.LENGTH_SHORT).show();
+    }
+
+    public void onCancel(Order order) {
+        // 弹确认框后执行
+        dm.updateOrderStatus(username, order.orderId, Order.STATUS_CANCELLED);
+        refresh();
+    }
+});</code></pre>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/data/DataManager.java</span>，第 690-695 行</div>
+<pre><code>public void updateOrderStatus(String username, String orderId, String status) {
+    ContentValues cv = new ContentValues();
+    cv.put("status", status);
+    wdb().update("orders", cv, "username=? AND order_id=?",
+            new String[] { username, orderId });
+}</code></pre>
+    <p><b>为什么更新订单要同时带 username 和 order_id：</b>即使订单号理论上唯一，也用 username 限制当前用户只能改自己的订单，更符合数据隔离思路。</p>
+
+    <h3>22.11 商品评价完整代码逻辑</h3>
+    <p><b>从商品详情进入评价：</b></p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/ProductDetailActivity.java</span>，第 196-201 行</div>
+<pre><code>LinearLayout llCommentSection = findViewById(R.id.llCommentSection);
+llCommentSection.setOnClickListener(v -> {
+    Intent intent = new Intent(this, ProductCommentsActivity.class);
+    intent.putExtra("product_id", product.id);
+    startActivity(intent);
+});</code></pre>
+    <p><b>写评价前判断是否买过：</b></p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/ProductCommentsActivity.java</span>，第 42-50 行</div>
+<pre><code>tvWriteReview.setOnClickListener(v -> {
+    if (dm.hasPurchasedProduct(currentUser, productId) || "admin".equals(currentUser)) {
+        Intent intent = new Intent(this, AddProductCommentActivity.class);
+        intent.putExtra("product_id", productId);
+        startActivity(intent);
+    } else {
+        Toast.makeText(this, "购买该商品后才可以进行评价哦", Toast.LENGTH_SHORT).show();
+    }
+});</code></pre>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/data/DataManager.java</span>，第 376-382 行</div>
+<pre><code>public boolean hasPurchasedProduct(String username, int productId) {
+    if (username == null || username.isEmpty())
+        return false;
+    return queryCount("SELECT COUNT(*) FROM orders WHERE username=? AND product_id=?",
+            new String[] { username, String.valueOf(productId) }) &gt; 0;
+}</code></pre>
+    <p><b>为什么用 orders 判断购买资格：</b>订单表是购买记录来源。只要用户有过该商品订单，就允许评价；admin 作为管理员绕过限制，方便测试和管理。</p>
+    <p><b>发表评价：</b></p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/AddProductCommentActivity.java</span>，第 90-103 行</div>
+<pre><code>btnSubmit.setOnClickListener(v -> {
+    String content = etContent.getText().toString().trim();
+    if (content.isEmpty() && imageUris.isEmpty()) {
+        Toast.makeText(this, "评价内容和图片不能同时为空", Toast.LENGTH_SHORT).show();
+        return;
+    }
+    String images = null;
+    if (!imageUris.isEmpty()) {
+        images = imageUris.stream().map(Uri::toString).collect(Collectors.joining(","));
+    }
+    dm.addProductComment(productId, username, content, images);
+    Toast.makeText(this, "评价发布成功", Toast.LENGTH_SHORT).show();
+    finish();
+});</code></pre>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/AddProductCommentActivity.java</span>，第 100-106 行</div>
+<pre><code>public ProductComment addProductComment(int productId, String username, String content, String images) {
+    String time = now("MM-dd HH:mm");
+    ContentValues cv = new ContentValues();
+    cv.put("product_id", productId);
+    cv.put("username", username);
+    cv.put("content", content);
+    cv.put("images", images == null ? "" : images);
+    cv.put("time", time);
+    long id = wdb().insert("product_comments", null, cv);
+    return new ProductComment((int) id, productId, username, content, images, time);
+}</code></pre>
+    <p><b>为什么多张图片用逗号拼接：</b>实现简单，一条评价只占一行。缺点是以后如果要单独管理每张图片，应该拆成评价图片表。</p>
+
+    <h3>22.12 个人中心、资料编辑、账号管理完整代码逻辑</h3>
+    <p><b>个人中心展示：</b></p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/ArticleDetailActivity.java</span>，第 64-71 行</div>
+<pre><code>private void bindViews(View view) {
+    DataManager dm = DataManager.getInstance(requireContext());
+    String username = dm.getLoggedUser();
+
+    ((TextView) view.findViewById(R.id.tvMineUsername)).setText("用户名： " + username);
+    ((TextView) view.findViewById(R.id.tvMineNickname)).setText(dm.getNickname(username));
+    ((TextView) view.findViewById(R.id.tvMineSignature)).setText(dm.getSignature(username));
+
+    ((TextView) view.findViewById(R.id.tvStatFollowers))
+            .setText(String.valueOf(dm.getFollowersCount(username)));
+    ((TextView) view.findViewById(R.id.tvStatFollowing))
+            .setText(String.valueOf(dm.getFollowingCount(username)));
+    ((TextView) view.findViewById(R.id.tvStatLikes))
+            .setText(String.valueOf(dm.getTotalLikesReceived(username)));
+
+    view.findViewById(R.id.tvMyArticles)
+            .setOnClickListener(v -> startActivity(new Intent(getContext(), MyArticlesActivity.class)));
+    view.findViewById(R.id.tvMyFavorites)
+            .setOnClickListener(v -> startActivity(new Intent(getContext(), MyFavoritesActivity.class)));
+    view.findViewById(R.id.tvMyOrders)
+            .setOnClickListener(v -> startActivity(new Intent(getContext(), MyOrdersActivity.class)));
+}</code></pre>
+    <p><b>为什么个人中心在 onResume 也刷新：</b>用户可能刚从资料编辑页回来，昵称头像变了；onResume 刷新可以立即显示最新数据。</p>
+    <p><b>保存资料：</b></p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/ProfileEditActivity.java</span>，第 133-166 行</div>
+<pre><code>tvSave.setOnClickListener(v -> {
+    String nick = etNickname.getText().toString().trim();
+    String sig = etSignature.getText().toString().trim();
+    if (nick.isEmpty()) {
+        Toast.makeText(this, "昵称不能为空", Toast.LENGTH_SHORT).show();
+        return;
+    }
+    if (nick.length() > 12) {
+        Toast.makeText(this, "昵称不能超过12个字符", Toast.LENGTH_SHORT).show();
+        return;
+    }
+
+    boolean success = true;
+    if (!nick.equals(dm.getNickname(username))) success &= dm.setNickname(username, nick);
+    if (!sig.equals(dm.getSignature(username))) success &= dm.updateSignature(username, sig);
+    if (pendingAvatarBase64 != null) success &= dm.setAvatarUri(username, pendingAvatarBase64);
+    else if (pendingAvatarUri != null) success &= dm.setAvatarUri(username, pendingAvatarUri);
+
+    if (success) finish();
+});</code></pre>
+    <p><b>为什么只更新发生变化的字段：</b>减少不必要数据库写入，也避免某一项没改却覆盖旧数据。</p>
+    <p><b>账号管理：</b></p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/AccountManagerActivity.java</span>，第 34-94 行</div>
+<pre><code>adapter = new UserAdapter(users, new UserAdapter.OnItemListener() {
+    public void onShortClick(User user) {
+        Intent intent = new Intent(AccountManagerActivity.this, ChangePasswordActivity.class);
+        intent.putExtra("username", user.username);
+        startActivity(intent);
+    }
+
+    public void onLongClick(User user) {
+        String current = dm.getLoggedUser();
+        if (user.username.equals(current)) {
+            // 提示不能删除当前登录账号
+            return;
+        }
+        dm.hideUserFromHistory(user.username);
+        refreshList();
+    }
+});</code></pre>
+    <p><b>为什么长按不是直接 deleteUser：</b>当前实现选择“隐藏本机登录历史”，避免真的注销账号和删除用户数据。代码里也有 <code>deleteUser()</code>，但账号管理没有调用它。</p>
+
+    <h3>22.13 设置、管理员模式、添加商品完整代码逻辑</h3>
+    <p><b>管理员模式：</b></p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/SettingsActivity.java</span>，第 32-52 行</div>
+<pre><code>SwitchCompat swAdmin = findViewById(R.id.swAdminMode);
+layoutAdminOptions = findViewById(R.id.layoutAdminOptions);
+
+swAdmin.setChecked(dm.isAdminMode());
+updateAdminVisibility(dm.isAdminMode());
+
+swAdmin.setOnCheckedChangeListener((btn, checked) -> {
+    dm.setAdminMode(checked);
+    updateAdminVisibility(checked);
+});
+
+findViewById(R.id.tvAddArticle)
+        .setOnClickListener(v -> startActivity(new Intent(this, AddArticleActivity.class)));
+findViewById(R.id.tvAddProduct)
+        .setOnClickListener(v -> startActivity(new Intent(this, AddProductActivity.class)));</code></pre>
+    <p><b>为什么管理员模式是本地开关：</b>这是课程项目/单机模拟实现，没有服务端角色系统，所以用 SharedPreferences 控制入口显示。它不是安全权限，只是 UI 层功能开关。</p>
+    <p><b>添加商品：</b></p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/AddProductActivity.java</span>，第 93-112 行</div>
+<pre><code>btnSubmit.setOnClickListener(v -> {
+    String name = etName.getText().toString().trim();
+    String desc = etDesc.getText().toString().trim();
+    String priceStr = etPrice.getText().toString().trim();
+    if (name.isEmpty() || desc.isEmpty() || priceStr.isEmpty()) {
+        Toast.makeText(this, "所有字段不能为空", Toast.LENGTH_SHORT).show();
+        return;
+    }
+    double price;
+    try {
+        price = Double.parseDouble(priceStr);
+    } catch (NumberFormatException e) {
+        Toast.makeText(this, "价格格式不正确", Toast.LENGTH_SHORT).show();
+        return;
+    }
+    String cover = null;
+    if (!coverUris.isEmpty()) {
+        cover = coverUris.stream().map(Uri::toString).collect(Collectors.joining(","));
+    }
+    dm.addProduct(name, desc, price, cover);
+    Toast.makeText(this, "商品添加成功", Toast.LENGTH_SHORT).show();
+    finish();
+});</code></pre>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/AddProductActivity.java</span>，第 112-118 行</div>
+<pre><code>public void addProduct(String name, String desc, double price, String coverUri) {
+    int newId = nextId("products");
+    ContentValues cv = new ContentValues();
+    cv.put("id", newId);
+    cv.put("name", name);
+    cv.put("desc", desc);
+    cv.put("price", price);
+    if (coverUri != null) cv.put("cover_uri", coverUri);
+    wdb().insert("products", null, cv);
+}</code></pre>
+    <p><b>为什么价格要 try/catch：</b>用户输入的是字符串，可能输入“abc”或空格。转 double 失败会抛异常，捕获后提示用户，而不是让 App 崩溃。</p>
+
+    <h3>22.14 图片选择、拍照、头像 Base64 完整代码逻辑</h3>
+    <p><b>统一图片选择弹窗：</b></p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/utils/ImageUtils.java</span>，第 26-49 行</div>
+<pre><code>public static void showImagePickerDialog(Context context, String title, OnImagePickerListener listener) {
+    BottomSheetDialog dialog = new BottomSheetDialog(context, R.style.BottomSheetDialogTheme);
+    View view = LayoutInflater.from(context).inflate(R.layout.dialog_image_picker, null);
+
+    view.findViewById(R.id.btnTake_photo).setOnClickListener(v -> {
+        dialog.dismiss();
+        listener.onTakePhoto();
+    });
+
+    view.findViewById(R.id.btnOpen_gallery).setOnClickListener(v -> {
+        dialog.dismiss();
+        listener.onPickFromGallery();
+    });
+
+    dialog.setContentView(view);
+    dialog.show();
+}</code></pre>
+    <p><b>为什么封装成 ImageUtils：</b>添加文章、添加商品、商品评价、修改头像都要“拍照/相册”弹窗。封装后每个页面只提供自己的回调，不需要重复写弹窗代码。</p>
+    <p><b>头像转 Base64：</b></p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/utils/ImageUtils.java</span>，第 51-74 行</div>
+<pre><code>public static String uriToBase64(Context context, Uri uri) {
+    InputStream inputStream = context.getContentResolver().openInputStream(uri);
+    Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+    int maxWidth = 500;
+    int maxHeight = 500;
+    float ratio = Math.min((float) maxWidth / bitmap.getWidth(), (float) maxHeight / bitmap.getHeight());
+    Bitmap scaledBitmap = Bitmap.createScaledBitmap(bitmap, width, height, true);
+    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    scaledBitmap.compress(Bitmap.CompressFormat.JPEG, 85, baos);
+    byte[] bytes = baos.toByteArray();
+    return "data:image/jpeg;base64," + Base64.encodeToString(bytes, Base64.NO_WRAP);
+}</code></pre>
+    <p><b>为什么要压缩头像：</b>如果直接把大图转 Base64 存入 SQLite，字符串会非常大，查询时可能超过 CursorWindow 限制，导致崩溃。缩放到 500x500 并压缩 JPEG 是为了让头像足够清晰又不会太大。</p>
+
+    <h3>22.15 AppDatabase 为什么这样设计</h3>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/data/AppDatabase.java</span>，第 11-26 行</div>
+<pre><code>public class AppDatabase extends SQLiteOpenHelper {
+    private static final String DB_NAME = "jntt.db";
+    private static final int DB_VERSION = 4;
+    private static AppDatabase instance;
+
+    public static AppDatabase getInstance(Context ctx) {
+        if (instance == null)
+            instance = new AppDatabase(ctx.getApplicationContext());
+        return instance;
+    }
+}</code></pre>
+    <p><b>为什么数据库用单例：</b>SQLiteOpenHelper 不需要每个页面都 new 一个。单例可以复用数据库连接管理，避免多个 helper 实例造成资源浪费。</p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/data/AppDatabase.java</span>，第 59-66 行</div>
+<pre><code>db.execSQL("CREATE TABLE cart (" +
+        "id INTEGER PRIMARY KEY AUTOINCREMENT," +
+        "username TEXT NOT NULL," +
+        "product_id INTEGER NOT NULL," +
+        "name TEXT NOT NULL," +
+        "price REAL NOT NULL," +
+        "quantity INTEGER NOT NULL DEFAULT 1," +
+        "UNIQUE(username, product_id))");</code></pre>
+    <p><b>为什么购物车有 UNIQUE(username, product_id)：</b>同一用户同一商品只保留一行，重复加入只增加 quantity。这样购物车不会出现多个相同商品卡片，合计也更简单。</p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/data/AppDatabase.java</span>，第 81-86 行</div>
+<pre><code>db.execSQL("CREATE TABLE article_likes (" +
+        "id INTEGER PRIMARY KEY AUTOINCREMENT," +
+        "username TEXT NOT NULL," +
+        "article_id INTEGER NOT NULL," +
+        "UNIQUE(username, article_id))");</code></pre>
+    <p><b>为什么点赞表也有 UNIQUE：</b>防止同一个用户对同一篇文章重复点赞。代码即使多次调用 <code>likeArticle</code>，数据库也会忽略重复插入。</p>
+  </section>
+
+  <section id="all-feature-deep-dive">
+    <h2>二十三、全功能深度代码讲解补充版</h2>
+    <p class="note">本节按照“购物车数据在哪里”那种讲法，把项目所有主要功能继续展开：每个功能都说明数据在哪里、涉及哪些代码、代码如何一步步串联、为什么要这样设计。为了避免只讲文件位置，下面每个功能都会贴出核心代码并逐段解释。</p>
+
+    <h3>23.1 App 启动与登录态：为什么打开 App 会先进入登录页</h3>
+    <p><b>功能现象：</b>用户点击 App 图标后，系统先打开登录页。如果之前已经登录过，就直接进入主界面。</p>
+    <p><b>入口在哪里：</b>入口不是 Java 代码决定的，而是 <code>AndroidManifest.xml</code> 里的 MAIN/LAUNCHER 配置决定的。</p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/AndroidManifest.xml</span>，第 16-23 行</div>
+<pre><code>&lt;activity
+    android:name=".LoginActivity"
+    android:exported="true"&gt;
+    &lt;intent-filter&gt;
+        &lt;action android:name="android.intent.action.MAIN" /&gt;
+        &lt;category android:name="android.intent.category.LAUNCHER" /&gt;
+    &lt;/intent-filter&gt;
+&lt;/activity&gt;</code></pre>
+    <p><b>代码解释：</b><code>MAIN</code> 表示这是应用启动入口，<code>LAUNCHER</code> 表示它会出现在桌面图标启动流程中。所以不是 MainActivity 先运行，而是 LoginActivity 先运行。</p>
+    <p><b>登录态在哪里：</b>登录态不在 SQLite 的 users 表，而是在 <code>SharedPreferences</code> 的 <code>pref_session</code> 里，键名是 <code>logged_user</code>。</p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/data/DataManager.java</span>，第 27-78 行</div>
+<pre><code>private static final String PREF_SESSION = "pref_session";
+private static final String KEY_LOGGED_USER = "logged_user";
+
+public void setLoggedUser(String username) {
+    prefs().edit().putString(KEY_LOGGED_USER, username).apply();
+}
+
+public String getLoggedUser() {
+    return prefs().getString(KEY_LOGGED_USER, null);
+}
+
+private SharedPreferences prefs() {
+    return ctx.getSharedPreferences(PREF_SESSION, Context.MODE_PRIVATE);
+}</code></pre>
+    <p><b>为什么登录态用 SharedPreferences：</b>登录态只是一个很小的状态值，只有“当前是谁登录了”。用 SQLite 存也可以，但太重；SharedPreferences 适合保存这种少量键值数据。</p>
+    <p><b>启动时怎么判断：</b></p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/AccountManagerActivity.java</span>，第 22-103 行</div>
+<pre><code>protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+
+    dm = DataManager.getInstance(this);
+
+    // 如果已经登录则直接进入主界面
+    if (dm.getLoggedUser() != null) {
+        goMain();
+        return;
+    }
+
+    setContentView(R.layout.activity_login);
+    ...
+}</code></pre>
+    <p><b>为什么要 return：</b>如果已经登录，调用 <code>goMain()</code> 后必须停止继续执行，否则下面还会加载登录页布局，造成逻辑混乱。</p>
+
+    <h3>23.2 注册功能：从输入框到 users 表的完整链路</h3>
+    <p><b>数据在哪里：</b>注册后的账号数据在 <code>jntt.db</code> 的 <code>users</code> 表中。</p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/data/AppDatabase.java</span>，第 31-40 行</div>
+<pre><code>CREATE TABLE users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT UNIQUE NOT NULL,
+    password TEXT NOT NULL,
+    nickname TEXT,
+    avatar_uri TEXT,
+    signature TEXT,
+    phone TEXT UNIQUE
+)</code></pre>
+    <p><b>涉及代码：</b><code>RegisterActivity</code> 负责界面输入与校验，<code>DataManager.register()</code> 负责写数据库，<code>AppDatabase</code> 负责创建表。</p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/RegisterActivity.java</span>，第 54-56 行</div>
+<pre><code>String username = etUsername.getText().toString().trim();
+String password = etPassword.getText().toString().trim();
+String phone = etPhone.getText().toString().trim();</code></pre>
+    <p><b>解释：</b>这三行从 XML 输入框中拿到用户填写的内容。<code>trim()</code> 去掉空格，避免用户输入“ admin ”这样的账号导致登录时难以匹配。</p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/RegisterActivity.java</span>，第 58-69 行</div>
+<pre><code>if (username.isEmpty() || password.isEmpty()) {
+    Toast.makeText(this, "用户名和密码不能为空", Toast.LENGTH_SHORT).show();
+    return;
+}
+if (!username.matches("^[a-zA-Z0-9\\-@_.]+$")) {
+    Toast.makeText(this, "用户名只能包含字母、数字及-@_.", Toast.LENGTH_SHORT).show();
+    return;
+}
+if (password.length() &lt; 6) {
+    Toast.makeText(this, "密码至少6位", Toast.LENGTH_SHORT).show();
+    return;
+}</code></pre>
+    <p><b>解释：</b>这些校验都在 Activity 里做，因为它们属于“用户输入是否符合页面规则”。每个错误都立刻 <code>return</code>，防止错误数据继续进入数据库。</p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/RegisterActivity.java</span>，第 71-80 行</div>
+<pre><code>if (!phone.isEmpty()) {
+    if (phone.length() != 11 || !phone.matches("^1[3-9]\\d{9}$") || phone.matches("^(\\d)\\1{10}$")) {
+        Toast.makeText(this, "请输入有效的11位手机号", Toast.LENGTH_SHORT).show();
+        return;
+    }
+    if (dm.isPhoneBound(phone)) {
+        Toast.makeText(this, "该手机号已被注册或绑定，请更换手机号", Toast.LENGTH_SHORT).show();
+        return;
+    }
+}</code></pre>
+    <p><b>为什么判断重复手机号：</b><code>users.phone</code> 是唯一的，一个手机号不能绑定多个账号。界面先判断可以给用户友好提示；数据库唯一约束作为第二层保护。</p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/data/DataManager.java</span>，第 99-112 行</div>
+<pre><code>public boolean register(String username, String password, String phone) {
+    if (phone != null && !phone.isEmpty()) {
+        if (isPhoneBound(phone))
+            return false;
+    }
+    ContentValues cv = new ContentValues();
+    cv.put("username", username);
+    cv.put("password", password);
+    cv.put("nickname", username);
+    if (phone != null && !phone.isEmpty()) {
+        cv.put("phone", phone);
+    }
+    return wdb().insertWithOnConflict("users", null, cv, SQLiteDatabase.CONFLICT_IGNORE) != -1;
+}</code></pre>
+    <p><b>逐行解释：</b><code>ContentValues</code> 相当于一行数据库数据；<code>nickname</code> 默认等于 username，是为了个人中心有默认昵称；<code>CONFLICT_IGNORE</code> 表示如果 username 或 phone 冲突就忽略插入，返回失败。</p>
+    <p><b>注册成功后为什么自动登录：</b></p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/RegisterActivity.java</span>，第 95-98 行</div>
+<pre><code>dm.setLoggedUser(username);
+Intent intent = new Intent(this, MainActivity.class);
+intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+startActivity(intent);</code></pre>
+    <p><b>解释：</b>注册成功说明账号已经可用，所以直接写入登录态。<code>CLEAR_TASK</code> 清掉旧页面栈，避免用户按返回键又回到注册页。</p>
+
+    <h3>23.3 登录功能：账号/手机号如何和数据库比对</h3>
+    <p><b>数据在哪里：</b>账号密码在 <code>users</code> 表，当前登录状态在 <code>pref_session.logged_user</code>。</p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/data/DataManager.java</span>，第 169-178 行</div>
+<pre><code>String targetUsername = dm.findUsernameByAccount(username);
+if (targetUsername == null || targetUsername.isEmpty()) {
+    // 未注册账号，弹窗引导注册
+    ...
+    return;
+}</code></pre>
+    <p><b>为什么先查账号是否存在：</b>这样可以区分“账号不存在”和“密码错误”。如果直接查账号密码组合，只能知道登录失败，用户不知道是账号错还是密码错。</p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/data/DataManager.java</span>，第 169-178 行</div>
+<pre><code>public String findUsernameByAccount(String account) {
+    try (Cursor c = rdb().rawQuery(
+            "SELECT username FROM users WHERE username=? OR phone=?",
+            new String[] { account, account })) {
+        if (c.moveToFirst()) {
+            return c.getString(0);
+        }
+    }
+    return null;
+}</code></pre>
+    <p><b>解释：</b>这里允许用户输入用户名或手机号。无论输入的是哪一种，最终都返回真正的 username，因为项目里的购物车、文章、订单都用 username 作为用户标识。</p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/LoginActivity.java</span>，第 81-87 行</div>
+<pre><code>User user = dm.login(username, password);
+if (user == null) {
+    Toast.makeText(this, "密码错误", Toast.LENGTH_SHORT).show();
+} else {
+    dm.setLoggedUser(user.username);
+    goMain();
+}</code></pre>
+    <p><b>解释：</b>如果 DataManager 返回 null，说明账号存在但密码不匹配；如果返回 User，就把真实 username 写入登录态并进入主界面。</p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/data/DataManager.java</span>，第 152-167 行</div>
+<pre><code>public User login(String usernameOrPhone, String password) {
+    try (Cursor c = rdb().rawQuery(
+            "SELECT username,password FROM users WHERE (username=? OR phone=?) AND password=?",
+            new String[] { usernameOrPhone, usernameOrPhone, password })) {
+        if (c.moveToFirst()) {
+            String uName = c.getString(0);
+            return new User(uName, c.getString(1));
+        }
+    }
+    return null;
+}</code></pre>
+    <p><b>为什么 SQL 里用 username 或 phone：</b>这样登录框可以同时支持用户名登录和手机号登录，提高易用性。</p>
+
+    <h3>23.4 忘记密码、验证码、重置密码：完整链路</h3>
+    <p><b>数据在哪里：</b>验证码只在内存变量 <code>realCaptcha</code>，不会存入数据库；新密码最终更新到 <code>users.password</code>。</p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/ForgotPasswordActivity.java</span>，第 40-45 行</div>
+<pre><code>private void refreshCaptcha() {
+    CaptchaUtils utils = CaptchaUtils.getInstance();
+    Bitmap bitmap = utils.createBitmap();
+    realCaptcha = utils.getCode();
+    ivCaptcha.setImageBitmap(bitmap);
+}</code></pre>
+    <p><b>解释：</b><code>CaptchaUtils.createBitmap()</code> 生成验证码图片，<code>getCode()</code> 拿到真实验证码字符串，用户输入后和它比较。</p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/ForgotPasswordActivity.java</span>，第 61-66 行</div>
+<pre><code>if (!inputCaptcha.equalsIgnoreCase(realCaptcha)) {
+    Toast.makeText(this, "验证码错误，请重新输入", Toast.LENGTH_SHORT).show();
+    refreshCaptcha();
+    etCaptcha.setText("");
+    return;
+}</code></pre>
+    <p><b>为什么错误后刷新验证码：</b>防止用户反复试同一个验证码，也符合验证码的一般安全逻辑。</p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/ForgotPasswordActivity.java</span>，第 68-80 行</div>
+<pre><code>String targetUsername = dm.findUsernameByAccount(account);
+if (targetUsername == null || targetUsername.isEmpty()) {
+    Toast.makeText(this, "未找到该用户，请检查输入的用户名或手机号", Toast.LENGTH_SHORT).show();
+    refreshCaptcha();
+    return;
+}
+
+Intent intent = new Intent(this, ResetPasswordActivity.class);
+intent.putExtra("username", targetUsername);
+intent.putExtra("display_account", account);
+startActivity(intent);
+finish();</code></pre>
+    <p><b>解释：</b>忘记密码页只负责验证账号和验证码，不直接改密码；验证通过后把 username 传给重置密码页。</p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/ChangePasswordActivity.java</span>，第 37-49 行</div>
+<pre><code>if (newPwd.length() &lt; 6) {
+    Toast.makeText(this, "密码至少6位", Toast.LENGTH_SHORT).show();
+    return;
+}
+if (!newPwd.equals(confirmPwd)) {
+    Toast.makeText(this, "两次密码不一致", Toast.LENGTH_SHORT).show();
+    return;
+}
+if (dm.isSameAsOldPassword(username, newPwd)) {
+    Toast.makeText(this, "新密码不能和旧密码相同", Toast.LENGTH_SHORT).show();
+    return;
+}
+
+dm.changePassword(username, newPwd);</code></pre>
+    <p><b>为什么两次输入密码：</b>降低用户输错新密码的概率；为什么不能和旧密码相同：避免“修改成功但实际没变”。</p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/data/DataManager.java</span>，第 190-194 行</div>
+<pre><code>public boolean changePassword(String username, String newPassword) {
+    ContentValues cv = new ContentValues();
+    cv.put("password", newPassword);
+    return wdb().update("users", cv, "username=?", new String[] { username }) &gt; 0;
+}</code></pre>
+    <p><b>最终结果：</b><code>users</code> 表里该 username 的 password 字段被更新。</p>
+
+    <h3>23.5 头条列表：文章数据从 articles 表如何显示到卡片上</h3>
+    <p><b>数据在哪里：</b>文章主体在 <code>articles</code> 表，作者昵称头像在 <code>users</code> 表。</p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/ArticleDetailActivity.java</span>，第 53-58 行</div>
+<pre><code>public List&lt;Article&gt; getArticles() {
+    return queryArticles(
+            "SELECT a.id,a.title,a.content,a.author,a.time,a.read_count,a.cover_uri,u.nickname,u.avatar_uri " +
+            "FROM articles a LEFT JOIN users u ON a.author=u.username ORDER BY a.id DESC",
+            null);
+}</code></pre>
+    <p><b>为什么要 LEFT JOIN：</b>文章只保存 author=username，但界面需要显示作者昵称和头像，所以查询时把 users 表也连上。如果作者资料缺失，LEFT JOIN 仍能返回文章。</p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/data/DataManager.java</span>，第 244-249 行</div>
+<pre><code>private List&lt;Article&gt; queryArticles(String sql, String[] args) {
+    List&lt;Article&gt; list = new ArrayList&lt;&gt;();
+    try (Cursor c = rdb().rawQuery(sql, args)) {
+        while (c.moveToNext()) {
+            Article a = new Article(c.getInt(0), c.getString(1), c.getString(2),
+                    c.getString(3), c.getString(4));
+            a.readCount = c.getInt(5);
+            a.coverUri = c.getString(6);
+            a.authorNickname = c.getString(7);
+            a.authorAvatarUri = c.getString(8);
+            list.add(a);
+        }
+    }
+    return list;
+}</code></pre>
+    <p><b>解释：</b>Cursor 是数据库查询结果，不能直接给 RecyclerView 用。这里把每一行转换成 Article 对象，列表 Adapter 才能方便绑定。</p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/fragment/HeadlineFragment.java</span>，第 39-48 行</div>
+<pre><code>allArticles = dm.getArticles();
+displayed = new ArrayList&lt;&gt;(allArticles);
+
+adapter = new ArticleAdapter(displayed, article -&gt; {
+    Intent intent = new Intent(getContext(), ArticleDetailActivity.class);
+    intent.putExtra("article_id", article.id);
+    startActivity(intent);
+}, dm, dm.getLoggedUser());</code></pre>
+    <p><b>为什么 displayed 要复制 allArticles：</b><code>allArticles</code> 保存完整数据，<code>displayed</code> 用于当前展示。搜索/刷新时可以清空 displayed 再填充，不破坏原始数据。</p>
+
+    <h3>23.6 文章卡片 Adapter：每个 item 为什么这样绑定</h3>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/adapter/ArticleAdapter.java</span>，第 63-162 行</div>
+<pre><code>public void onBindViewHolder(@NonNull VH h, int position) {
+    Article a = data.get(position);
+
+    String authorName = a.authorNickname != null && !a.authorNickname.isEmpty()
+            ? a.authorNickname : a.author;
+    h.tvAuthor.setText(authorName);
+    h.tvTime.setText(a.time);
+    h.tvReadCount.setText("阅读 " + a.readCount);
+    h.tvArticleTitle.setText(a.title);
+    h.tvArticleContent.setText(a.content);
+}</code></pre>
+    <p><b>解释：</b>Adapter 的 <code>onBindViewHolder</code> 会在每个列表项显示时执行。它从 Article 对象中取数据，填入 XML 对应控件。</p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/adapter/ArticleAdapter.java</span>，第 104-127 行</div>
+<pre><code>if (a.coverUri != null) {
+    h.ivThumb.setImageURI(Uri.parse(a.coverUri));
+} else {
+    switch (a.id) {
+        case 5: h.ivThumb.setImageResource(R.mipmap.text1); break;
+        case 4: h.ivThumb.setImageResource(R.mipmap.text2); break;
+        ...
+        default:
+            h.ivThumb.setImageResource(R.drawable.ic_product_placeholder);
+    }
+}</code></pre>
+    <p><b>为什么有两套图片逻辑：</b>默认种子文章没有 coverUri，所以按 id 显示内置资源图；用户后来发布的文章有 coverUri，就显示用户选择的图片。</p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/adapter/ArticleAdapter.java</span>，第 155-161 行</div>
+<pre><code>h.itemView.setOnClickListener(v -&gt; {
+    if (a.isDeleted) {
+        Toast.makeText(v.getContext(), "该稿件已被删除", Toast.LENGTH_SHORT).show();
+        return;
+    }
+    listener.onItemClick(a);
+});</code></pre>
+    <p><b>为什么删除文章不能进入详情：</b>收藏列表中可能保留“已删除文章”的占位对象，这种对象没有真实正文，点击时只提示，不打开详情。</p>
+
+    <h3>23.7 文章详情：阅读、关注、点赞、评论、删除如何串联</h3>
+    <p><b>阅读量：</b></p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/ArticleDetailActivity.java</span>，第 49-51 行</div>
+<pre><code>articleId = getIntent().getIntExtra("article_id", -1);
+dm.incrementReadCount(articleId);</code></pre>
+    <p><b>解释：</b>详情页拿到列表传来的 article_id，立刻把阅读量 +1。</p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/data/DataManager.java</span>，第 269-272 行</div>
+<pre><code>public void incrementReadCount(int articleId) {
+    wdb().execSQL("UPDATE articles SET read_count = read_count + 1 WHERE id=?",
+            new Object[] { articleId });
+}</code></pre>
+    <p><b>关注：</b></p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/ArticleDetailActivity.java</span>，第 208-219 行</div>
+<pre><code>if (currentUser != null && !article.author.equals(currentUser)) {
+    tvFollow.setVisibility(View.VISIBLE);
+    refreshFollowBtn(tvFollow);
+    tvFollow.setOnClickListener(v -&gt; {
+        if (dm.isFollowing(currentUser, article.author)) {
+            dm.unfollowUser(currentUser, article.author);
+        } else {
+            dm.followUser(currentUser, article.author);
+        }
+        refreshFollowBtn(tvFollow);
+    });
+}</code></pre>
+    <p><b>为什么看自己的文章不显示关注：</b>自己关注自己没有意义，所以条件里排除了 <code>article.author.equals(currentUser)</code>。</p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/data/DataManager.java</span>，第 497-502 行</div>
+<pre><code>public void followUser(String follower, String following) {
+    ContentValues cv = new ContentValues();
+    cv.put("follower", follower);
+    cv.put("following", following);
+    wdb().insertWithOnConflict("follows", null, cv, SQLiteDatabase.CONFLICT_IGNORE);
+}</code></pre>
+    <p><b>点赞：</b></p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/ArticleDetailActivity.java</span>，第 299-309 行</div>
+<pre><code>boolean nowLiked = dm.isArticleLiked(currentUser, articleId);
+if (nowLiked) {
+    dm.unlikeArticle(currentUser, articleId);
+} else {
+    dm.likeArticle(currentUser, articleId);
+}
+refreshLikeUI();</code></pre>
+    <p><b>解释：</b>这就是切换状态：已经点赞就取消，没点赞就点赞。刷新 UI 会重新查点赞状态和点赞数。</p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/ArticleDetailActivity.java</span>，第 333-338 行</div>
+<pre><code>private void refreshLikeUI() {
+    boolean liked = currentUser != null && dm.isArticleLiked(currentUser, articleId);
+    int count = dm.getArticleLikeCount(articleId);
+    ivLikeBtn.setImageResource(liked ? R.mipmap.dianzan : R.mipmap.weidianzan);
+    tvLikeCount.setText(count &gt; 0 ? String.valueOf(count) : "");
+}</code></pre>
+    <p><b>评论：</b></p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/ArticleDetailActivity.java</span>，第 235-272 行</div>
+<pre><code>comments = dm.getComments(articleId, currentUser != null ? currentUser : "");
+commentAdapter = new CommentAdapter(comments, currentUser, article.author, dm);
+rv.setAdapter(commentAdapter);</code></pre>
+    <p><b>解释：</b>详情页先从数据库取评论，再交给 CommentAdapter 显示。传入 currentUser 是为了判断“这条评论我是否点过赞”和“我是否能删除”。</p>
+
+    <h3>23.8 评论表、评论点赞表：评论数据到底在哪里</h3>
+    <p><b>评论数据在：</b><code>comments</code> 表。</p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/data/AppDatabase.java</span>，第 88-94 行</div>
+<pre><code>CREATE TABLE comments (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    article_id INTEGER NOT NULL,
+    username TEXT NOT NULL,
+    content TEXT NOT NULL,
+    time TEXT NOT NULL
+)</code></pre>
+    <p><b>评论点赞数据在：</b><code>comment_likes</code> 表。</p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/data/AppDatabase.java</span>，第 96-101 行</div>
+<pre><code>CREATE TABLE comment_likes (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT NOT NULL,
+    comment_id INTEGER NOT NULL,
+    UNIQUE(username, comment_id)
+)</code></pre>
+    <p><b>发表评论代码：</b></p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/data/DataManager.java</span>，第 427-436 行</div>
+<pre><code>public Comment addComment(int articleId, String username, String content) {
+    String time = now("MM-dd HH:mm");
+    ContentValues cv = new ContentValues();
+    cv.put("article_id", articleId);
+    cv.put("username", username);
+    cv.put("content", content);
+    cv.put("time", time);
+    long id = wdb().insert("comments", null, cv);
+    return new Comment((int) id, articleId, username, content, time, 0);
+}</code></pre>
+    <p><b>为什么返回 Comment 对象：</b>插入成功后界面马上需要显示这条评论。返回对象后 Activity 直接加进列表，无需重新查一遍全部评论。</p>
+    <p><b>查询评论代码：</b></p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/ArticleDetailActivity.java</span>，第 235-267 行</div>
+<pre><code>public List&lt;Comment&gt; getComments(int articleId, String currentUser) {
+    String sql = "SELECT c.id, c.article_id, c.username, c.content, c.time, " +
+            "COUNT(cl.id) AS like_count, u.nickname, u.avatar_uri " +
+            "FROM comments c " +
+            "LEFT JOIN comment_likes cl ON c.id=cl.comment_id AND cl.username&lt;&gt;c.username " +
+            "LEFT JOIN users u ON c.username=u.username " +
+            "WHERE c.article_id=? GROUP BY c.id ORDER BY c.id ASC";
+    ...
+    cm.isLikedByMe = isCommentLiked(currentUser, cm.id);
+}</code></pre>
+    <p><b>为什么这里也 LEFT JOIN users：</b>评论表只有 username，界面要显示昵称和头像，所以需要连用户表。</p>
+    <p><b>为什么 COUNT(cl.id)：</b>评论点赞数不是存在 comments 表里的字段，而是从 comment_likes 表统计出来的。</p>
+
+    <h3>23.9 我的收藏：为什么收藏来自 article_likes 表</h3>
+    <p><b>数据在哪里：</b>项目没有单独 <code>favorites</code> 表，我的收藏读取的是 <code>article_likes</code> 表。</p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/data/DataManager.java</span>，第 333-359 行</div>
+<pre><code>List&lt;Article&gt; articles = dm.getLikedArticles(username);
+adapter = new ArticleAdapter(articles, article -&gt; {
+    Intent intent = new Intent(this, ArticleDetailActivity.class);
+    intent.putExtra("article_id", article.id);
+    startActivity(intent);
+});</code></pre>
+    <p><b>解释：</b>MyFavoritesActivity 直接调用 <code>getLikedArticles()</code>，所以用户点过赞的文章会出现在我的收藏中。</p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/data/DataManager.java</span>，第 333-359 行</div>
+<pre><code>public List&lt;Article&gt; getLikedArticles(String username) {
+    String sql = "SELECT l.article_id, a.title, a.content, a.author, a.time, a.read_count, a.cover_uri, u.nickname, u.avatar_uri " +
+            "FROM article_likes l LEFT JOIN articles a ON l.article_id=a.id " +
+            "LEFT JOIN users u ON a.author=u.username " +
+            "WHERE l.username=? AND (a.author IS NULL OR l.username&lt;&gt;a.author) ORDER BY l.id DESC";
+    ...
+    if (title == null) {
+        a = new Article(articleId, "该稿件已被删除", "抱歉，该作品已被作者删除。", "", "");
+        a.isDeleted = true;
+    }
+}</code></pre>
+    <p><b>为什么用 LEFT JOIN articles：</b>如果文章已经被作者删除，article_likes 里还保留点赞记录。LEFT JOIN 允许查出这条记录，并显示“该稿件已被删除”。如果用 INNER JOIN，被删除文章会直接消失，用户不知道发生了什么。</p>
+
+    <h3>23.10 我的文章：当前账号发布的文章从哪里来</h3>
+    <p><b>数据在哪里：</b><code>articles.author</code> 字段保存作者 username。</p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/MyArticlesActivity.java</span>，第 43-70 行</div>
+<pre><code>targetUsername = getIntent().getStringExtra("username");
+if (targetUsername == null || targetUsername.isEmpty()) {
+    targetUsername = currentUser;
+}
+
+List&lt;Article&gt; articles = dm.getArticlesByAuthor(targetUsername);</code></pre>
+    <p><b>解释：</b>如果没有传 username，就显示当前用户自己的文章；如果从关注/粉丝列表点进别人主页，会传 username，显示别人的文章。</p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/data/DataManager.java</span>，第 249-253 行</div>
+<pre><code>public List&lt;Article&gt; getArticlesByAuthor(String author) {
+    return queryArticles(
+        "SELECT a.id,a.title,a.content,a.author,a.time,a.read_count,a.cover_uri,u.nickname,u.avatar_uri " +
+        "FROM articles a LEFT JOIN users u ON a.author=u.username WHERE a.author=? ORDER BY a.id DESC",
+        new String[] { author });
+}</code></pre>
+    <p><b>为什么 WHERE a.author=?：</b>文章表中 author 就是文章归属字段，用它过滤即可得到某个用户发布的所有文章。</p>
+
+    <h3>23.11 商城列表和商品搜索：商品数据在哪里</h3>
+    <p><b>数据在哪里：</b>商品在 <code>products</code> 表。</p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/data/AppDatabase.java</span>，第 51-57 行</div>
+<pre><code>CREATE TABLE products (
+    id INTEGER PRIMARY KEY,
+    name TEXT NOT NULL,
+    desc TEXT NOT NULL,
+    cover_uri TEXT,
+    price REAL NOT NULL
+)</code></pre>
+    <p><b>读取商品：</b></p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/data/DataManager.java</span>，第 592-600 行</div>
+<pre><code>public List&lt;Product&gt; getProducts() {
+    List&lt;Product&gt; list = new ArrayList&lt;&gt;();
+    try (Cursor c = rdb().rawQuery(
+            "SELECT id,name,`desc`,price,cover_uri FROM products", null)) {
+        while (c.moveToNext())
+            list.add(new Product(c.getInt(0), c.getString(1), c.getString(2), c.getDouble(3), c.getString(4)));
+    }
+    return list;
+}</code></pre>
+    <p><b>为什么 desc 要加反引号：</b><code>desc</code> 在 SQL 里常用于降序排序关键字，使用反引号可以避免字段名和关键字冲突。</p>
+    <p><b>商城页显示商品：</b></p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/fragment/MallFragment.java</span>，第 47-57 行</div>
+<pre><code>allProducts = dm.getProducts();
+displayed = new ArrayList&lt;&gt;(allProducts);
+
+RecyclerView rv = view.findViewById(R.id.rvProducts);
+rv.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
+adapter = new ProductAdapter(displayed, product -&gt; {
+    Intent intent = new Intent(getContext(), ProductDetailActivity.class);
+    intent.putExtra("product_id", product.id);
+    startActivity(intent);
+});</code></pre>
+    <p><b>为什么用 StaggeredGridLayoutManager：</b>商城商品卡片更适合两列瀑布流，图片和文字高度可能不同，用瀑布流比普通单列列表更像商城。</p>
+    <p><b>商品搜索：</b></p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/fragment/MallFragment.java</span>，第 84-96 行</div>
+<pre><code>private void filter(String query) {
+    displayed.clear();
+    if (query.isEmpty()) {
+        displayed.addAll(allProducts);
+    } else {
+        for (Product p : allProducts) {
+            if (p.name.contains(query) || p.desc.contains(query)) {
+                displayed.add(p);
+            }
+        }
+    }
+    adapter.notifyDataSetChanged();
+}</code></pre>
+    <p><b>为什么搜索在内存中做：</b>商品数量少，内存过滤简单快速。输入一个字就刷新列表，用户体验更直接。</p>
+
+    <h3>23.12 商品详情：图片、详情、立即购买、购物车入口</h3>
+    <p><b>商品详情根据 product_id 找商品：</b></p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/ProductDetailActivity.java</span>，第 26-40 行</div>
+<pre><code>productId = getIntent().getIntExtra("product_id", -1);
+Product target = null;
+for (Product p : dm.getProducts()) {
+    if (p.id == productId) {
+        target = p;
+        break;
+    }
+}
+if (target == null) {
+    finish();
+    return;
+}</code></pre>
+    <p><b>为什么找不到商品就 finish：</b>如果 product_id 错误或商品不存在，详情页没有数据可显示，直接关闭页面避免空指针崩溃。</p>
+    <p><b>商品图片：</b></p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/ProductDetailActivity.java</span>，第 50-115 行</div>
+<pre><code>switch (product.id) {
+    case 1:
+        images.add(R.mipmap.dami1);
+        images.add(R.mipmap.dami2);
+        images.add(R.mipmap.dami3);
+        break;
+    ...
+    default:
+        if (product.coverUri != null && !product.coverUri.isEmpty()) {
+            String[] uris = product.coverUri.split(",");
+            for (String uri : uris) images.add(uri);
+        } else {
+            images.add(R.drawable.ic_product_placeholder);
+        }
+}</code></pre>
+    <p><b>为什么默认商品按 id 写死图片：</b>种子商品是固定的 10 个，项目资源里已经准备了对应图片；管理员新增商品没有固定资源 id，所以使用 coverUri。</p>
+    <p><b>立即购买：</b></p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/ProductDetailActivity.java</span>，第 210-214 行</div>
+<pre><code>((Button) findViewById(R.id.btnBuy)).setOnClickListener(v -&gt; {
+    dm.addOrder(username, product.id, product.name, product.price, 1);
+    Toast.makeText(this, "下单成功", Toast.LENGTH_SHORT).show();
+    startActivity(new Intent(this, MyOrdersActivity.class));
+});</code></pre>
+    <p><b>为什么立即购买直接生成订单：</b>它绕过购物车，直接把当前商品以数量 1 写入 orders 表。当前实现没有商品详情数量选择器，所以默认数量是 1。</p>
+
+    <h3>23.13 添加商品：管理员新增商品如何写入 products 表</h3>
+    <p><b>数据在哪里：</b>新增商品写入 <code>products</code> 表，图片 Uri 保存到 <code>cover_uri</code> 字段，多个 Uri 用逗号拼接。</p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/AddProductActivity.java</span>，第 94-107 行</div>
+<pre><code>String name = etName.getText().toString().trim();
+String desc = etDesc.getText().toString().trim();
+String priceStr = etPrice.getText().toString().trim();
+if (name.isEmpty() || desc.isEmpty() || priceStr.isEmpty()) {
+    Toast.makeText(this, "所有字段不能为空", Toast.LENGTH_SHORT).show();
+    return;
+}
+double price;
+try {
+    price = Double.parseDouble(priceStr);
+} catch (NumberFormatException e) {
+    Toast.makeText(this, "价格格式不正确", Toast.LENGTH_SHORT).show();
+    return;
+}</code></pre>
+    <p><b>为什么价格要转换和捕获异常：</b>EditText 里拿到的是字符串，数据库 price 是 REAL。用户可能输入非数字，必须捕获错误，否则 App 会崩溃。</p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/AddProductActivity.java</span>，第 108-112 行</div>
+<pre><code>String cover = null;
+if (!coverUris.isEmpty()) {
+    cover = coverUris.stream().map(Uri::toString).collect(Collectors.joining(","));
+}
+dm.addProduct(name, desc, price, cover);</code></pre>
+    <p><b>为什么多个图片用逗号拼接：</b>这样不用再设计商品图片表，实现简单。缺点是后续如果要单独删除某张图或排序，拆表会更合理。</p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/data/DataManager.java</span>，第 602-613 行</div>
+<pre><code>public void addProduct(String name, String desc, double price, String coverUri) {
+    int newId = nextId("products");
+    ContentValues cv = new ContentValues();
+    cv.put("id", newId);
+    cv.put("name", name);
+    cv.put("desc", desc);
+    cv.put("price", price);
+    if (coverUri != null) {
+        cv.put("cover_uri", coverUri);
+    }
+    wdb().insert("products", null, cv);
+}</code></pre>
+    <p><b>为什么 nextId：</b>新增商品需要一个新的 id。这里通过查询当前最大 id + 1 生成，简单适合单机应用。</p>
+
+    <h3>23.14 购物车：数据位置、所有代码和为什么这样写</h3>
+    <p><b>数据在哪里：</b>购物车数据在 <code>jntt.db</code> 的 <code>cart</code> 表。</p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/data/AppDatabase.java</span>，第 59-66 行</div>
+<pre><code>CREATE TABLE cart (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT NOT NULL,
+    product_id INTEGER NOT NULL,
+    name TEXT NOT NULL,
+    price REAL NOT NULL,
+    quantity INTEGER NOT NULL DEFAULT 1,
+    UNIQUE(username, product_id)
+)</code></pre>
+    <p><b>为什么 cart 表保存 username：</b>因为同一台手机可以注册/登录多个账号，每个账号要有自己的购物车。</p>
+    <p><b>为什么保存 name 和 price：</b>购物车需要显示商品名称和价格。保存快照后，即使商品表里的价格后来变化，购物车仍保留加入时的数据。</p>
+    <p><b>加入购物车入口 1：商城列表。</b></p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/fragment/MallFragment.java</span>，第 58-62 行</div>
+<pre><code>adapter.setOnAddCartListener(product -&gt; {
+    dm.addToCart(dm.getLoggedUser(), product);
+    Toast.makeText(getContext(), "已加入购物车", Toast.LENGTH_SHORT).show();
+    refreshBadge(view, dm);
+});</code></pre>
+    <p><b>加入购物车入口 2：商品详情。</b></p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/ProductDetailActivity.java</span>，第 204-207 行</div>
+<pre><code>((Button) findViewById(R.id.btnAddCart)).setOnClickListener(v -&gt; {
+    dm.addToCart(username, product);
+    Toast.makeText(this, "已加入购物车", Toast.LENGTH_SHORT).show();
+});</code></pre>
+    <p><b>真正写库：</b></p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/data/DataManager.java</span>，第 628-646 行</div>
+<pre><code>public void addToCart(String username, Product product) {
+    try (Cursor c = rdb().rawQuery(
+            "SELECT quantity FROM cart WHERE username=? AND product_id=?",
+            new String[] { username, String.valueOf(product.id) })) {
+        if (c.moveToFirst()) {
+            int qty = c.getInt(0) + 1;
+            wdb().execSQL("UPDATE cart SET quantity=? WHERE username=? AND product_id=?",
+                    new Object[] { qty, username, product.id });
+        } else {
+            ContentValues cv = new ContentValues();
+            cv.put("username", username);
+            cv.put("product_id", product.id);
+            cv.put("name", product.name);
+            cv.put("price", product.price);
+            cv.put("quantity", 1);
+            wdb().insert("cart", null, cv);
+        }
+    }
+}</code></pre>
+    <p><b>为什么先 SELECT：</b>要判断同一用户是否已经加过这个商品。已有就更新数量，没有才插入新行。这样配合 UNIQUE(username, product_id)，保证购物车不会出现重复商品卡片。</p>
+    <p><b>读取购物车：</b></p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/data/DataManager.java</span>，第 617-626 行</div>
+<pre><code>public List&lt;CartItem&gt; getCart(String username) {
+    List&lt;CartItem&gt; list = new ArrayList&lt;&gt;();
+    try (Cursor c = rdb().rawQuery(
+            "SELECT product_id,name,price,quantity FROM cart WHERE username=?",
+            new String[] { username })) {
+        while (c.moveToNext())
+            list.add(new CartItem(c.getInt(0), c.getString(1), c.getDouble(2), c.getInt(3)));
+    }
+    return list;
+}</code></pre>
+    <p><b>购物车页面使用：</b></p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/CartActivity.java</span>，第 39-46 行</div>
+<pre><code>username = dm.getLoggedUser();
+items = dm.getCart(username);
+adapter = new CartAdapter(items);
+adapter.setOnChangeListener(this::persistCartState);</code></pre>
+    <p><b>为什么 CartAdapter 不直接写数据库：</b>Adapter 负责列表显示和交互；Activity 负责页面级业务；DataManager 负责数据库。这样分层清楚。</p>
+    <p><b>保存购物车：</b></p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/CartActivity.java</span>，第 99-102 行</div>
+<pre><code>private void persistCartState() {
+    dm.saveCartPublic(username, items);
+    refreshBottomBar();
+}</code></pre>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/data/DataManager.java</span>，第 648-660 行</div>
+<pre><code>public void saveCartPublic(String username, List&lt;CartItem&gt; items) {
+    SQLiteDatabase d = wdb();
+    d.delete("cart", "username=?", new String[] { username });
+    for (CartItem item : items) {
+        ContentValues cv = new ContentValues();
+        cv.put("username", username);
+        cv.put("product_id", item.productId);
+        cv.put("name", item.name);
+        cv.put("price", item.price);
+        cv.put("quantity", item.quantity);
+        d.insert("cart", null, cv);
+    }
+}</code></pre>
+    <p><b>为什么先删除再重新插入：</b>购物车可能发生增加、减少、删除、清空。全量覆盖最简单，能保证数据库和当前界面列表完全一致。</p>
+
+    <h3>23.15 订单：购物车如何变成订单，订单数据在哪里</h3>
+    <p><b>数据在哪里：</b>订单在 <code>orders</code> 表。</p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/data/AppDatabase.java</span>，第 69-78 行</div>
+<pre><code>CREATE TABLE orders (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    order_id TEXT UNIQUE NOT NULL,
+    username TEXT NOT NULL,
+    product_id INTEGER NOT NULL,
+    name TEXT NOT NULL,
+    price REAL NOT NULL,
+    quantity INTEGER NOT NULL,
+    time TEXT NOT NULL,
+    status TEXT NOT NULL
+)</code></pre>
+    <p><b>结算代码：</b></p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/CartActivity.java</span>，第 57-64 行</div>
+<pre><code>private void checkout() {
+    List&lt;CartItem&gt; checkedItems = adapter.getCheckedItems();
+    if (checkedItems.isEmpty()) {
+        Toast.makeText(this, "请先选择商品", Toast.LENGTH_SHORT).show();
+        return;
+    }
+    for (CartItem item : checkedItems) {
+        dm.addOrder(username, item.productId, item.name, item.price, item.quantity);
+    }
+    adapter.removeChecked();
+    dm.saveCartPublic(username, items);
+    startActivity(new Intent(this, MyOrdersActivity.class));
+    finish();
+}</code></pre>
+    <p><b>解释：</b>购物车中只有被勾选的商品才会进入订单；未勾选商品继续留在购物车。</p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/data/DataManager.java</span>，第 677-688 行</div>
+<pre><code>public void addOrder(String username, int productId, String name, double price, int quantity) {
+    ContentValues cv = new ContentValues();
+    cv.put("order_id", "JN" + System.currentTimeMillis());
+    cv.put("username", username);
+    cv.put("product_id", productId);
+    cv.put("name", name);
+    cv.put("price", price);
+    cv.put("quantity", quantity);
+    cv.put("time", now("yyyy-MM-dd HH:mm"));
+    cv.put("status", Order.STATUS_PENDING);
+    wdb().insert("orders", null, cv);
+}</code></pre>
+    <p><b>为什么订单也保存 name 和 price：</b>订单是历史记录，应保存下单时的商品名和价格，不能完全依赖 products 表当前值。</p>
+    <p><b>订单状态：</b></p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/model/Order.java</span>，第 10-12 行</div>
+<pre><code>public static final String STATUS_PENDING   = "pending";
+public static final String STATUS_PAID      = "paid";
+public static final String STATUS_CANCELLED = "cancelled";</code></pre>
+    <p><b>解释：</b>订单只用三个状态：待支付、已完成、已取消，足够支撑当前模拟购物流程。</p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/data/DataManager.java</span>，第 690-695 行</div>
+<pre><code>public void updateOrderStatus(String username, String orderId, String status) {
+    ContentValues cv = new ContentValues();
+    cv.put("status", status);
+    wdb().update("orders", cv, "username=? AND order_id=?",
+            new String[] { username, orderId });
+}</code></pre>
+    <p><b>为什么更新状态要带 username：</b>保证只更新当前用户自己的订单。</p>
+
+    <h3>23.16 商品评价：为什么必须购买后才能评价</h3>
+    <p><b>数据在哪里：</b>商品评价在 <code>product_comments</code> 表；购买记录来自 <code>orders</code> 表。</p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/data/DataManager.java</span>，第 376-382 行</div>
+<pre><code>public boolean hasPurchasedProduct(String username, int productId) {
+    if (username == null || username.isEmpty())
+        return false;
+    return queryCount("SELECT COUNT(*) FROM orders WHERE username=? AND product_id=?",
+            new String[] { username, String.valueOf(productId) }) &gt; 0;
+}</code></pre>
+    <p><b>解释：</b>只要 orders 表里存在当前用户购买过这个 product_id 的记录，就允许评价。</p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/ProductCommentsActivity.java</span>，第 42-50 行</div>
+<pre><code>tvWriteReview.setOnClickListener(v -&gt; {
+    if (dm.hasPurchasedProduct(currentUser, productId) || "admin".equals(currentUser)) {
+        Intent intent = new Intent(this, AddProductCommentActivity.class);
+        intent.putExtra("product_id", productId);
+        startActivity(intent);
+    } else {
+        Toast.makeText(this, "购买该商品后才可以进行评价哦", Toast.LENGTH_SHORT).show();
+    }
+});</code></pre>
+    <p><b>为什么 admin 可以跳过购买限制：</b>方便管理员测试评价功能，也方便课程项目演示。</p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/AddProductCommentActivity.java</span>，第 100-106 行</div>
+<pre><code>public ProductComment addProductComment(int productId, String username, String content, String images) {
+    String time = now("MM-dd HH:mm");
+    ContentValues cv = new ContentValues();
+    cv.put("product_id", productId);
+    cv.put("username", username);
+    cv.put("content", content);
+    cv.put("images", images == null ? "" : images);
+    cv.put("time", time);
+    long id = wdb().insert("product_comments", null, cv);
+    return new ProductComment((int) id, productId, username, content, images, time);
+}</code></pre>
+    <p><b>为什么评价可以只有图片或只有文字：</b>提交前判断的是“内容和图片不能同时为空”，所以用户可以纯文字评价，也可以只发图片。</p>
+
+    <h3>23.17 个人中心：头像、昵称、签名、粉丝、关注、获赞</h3>
+    <p><b>数据在哪里：</b>昵称、签名、头像在 <code>users</code> 表；粉丝关注在 <code>follows</code> 表；获赞来自 <code>article_likes</code> 和 <code>articles</code> 联合统计。</p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/fragment/MineFragment.java</span>，第 51-57 行</div>
+<pre><code>((TextView) view.findViewById(R.id.tvMineUsername)).setText("用户名： " + username);
+((TextView) view.findViewById(R.id.tvMineNickname)).setText(dm.getNickname(username));
+((TextView) view.findViewById(R.id.tvMineSignature)).setText(dm.getSignature(username));</code></pre>
+    <p><b>解释：</b>个人中心每次绑定视图时，从 DataManager 读取当前用户资料并显示。</p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/fragment/MineFragment.java</span>，第 86-91 行</div>
+<pre><code>((TextView) view.findViewById(R.id.tvStatFollowers))
+        .setText(String.valueOf(dm.getFollowersCount(username)));
+((TextView) view.findViewById(R.id.tvStatFollowing))
+        .setText(String.valueOf(dm.getFollowingCount(username)));
+((TextView) view.findViewById(R.id.tvStatLikes))
+        .setText(String.valueOf(dm.getTotalLikesReceived(username)));</code></pre>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/data/DataManager.java</span>，第 517-575 行</div>
+<pre><code>public int getFollowersCount(String username) {
+    return queryCount("SELECT COUNT(*) FROM follows WHERE `following`=?", username);
+}
+
+public int getFollowingCount(String username) {
+    return queryCount("SELECT COUNT(*) FROM follows WHERE follower=?", username);
+}
+
+public int getTotalLikesReceived(String username) {
+    return queryCount(
+        "SELECT COUNT(*) FROM article_likes al " +
+        "INNER JOIN articles a ON al.article_id=a.id WHERE a.author=? AND al.username&lt;&gt;a.author",
+        username);
+}</code></pre>
+    <p><b>为什么获赞要连接 articles：</b>article_likes 只知道谁点赞了哪篇文章，要知道“这些点赞是不是给当前用户的文章”，必须连接 articles 表看文章作者。</p>
+
+    <h3>23.18 编辑资料和头像：数据如何保存到 users 表</h3>
+    <p><b>数据在哪里：</b><code>users.nickname</code>、<code>users.signature</code>、<code>users.avatar_uri</code>、<code>users.phone</code>。</p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/ProfileEditActivity.java</span>，第 148-158 行</div>
+<pre><code>if (!nick.equals(dm.getNickname(username))) {
+    success &amp;= dm.setNickname(username, nick);
+}
+if (!sig.equals(dm.getSignature(username))) {
+    success &amp;= dm.updateSignature(username, sig);
+}
+if (pendingAvatarBase64 != null) {
+    success &amp;= dm.setAvatarUri(username, pendingAvatarBase64);
+} else if (pendingAvatarUri != null) {
+    success &amp;= dm.setAvatarUri(username, pendingAvatarUri);
+}</code></pre>
+    <p><b>为什么 success 用 &=：</b>每个字段更新返回 true/false，所有都成功 success 才是 true。只要有一个失败，就提示保存失败。</p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/data/DataManager.java</span>，第 214-239 行</div>
+<pre><code>public boolean setNickname(String username, String nickname) {
+    ContentValues cv = new ContentValues();
+    cv.put("nickname", nickname);
+    return wdb().update("users", cv, "username=?", new String[] { username }) &gt; 0;
+}
+
+public boolean setAvatarUri(String username, String uri) {
+    ContentValues cv = new ContentValues();
+    cv.put("avatar_uri", uri);
+    return wdb().update("users", cv, "username=?", new String[] { username }) &gt; 0;
+}</code></pre>
+    <p><b>头像为什么可能是 Base64：</b>头像经过裁剪后，项目会尝试压缩成 Base64 存入数据库，避免外部 Uri 权限丢失后头像无法显示。</p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/utils/ImageUtils.java</span>，第 51-74 行</div>
+<pre><code>public static String uriToBase64(Context context, Uri uri) {
+    InputStream inputStream = context.getContentResolver().openInputStream(uri);
+    Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+    Bitmap scaledBitmap = Bitmap.createScaledBitmap(bitmap, width, height, true);
+    scaledBitmap.compress(Bitmap.CompressFormat.JPEG, 85, baos);
+    return "data:image/jpeg;base64," + Base64.encodeToString(bytes, Base64.NO_WRAP);
+}</code></pre>
+    <p><b>为什么压缩：</b>直接存原图会太大，数据库读取可能出问题；压缩后更适合本地保存。</p>
+
+    <h3>23.19 粉丝、关注、获赞列表：FollowListActivity 如何复用一个页面</h3>
+    <p><b>数据在哪里：</b>粉丝/关注在 <code>follows</code> 表；获赞用户来自 <code>article_likes</code> 与 <code>articles</code>。</p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/FollowListActivity.java</span>，第 29-35 行</div>
+<pre><code>String type = getIntent().getStringExtra("type");
+String username = getIntent().getStringExtra("username");
+
+boolean isFollowers = "followers".equals(type);
+boolean isLikes = "likes".equals(type);
+
+List&lt;String&gt; users;
+if (isLikes) {
+    users = dm.getUsersWhoLikedMyArticles(username);
+} else {
+    users = isFollowers ? dm.getFollowers(username) : dm.getFollowing(username);
+}</code></pre>
+    <p><b>为什么一个 Activity 支持三种列表：</b>粉丝、关注、获赞列表界面结构相似，都是展示用户列表。通过 Intent 的 <code>type</code> 区分要查哪种数据，可以减少重复页面。</p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/data/DataManager.java</span>，第 546-555 行</div>
+<pre><code>public List&lt;String&gt; getFollowers(String username) {
+    SELECT follower FROM follows WHERE following=? ORDER BY id DESC
+}
+
+public List&lt;String&gt; getFollowing(String username) {
+    SELECT following FROM follows WHERE follower=? ORDER BY id DESC
+}</code></pre>
+
+    <h3>23.20 设置页、退出登录、管理员模式、账号管理</h3>
+    <p><b>管理员模式在哪里：</b><code>SharedPreferences.pref_session.admin_mode</code>。</p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/SettingsActivity.java</span>，第 40-46 行</div>
+<pre><code>swAdmin.setChecked(dm.isAdminMode());
+updateAdminVisibility(dm.isAdminMode());
+
+swAdmin.setOnCheckedChangeListener((btn, checked) -&gt; {
+    dm.setAdminMode(checked);
+    updateAdminVisibility(checked);
+});</code></pre>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/data/DataManager.java</span>，第 61-67 行</div>
+<pre><code>public void setAdminMode(boolean enabled) {
+    prefs().edit().putBoolean(KEY_ADMIN_MODE, enabled).apply();
+}
+
+public boolean isAdminMode() {
+    return prefs().getBoolean(KEY_ADMIN_MODE, false);
+}</code></pre>
+    <p><b>为什么管理员模式不放数据库：</b>它只是本机 UI 开关，不是正式权限系统，所以保存在 SharedPreferences。</p>
+    <p><b>退出登录：</b></p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/SettingsActivity.java</span>，第 75-81 行</div>
+<pre><code>view.findViewById(R.id.btnDialogConfirm).setOnClickListener(v -&gt; {
+    dialog.dismiss();
+    dm.logout();
+    Intent intent = new Intent(this, LoginActivity.class);
+    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+    startActivity(intent);
+});</code></pre>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/data/DataManager.java</span>，第 57-59 行</div>
+<pre><code>public void logout() {
+    prefs().edit().remove(KEY_LOGGED_USER).apply();
+}</code></pre>
+    <p><b>解释：</b>退出登录只删除当前登录态，不删除 users 表中的账号数据。</p>
+    <p><b>账号管理长按删除为什么不是删账号：</b></p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/AccountManagerActivity.java</span>，第 89-98 行</div>
+<pre><code>public void hideUserFromHistory(String username) {
+    Set&lt;String&gt; hidden = new HashSet&lt;&gt;(
+            prefs().getStringSet("hidden_users", new HashSet&lt;&gt;()));
+    hidden.add(username);
+    prefs().edit().putStringSet("hidden_users", hidden).apply();
+}</code></pre>
+    <p><b>解释：</b>这个方法只是把账号加入隐藏列表。<code>getUsers()</code> 显示账号时会跳过 hidden_users，所以视觉上像删除了，但数据库 users 表仍保留账号。</p>
+
+    <h3>23.21 初始数据：为什么新安装也有文章和商品</h3>
+    <p><b>数据在哪里：</b>初始化后写入 <code>users</code>、<code>articles</code>、<code>products</code> 表。</p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/data/DataManager.java</span>，第 35-39 行</div>
+<pre><code>private DataManager(Context ctx) {
+    this.ctx = ctx.getApplicationContext();
+    this.appDb = AppDatabase.getInstance(this.ctx);
+    seedDefaultData();
+}</code></pre>
+    <p><b>解释：</b>DataManager 第一次创建时会自动调用 <code>seedDefaultData()</code>。</p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/data/DataManager.java</span>，第 38-41 行</div>
+<pre><code>private void seedDefaultData() {
+    boolean needSeed = false;
+    try (Cursor c = rdb().rawQuery("SELECT COUNT(*) FROM products", null)) {
+        if (c.moveToFirst() && c.getInt(0) &lt; 10) {
+            needSeed = true;
+        }
+    }
+    if (!needSeed)
+        return;
+
+    register("admin", "123456");
+    register("user1", "123456");
+    ...
+    insertArticle(...);
+    insertProduct(...);
+}</code></pre>
+    <p><b>为什么用商品数量判断是否初始化：</b>商品是商城核心演示数据。如果商品少于 10，说明数据库可能是首次创建或数据不完整，于是补齐默认数据。</p>
+
+    <h3>23.22 AppDatabase：所有表为什么这样设计</h3>
+    <p><b>数据库文件：</b><code>jntt.db</code>。在真机/模拟器运行后，实际位于应用私有目录：</p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/data/AppDatabase.java</span>，第 12-17 行；数据库文件名源码；运行时路径由 Android 私有目录生成</div>
+<pre><code>/data/data/com.example.jntt/databases/jntt.db</code></pre>
+    <p><b>源码中创建数据库：</b></p>
+    <div class="source-ref"><b>代码位置：</b><span class="path">app/src/main/java/com/example/jntt/data/AppDatabase.java</span>，第 13-26 行</div>
+<pre><code>private static final String DB_NAME = "jntt.db";
+private static final int DB_VERSION = 4;
+
+private AppDatabase(Context ctx) {
+    super(ctx, DB_NAME, null, DB_VERSION);
+}</code></pre>
+    <p><b>为什么表集中在 AppDatabase：</b>SQLiteOpenHelper 的职责就是创建和升级数据库。所有建表语句集中在 <code>onCreate()</code>，项目结构清晰。</p>
+    <p><b>为什么 DataManager 不直接写 CREATE TABLE：</b>DataManager 只负责业务数据读写；建库建表属于数据库生命周期，交给 AppDatabase 更合理。</p>
+  </section>
+
+  <section id="notes">
+    <h2>二十四、实现差异与重要说明</h2>
+    <div class="warn">
+      <p><b>1. 数据库与后端：</b>需求分析文档中提到后端 Spring Boot、MySQL、RESTful API；当前项目实际没有后端接口，业务数据全部在本地 SQLite。</p>
+      <p><b>2. Android 版本：</b>需求文档写 Android 8.0 以上，但 <code>app/build.gradle.kts</code> 当前 <code>minSdk = 31</code>，即 Android 12 以上。</p>
+      <p><b>3. 收藏实现：</b>需求写收藏按钮；当前“我的收藏”实际复用文章点赞表 <code>article_likes</code>，没有独立 <code>favorites</code> 表。</p>
+      <p><b>4. 商品数量选择：</b>需求写商品详情可选择购买数量；当前商品详情加入购物车一次只 +1，数量主要在购物车页面通过 +/- 调整。</p>
+      <p><b>5. 账号管理删除：</b>需求写长按删除账号；当前代码实际只隐藏本机账号历史，不从 <code>users</code> 表删除账号。</p>
+    </div>
+    <h3>关键文件索引</h3>
+    <table>
+      <tr><th>文件</th><th>负责内容</th></tr>
+      <tr><td><span class="path">app/src/main/java/com/example/jntt/data/AppDatabase.java</span></td><td>SQLite 数据库名、版本、建表、升级。</td></tr>
+      <tr><td><span class="path">app/src/main/java/com/example/jntt/data/DataManager.java</span></td><td>所有业务数据读写方法。</td></tr>
+      <tr><td><span class="path">app/src/main/java/com/example/jntt/LoginActivity.java / RegisterActivity.java</span></td><td>登录、注册、自动登录。</td></tr>
+      <tr><td><span class="path">app/src/main/java/com/example/jntt/MainActivity.java</span></td><td>底部导航和 Fragment 切换。</td></tr>
+      <tr><td><span class="path">fragment/HeadlineFragment.java / MallFragment.java / MineFragment.java</span></td><td>三大主功能页。</td></tr>
+      <tr><td><span class="path">ArticleDetailActivity.java / AddArticleActivity.java / SearchActivity.java</span></td><td>文章详情、互动、发布、搜索。</td></tr>
+      <tr><td><span class="path">ProductDetailActivity.java / AddProductActivity.java / ProductCommentsActivity.java</span></td><td>商品详情、添加商品、商品评价。</td></tr>
+      <tr><td><span class="path">CartActivity.java / CartAdapter.java</span></td><td>购物车显示、勾选、数量、合计、结算。</td></tr>
+      <tr><td><span class="path">MyOrdersActivity.java / OrderDetailActivity.java / OrderAdapter.java</span></td><td>订单列表、订单详情、支付取消、倒计时。</td></tr>
+      <tr><td><span class="path">ProfileEditActivity.java / SettingsActivity.java / AccountManagerActivity.java</span></td><td>个人资料、设置、管理员模式、账号管理。</td></tr>
+    </table>
+  </section>
+</main>
+
+<script>
+  (() => {
+    const input = document.getElementById("pageSearch");
+    const prevBtn = document.getElementById("searchPrev");
+    const nextBtn = document.getElementById("searchNext");
+    const clearBtn = document.getElementById("searchClear");
+    const count = document.getElementById("searchCount");
+    const resultsBox = document.getElementById("searchResults");
+    let entries = [];
+    let matches = [];
+    let activeIndex = -1;
+    let activeElement = null;
+
+    function nearestTitle(el) {
+      if (/^H[234]$/.test(el.tagName)) return el.textContent.trim();
+      const section = el.closest("section");
+      let node = el.previousElementSibling;
+      while (node) {
+        if (/^H[234]$/.test(node.tagName)) return node.textContent.trim();
+        node = node.previousElementSibling;
+      }
+      const h2 = section ? section.querySelector("h2") : null;
+      return h2 ? h2.textContent.trim() : "报告内容";
+    }
+
+    function buildIndex() {
+      const nodes = document.querySelectorAll("main h2, main h3, main h4, main p, main li, main td, main th, main pre, main summary");
+      entries = Array.from(nodes)
+        .map((el) => {
+          const text = (el.innerText || el.textContent || "").replace(/\s+/g, " ").trim();
+          return {
+            el,
+            text,
+            lower: text.toLowerCase(),
+            title: nearestTitle(el)
+          };
+        })
+        .filter((item) => item.text.length > 0);
+    }
+
+    function makeSnippet(text, query) {
+      const lower = text.toLowerCase();
+      const i = lower.indexOf(query);
+      if (i < 0) return text.slice(0, 90);
+      const start = Math.max(0, i - 36);
+      const end = Math.min(text.length, i + query.length + 54);
+      return `${start > 0 ? "..." : ""}${text.slice(start, end)}${end < text.length ? "..." : ""}`;
+    }
+
+    function clearActive() {
+      if (activeElement) activeElement.classList.remove("search-hit");
+      activeElement = null;
+      resultsBox.querySelectorAll(".search-result.active").forEach((btn) => btn.classList.remove("active"));
+    }
+
+    function renderResults(query) {
+      resultsBox.textContent = "";
+      if (!query || matches.length === 0) {
+        resultsBox.classList.toggle("show", Boolean(query));
+        if (query) {
+          const empty = document.createElement("div");
+          empty.className = "search-result";
+          empty.textContent = "没有找到匹配内容";
+          resultsBox.appendChild(empty);
+        }
+        return;
+      }
+
+      matches.slice(0, 24).forEach((item, index) => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "search-result";
+        if (index === activeIndex) btn.classList.add("active");
+        btn.dataset.index = String(index);
+        btn.append(document.createTextNode(item.title));
+
+        const small = document.createElement("small");
+        small.textContent = makeSnippet(item.text, query);
+        btn.appendChild(small);
+        btn.addEventListener("click", () => goTo(index));
+        resultsBox.appendChild(btn);
+      });
+      resultsBox.classList.add("show");
+    }
+
+    function updateCount() {
+      if (!input.value.trim()) {
+        count.textContent = "输入关键词快速定位报告内容";
+      } else if (matches.length === 0) {
+        count.textContent = "0 个匹配";
+      } else {
+        count.textContent = `${activeIndex + 1}/${matches.length} 个匹配`;
+      }
+    }
+
+    function runSearch() {
+      const query = input.value.trim().toLowerCase();
+      clearActive();
+      if (!query) {
+        matches = [];
+        activeIndex = -1;
+        resultsBox.classList.remove("show");
+        resultsBox.textContent = "";
+        updateCount();
+        return;
+      }
+
+      matches = entries.filter((item) => item.lower.includes(query));
+      activeIndex = matches.length ? 0 : -1;
+      renderResults(query);
+      updateCount();
+    }
+
+    function goTo(index) {
+      if (!matches.length) return;
+      clearActive();
+      activeIndex = (index + matches.length) % matches.length;
+      const item = matches[activeIndex];
+      activeElement = item.el;
+      activeElement.classList.add("search-hit");
+      activeElement.closest("details")?.setAttribute("open", "");
+      activeElement.scrollIntoView({ behavior: "smooth", block: "center" });
+      renderResults(input.value.trim().toLowerCase());
+      updateCount();
+    }
+
+    input.addEventListener("input", runSearch);
+    input.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        goTo(activeIndex < 0 ? 0 : activeIndex + 1);
+      }
+      if (event.key === "Escape") clearBtn.click();
+    });
+    prevBtn.addEventListener("click", () => goTo(activeIndex <= 0 ? matches.length - 1 : activeIndex - 1));
+    nextBtn.addEventListener("click", () => goTo(activeIndex + 1));
+    clearBtn.addEventListener("click", () => {
+      input.value = "";
+      runSearch();
+      input.focus();
+    });
+
+    buildIndex();
+  })();
+</script>
+
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({ startOnLoad: true, theme: "default", flowchart: { htmlLabels: true, curve: "basis" } });
+</script>
+</body>
+</html>

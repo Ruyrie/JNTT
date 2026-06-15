@@ -29,7 +29,7 @@ public class ProductImageAdapter extends RecyclerView.Adapter<ProductImageAdapte
         imageView.setLayoutParams(new ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT));
-        imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        imageView.setScaleType(ImageView.ScaleType.FIT_XY);
         return new ImageViewHolder(imageView);
     }
 

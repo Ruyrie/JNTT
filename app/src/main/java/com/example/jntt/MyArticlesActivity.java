@@ -18,6 +18,9 @@ public class MyArticlesActivity extends AppCompatActivity {
 
     private RecyclerView rv;
     private LinearLayout llEmptyState;
+    private TextView tvTitle, btnAddArticle, ivAddArticleIcon, tvEmptyArticleHint;
+    private String targetUsername;
+    private String currentUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,12 +33,30 @@ public class MyArticlesActivity extends AppCompatActivity {
 
         rv = findViewById(R.id.rvArticles);
         llEmptyState = findViewById(R.id.llEmptyState);
-        TextView btnAddArticle = findViewById(R.id.btnAddArticle);
-        TextView ivAddArticleIcon = findViewById(R.id.ivAddArticleIcon);
+        tvTitle = findViewById(R.id.tvArticleListTitle);
+        btnAddArticle = findViewById(R.id.btnAddArticle);
+        ivAddArticleIcon = findViewById(R.id.ivAddArticleIcon);
+        tvEmptyArticleHint = findViewById(R.id.tvEmptyArticleHint);
+
+        DataManager dm = DataManager.getInstance(this);
+        currentUser = dm.getLoggedUser();
+        targetUsername = getIntent().getStringExtra("username");
+        if (targetUsername == null || targetUsername.isEmpty()) {
+            targetUsername = currentUser;
+        }
+
+        boolean viewingOwnArticles = targetUsername != null && targetUsername.equals(currentUser);
+        String nickname = dm.getNickname(targetUsername);
+        String displayName = nickname != null && !nickname.isEmpty() ? nickname : targetUsername;
+        tvTitle.setText(viewingOwnArticles ? "我的文章" : displayName + "的文章");
+        tvEmptyArticleHint.setText(viewingOwnArticles ? "您还未上传过文章" : "该账号还未发布文章");
 
         View.OnClickListener goAdd = v -> startActivity(new Intent(this, AddArticleActivity.class));
         btnAddArticle.setOnClickListener(goAdd);
         ivAddArticleIcon.setOnClickListener(goAdd);
+
+        btnAddArticle.setVisibility(viewingOwnArticles ? View.VISIBLE : View.GONE);
+        ivAddArticleIcon.setVisibility(viewingOwnArticles ? View.VISIBLE : View.INVISIBLE);
     }
 
     @Override
@@ -46,8 +67,7 @@ public class MyArticlesActivity extends AppCompatActivity {
 
     private void loadData() {
         DataManager dm = DataManager.getInstance(this);
-        String username = dm.getLoggedUser();
-        List<Article> articles = dm.getArticlesByAuthor(username);
+        List<Article> articles = dm.getArticlesByAuthor(targetUsername);
 
         if (articles == null || articles.isEmpty()) {
             rv.setVisibility(View.GONE);
@@ -60,7 +80,7 @@ public class MyArticlesActivity extends AppCompatActivity {
                 Intent intent = new Intent(this, ArticleDetailActivity.class);
                 intent.putExtra("article_id", article.id);
                 startActivity(intent);
-            }, dm, username));
+            }, dm, currentUser));
         }
     }
 }

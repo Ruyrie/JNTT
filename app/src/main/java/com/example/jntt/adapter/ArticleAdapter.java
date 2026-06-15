@@ -169,6 +169,11 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.VH> {
         h.layoutItemLike.setOnClickListener(v -> {
             // Intercept: don't bubble up to item click
             v.setPressed(true);
+            if (currentUser.equals(a.author)) {
+                android.widget.Toast.makeText(v.getContext(), "不能给自己的文章点赞", android.widget.Toast.LENGTH_SHORT)
+                        .show();
+                return;
+            }
             if (dm.isArticleLiked(currentUser, a.id)) {
                 dm.unlikeArticle(currentUser, a.id);
             } else {

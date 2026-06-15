@@ -93,13 +93,8 @@
                     android:layout_width="30dp"
                     android:layout_height="30dp"
                     android:gravity="center"
-                    android:text="+"
-                    android:textSize="20sp"
-                    android:textColor="@color/white"
-                    android:textStyle="bold"
-                    android:includeFontPadding="false"
-                    android:paddingBottom="2dp"
-                    android:background="@drawable/bg_auth_button" />
+                    android:text=""
+                    android:background="@drawable/bg_add_cart_plus" />
             </LinearLayout>
         </LinearLayout>
 

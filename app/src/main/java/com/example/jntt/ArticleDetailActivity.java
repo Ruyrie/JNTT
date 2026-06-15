@@ -292,6 +292,10 @@ public class ArticleDetailActivity extends AppCompatActivity {
                 Toast.makeText(this, "请先登录", Toast.LENGTH_SHORT).show();
                 return;
             }
+            if (currentUser.equals(article.author)) {
+                Toast.makeText(this, "不能给自己的文章点赞", Toast.LENGTH_SHORT).show();
+                return;
+            }
             boolean nowLiked = dm.isArticleLiked(currentUser, articleId);
             if (nowLiked) {
                 dm.unlikeArticle(currentUser, articleId);

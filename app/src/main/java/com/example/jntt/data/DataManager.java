@@ -14,8 +14,10 @@ import com.example.jntt.model.User;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 /**
  * 统一数据管理类。
@@ -300,6 +302,8 @@ public class DataManager {
     // ─── 文章点赞 / 收藏 ─────────────────────────────────────────────────────
 
     public void likeArticle(String username, int articleId) {
+        if (username == null || username.equals(getArticleAuthor(articleId)))
+            return;
         ContentValues cv = new ContentValues();
         cv.put("username", username);
         cv.put("article_id", articleId);
@@ -312,6 +316,8 @@ public class DataManager {
     }
 
     public boolean isArticleLiked(String username, int articleId) {
+        if (username == null || username.equals(getArticleAuthor(articleId)))
+            return false;
         try (Cursor c = rdb().rawQuery(
                 "SELECT 1 FROM article_likes WHERE username=? AND article_id=?",
                 new String[] { username, String.valueOf(articleId) })) {
@@ -320,7 +326,8 @@ public class DataManager {
     }
 
     public int getArticleLikeCount(int articleId) {
-        return queryCount("SELECT COUNT(*) FROM article_likes WHERE article_id=?",
+        return queryCount(
+                "SELECT COUNT(*) FROM article_likes l INNER JOIN articles a ON l.article_id=a.id WHERE l.article_id=? AND l.username<>a.author",
                 String.valueOf(articleId));
     }
 
@@ -331,7 +338,7 @@ public class DataManager {
                 +
                 "FROM article_likes l LEFT JOIN articles a ON l.article_id=a.id " +
                 "LEFT JOIN users u ON a.author=u.username " +
-                "WHERE l.username=? ORDER BY l.id DESC";
+                "WHERE l.username=? AND (a.author IS NULL OR l.username<>a.author) ORDER BY l.id DESC";
         try (Cursor c = rdb().rawQuery(sql, new String[] { username })) {
             while (c.moveToNext()) {
                 int articleId = c.getInt(0);
@@ -435,7 +442,7 @@ public class DataManager {
         String sql = "SELECT c.id, c.article_id, c.username, c.content, c.time, " +
                 "COUNT(cl.id) AS like_count, u.nickname, u.avatar_uri " +
                 "FROM comments c " +
-                "LEFT JOIN comment_likes cl ON c.id=cl.comment_id " +
+                "LEFT JOIN comment_likes cl ON c.id=cl.comment_id AND cl.username<>c.username " +
                 "LEFT JOIN users u ON c.username=u.username " +
                 "WHERE c.article_id=? GROUP BY c.id ORDER BY c.id ASC";
         try (Cursor c = rdb().rawQuery(sql, new String[] { String.valueOf(articleId) })) {
@@ -464,6 +471,8 @@ public class DataManager {
     // ─── 评论点赞 ────────────────────────────────────────────────────────────
 
     public void likeComment(String username, int commentId) {
+        if (username == null || username.equals(getCommentAuthor(commentId)))
+            return;
         ContentValues cv = new ContentValues();
         cv.put("username", username);
         cv.put("comment_id", commentId);
@@ -476,6 +485,8 @@ public class DataManager {
     }
 
     public boolean isCommentLiked(String username, int commentId) {
+        if (username == null || username.equals(getCommentAuthor(commentId)))
+            return false;
         try (Cursor c = rdb().rawQuery(
                 "SELECT 1 FROM comment_likes WHERE username=? AND comment_id=?",
                 new String[] { username, String.valueOf(commentId) })) {
@@ -518,7 +529,7 @@ public class DataManager {
         String sql = "SELECT c.id, c.article_id, c.username, c.content, c.time, " +
                 "COUNT(cl.id) AS like_count, u.nickname, u.avatar_uri " +
                 "FROM comments c " +
-                "LEFT JOIN comment_likes cl ON c.id=cl.comment_id " +
+                "LEFT JOIN comment_likes cl ON c.id=cl.comment_id AND cl.username<>c.username " +
                 "LEFT JOIN users u ON c.username=u.username " +
                 "WHERE c.article_id=? GROUP BY c.id ORDER BY like_count DESC, c.id DESC LIMIT 1";
         try (Cursor c = rdb().rawQuery(sql, new String[] { String.valueOf(articleId) })) {
@@ -561,7 +572,7 @@ public class DataManager {
     public int getTotalLikesReceived(String username) {
         return queryCount(
                 "SELECT COUNT(*) FROM article_likes al " +
-                        "INNER JOIN articles a ON al.article_id=a.id WHERE a.author=?",
+                        "INNER JOIN articles a ON al.article_id=a.id WHERE a.author=? AND al.username<>a.author",
                 username);
     }
 
@@ -569,7 +580,7 @@ public class DataManager {
         List<String> list = new ArrayList<>();
         try (Cursor c = rdb().rawQuery(
                 "SELECT DISTINCT al.username FROM article_likes al " +
-                        "INNER JOIN articles a ON al.article_id=a.id WHERE a.author=?",
+                        "INNER JOIN articles a ON al.article_id=a.id WHERE a.author=? AND al.username<>a.author",
                 new String[] { username })) {
             while (c.moveToNext()) {
                 list.add(c.getString(0));
@@ -601,6 +612,20 @@ public class DataManager {
             cv.put("cover_uri", coverUri);
         }
         wdb().insert("products", null, cv);
+    }
+
+    public void deleteProduct(int id) {
+        wdb().delete("products", "id=?", new String[] { String.valueOf(id) });
+    }
+
+    /** ID set of products that still exist (used to flag delisted items in the cart). */
+    public Set<Integer> getAvailableProductIds() {
+        Set<Integer> ids = new HashSet<>();
+        try (Cursor c = rdb().rawQuery("SELECT id FROM products", null)) {
+            while (c.moveToNext())
+                ids.add(c.getInt(0));
+        }
+        return ids;
     }
 
     // ─── 购物车 ───────────────────────────────────────────────────────────────
@@ -704,6 +729,20 @@ public class DataManager {
     private int queryCount(String sql, String[] args) {
         try (Cursor c = rdb().rawQuery(sql, args)) {
             return c.moveToFirst() ? c.getInt(0) : 0;
+        }
+    }
+
+    private String getArticleAuthor(int articleId) {
+        try (Cursor c = rdb().rawQuery("SELECT author FROM articles WHERE id=?",
+                new String[] { String.valueOf(articleId) })) {
+            return c.moveToFirst() ? c.getString(0) : null;
+        }
+    }
+
+    private String getCommentAuthor(int commentId) {
+        try (Cursor c = rdb().rawQuery("SELECT username FROM comments WHERE id=?",
+                new String[] { String.valueOf(commentId) })) {
+            return c.moveToFirst() ? c.getString(0) : null;
         }
     }
 

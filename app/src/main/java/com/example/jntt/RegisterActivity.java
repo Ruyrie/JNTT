@@ -2,8 +2,11 @@ package com.example.jntt;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import com.example.jntt.data.DataManager;
@@ -29,10 +32,22 @@ public class RegisterActivity extends AppCompatActivity {
         etPassword = findViewById(R.id.etRegPassword);
         etPhone = findViewById(R.id.etRegPhone);
         Button btnRegister = findViewById(R.id.btnRegister);
+        LinearLayout layoutGoLogin = findViewById(R.id.layoutGoLogin);
+        TextView tvGoLogin = findViewById(R.id.tvGoLogin);
 
         setTitle(isAddMode ? "添加账号" : "注册");
 
         btnRegister.setOnClickListener(v -> doRegister());
+        if (isAddMode) {
+            layoutGoLogin.setVisibility(View.GONE);
+        } else {
+            tvGoLogin.setOnClickListener(v -> {
+                Intent intent = new Intent(this, LoginActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                startActivity(intent);
+                finish();
+            });
+        }
     }
 
     private void doRegister() {

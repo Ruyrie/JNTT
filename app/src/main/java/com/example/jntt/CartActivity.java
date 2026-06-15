@@ -44,6 +44,7 @@ public class CartActivity extends AppCompatActivity {
 
         adapter = new CartAdapter(items);
         adapter.setOnChangeListener(this::persistCartState);
+        adapter.setAvailableIds(dm.getAvailableProductIds());
         rv.setAdapter(adapter);
 
         cbSelectAll = findViewById(R.id.cbSelectAll);
@@ -103,7 +104,7 @@ public class CartActivity extends AppCompatActivity {
 
     private void refreshBottomBar() {
         double total = adapter.getSelectedTotal();
-        tvTotal.setText(String.format("¥%.2f", total));
+        tvTotal.setText(String.format("¥%,.2f", total));
         tvCount.setText("共 " + items.size() + " 件");
         cbSelectAll.setOnCheckedChangeListener(null);
         cbSelectAll.setChecked(adapter.areAllChecked());

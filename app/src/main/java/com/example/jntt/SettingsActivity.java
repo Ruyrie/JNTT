@@ -50,6 +50,9 @@ public class SettingsActivity extends AppCompatActivity {
 
         findViewById(R.id.tvAddProduct)
                 .setOnClickListener(v -> startActivity(new Intent(this, AddProductActivity.class)));
+
+        findViewById(R.id.tvDeleteProduct)
+                .setOnClickListener(v -> startActivity(new Intent(this, DeleteProductActivity.class)));
     }
 
     private void updateAdminVisibility(boolean enabled) {

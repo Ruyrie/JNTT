@@ -3,39 +3,35 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#F2F2F7"
+    android:fitsSystemWindows="true"
     android:orientation="vertical">
 
     <!-- 顶部标题栏 -->
-    <LinearLayout
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="56dp"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:paddingEnd="12dp"
-        android:background="#FFFFFF"
-        android:elevation="2dp"
-        android:fitsSystemWindows="true">
+        android:layout_height="48dp"
+        android:background="@color/white"
+        android:elevation="2dp">
 
         <ImageView
             android:id="@+id/tvBack"
             android:layout_width="20dp"
             android:layout_height="20dp"
-            android:src="@mipmap/fanhui"
+            android:layout_gravity="center_vertical|start"
+            android:layout_marginStart="12dp"
+            android:contentDescription="@string/cd_back"
             android:scaleType="fitCenter"
-            android:layout_marginStart="8dp"
-            android:layout_marginEnd="8dp" />
+            android:src="@mipmap/fanhui" />
 
         <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="商品详情"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:textColor="#333333"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:gravity="center"
-            android:layout_marginEnd="38dp" />
-    </LinearLayout>
+            android:text="商品详情"
+            android:textColor="#1F1F1F"
+            android:textSize="17sp"
+            android:textStyle="bold" />
+    </FrameLayout>
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
@@ -53,10 +49,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="300dp">
 
-                <androidx.viewpager2.widget.ViewPager2
+                <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/vpProductImage"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent" />
+                    android:layout_height="match_parent"
+                    android:overScrollMode="never" />
 
                 <!-- 轮播指示器 (1/5) -->
                 <TextView
@@ -149,7 +146,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="参数"
+                    android:text="产品宣传"
                     android:textSize="14sp"
                     android:textColor="#999999"
                     android:layout_marginEnd="16dp"/>
@@ -157,7 +154,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="品牌 产地 包装方式..."
+                    android:text="源头直采 · 严选品质 · 新鲜送达"
                     android:textSize="13sp"
                     android:textColor="#333333"/>
             </LinearLayout>
