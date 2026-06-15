@@ -3,6 +3,8 @@ package com.example.jntt;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -88,12 +90,14 @@ public class AddProductActivity extends AppCompatActivity {
 
         tvBack.setOnClickListener(v -> finish());
 
+        attachThousandsFormatter(etPrice);
+
         DataManager dm = DataManager.getInstance(this);
 
         btnSubmit.setOnClickListener(v -> {
             String name = etName.getText().toString().trim();
             String desc = etDesc.getText().toString().trim();
-            String priceStr = etPrice.getText().toString().trim();
+            String priceStr = etPrice.getText().toString().trim().replace(",", "");
             if (name.isEmpty() || desc.isEmpty() || priceStr.isEmpty()) {
                 Toast.makeText(this, "所有字段不能为空", Toast.LENGTH_SHORT).show();
                 return;
@@ -113,6 +117,54 @@ public class AddProductActivity extends AppCompatActivity {
             Toast.makeText(this, "商品添加成功", Toast.LENGTH_SHORT).show();
             finish();
         });
+    }
+
+    /** Live-format the price field with thousands separators while keeping it parseable. */
+    private void attachThousandsFormatter(EditText et) {
+        et.addTextChangedListener(new TextWatcher() {
+            private boolean editing = false;
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (editing)
+                    return;
+                editing = true;
+                String formatted = groupPrice(s.toString());
+                s.replace(0, s.length(), formatted);
+                editing = false;
+            }
+        });
+    }
+
+    /** Insert thousands separators into the integer part, preserve up to two decimals. */
+    private String groupPrice(String input) {
+        String raw = input.replace(",", "");
+        int dot = raw.indexOf('.');
+        String intPart = (dot >= 0 ? raw.substring(0, dot) : raw).replaceAll("[^0-9]", "");
+        String decPart = dot >= 0 ? raw.substring(dot + 1).replaceAll("[^0-9]", "") : null;
+        if (decPart != null && decPart.length() > 2)
+            decPart = decPart.substring(0, 2);
+
+        StringBuilder grouped = new StringBuilder();
+        int count = 0;
+        for (int i = intPart.length() - 1; i >= 0; i--) {
+            grouped.append(intPart.charAt(i));
+            if (++count % 3 == 0 && i != 0)
+                grouped.append(',');
+        }
+        String intGrouped = grouped.reverse().toString();
+
+        if (dot >= 0)
+            return (intGrouped.isEmpty() ? "0" : intGrouped) + "." + decPart;
+        return intGrouped;
     }
 
     private Uri createImageFile() {

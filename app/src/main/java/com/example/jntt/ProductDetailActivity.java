@@ -148,7 +148,7 @@ public class ProductDetailActivity extends AppCompatActivity {
         ((TextView) findViewById(R.id.tvDetailProductName)).setText(product.name);
         ((TextView) findViewById(R.id.tvDetailProductDesc)).setText(product.desc);
         ((TextView) findViewById(R.id.tvDetailProductPrice))
-                .setText(String.format("¥%.2f", product.price));
+                .setText(String.format("¥%,.2f", product.price));
 
         // 绑定底部图文详情 RecyclerView
         androidx.recyclerview.widget.RecyclerView rvDetailImages = findViewById(R.id.rvDetailImages);
