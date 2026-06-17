@@ -82,6 +82,10 @@
         <!-- 删除商品（管理员） -->
         <activity android:name=".DeleteProductActivity" />
 
+        <!-- 编辑商品（管理员） -->
+        <activity android:name=".EditProductActivity" />
+        <activity android:name=".EditProductFormActivity" />
+
         <!-- 订单详情 -->
         <activity android:name=".OrderDetailActivity" />
 

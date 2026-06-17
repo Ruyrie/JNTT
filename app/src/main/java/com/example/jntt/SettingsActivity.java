@@ -51,6 +51,9 @@ public class SettingsActivity extends AppCompatActivity {
         findViewById(R.id.tvAddProduct)
                 .setOnClickListener(v -> startActivity(new Intent(this, AddProductActivity.class)));
 
+        findViewById(R.id.tvEditProduct)
+                .setOnClickListener(v -> startActivity(new Intent(this, EditProductActivity.class)));
+
         findViewById(R.id.tvDeleteProduct)
                 .setOnClickListener(v -> startActivity(new Intent(this, DeleteProductActivity.class)));
     }

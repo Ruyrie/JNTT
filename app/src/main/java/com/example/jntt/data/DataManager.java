@@ -614,6 +614,25 @@ public class DataManager {
         wdb().insert("products", null, cv);
     }
 
+    public void updateProduct(int id, String name, String desc, double price, String coverUri) {
+        ContentValues cv = new ContentValues();
+        cv.put("name", name);
+        cv.put("desc", desc);
+        cv.put("price", price);
+        cv.put("cover_uri", coverUri);
+        wdb().update("products", cv, "id=?", new String[] { String.valueOf(id) });
+    }
+
+    public Product getProduct(int id) {
+        try (Cursor c = rdb().rawQuery(
+                "SELECT id,name,`desc`,price,cover_uri FROM products WHERE id=?",
+                new String[] { String.valueOf(id) })) {
+            if (c.moveToNext())
+                return new Product(c.getInt(0), c.getString(1), c.getString(2), c.getDouble(3), c.getString(4));
+        }
+        return null;
+    }
+
     public void deleteProduct(int id) {
         wdb().delete("products", "id=?", new String[] { String.valueOf(id) });
     }

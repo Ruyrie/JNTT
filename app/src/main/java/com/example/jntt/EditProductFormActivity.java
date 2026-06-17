@@ -1,0 +1,224 @@
+package com.example.jntt;
+
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.View;
+import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.FileProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import com.example.jntt.adapter.ImagePickerAdapter;
+import com.example.jntt.data.DataManager;
+import com.example.jntt.model.Product;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
+/** 编辑商品表单（仅管理员可见）：预填已发布商品并保存修改。 */
+public class EditProductFormActivity extends AppCompatActivity {
+
+    private List<Uri> coverUris = new ArrayList<>();
+    private ImagePickerAdapter adapter;
+    private RecyclerView rvProductImages;
+
+    private Uri currentCameraUri;
+    private int productId = -1;
+
+    private final ActivityResultLauncher<String> pickCover = registerForActivityResult(
+            new ActivityResultContracts.GetMultipleContents(), uris -> {
+                if (uris != null && !uris.isEmpty()) {
+                    for (Uri uri : uris) {
+                        try {
+                            getContentResolver().takePersistableUriPermission(uri,
+                                    Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                        } catch (SecurityException e) {
+                            e.printStackTrace();
+                        }
+                        if (coverUris.size() < 9) {
+                            coverUris.add(uri);
+                        }
+                    }
+                    adapter.notifyDataSetChanged();
+                }
+            });
+
+    private final ActivityResultLauncher<Uri> takePicture = registerForActivityResult(
+            new ActivityResultContracts.TakePicture(), success -> {
+                if (success && currentCameraUri != null) {
+                    if (coverUris.size() < 9) {
+                        coverUris.add(currentCameraUri);
+                        adapter.notifyDataSetChanged();
+                    }
+                }
+            });
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_edit_product_form);
+        if (getSupportActionBar() != null)
+            getSupportActionBar().hide();
+
+        DataManager dm = DataManager.getInstance(this);
+
+        // 编辑功能仅在管理员模式下可用
+        if (!dm.isAdminMode()) {
+            Toast.makeText(this, "仅管理员可编辑商品", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
+
+        productId = getIntent().getIntExtra("product_id", -1);
+        Product product = productId >= 0 ? dm.getProduct(productId) : null;
+        if (product == null) {
+            Toast.makeText(this, "商品不存在", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
+
+        View tvBack = findViewById(R.id.tvBack);
+        EditText etName = findViewById(R.id.etProductName);
+        EditText etDesc = findViewById(R.id.etProductDesc);
+        EditText etPrice = findViewById(R.id.etProductPrice);
+        TextView btnSubmit = findViewById(R.id.btnSubmitProduct);
+
+        rvProductImages = findViewById(R.id.rvProductImages);
+        rvProductImages.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+        adapter = new ImagePickerAdapter(coverUris, 9, new ImagePickerAdapter.OnImagePickerClickListener() {
+            @Override
+            public void onAddClick() {
+                showImagePickerDialog();
+            }
+
+            @Override
+            public void onDeleteClick(int position) {
+                coverUris.remove(position);
+                adapter.notifyDataSetChanged();
+            }
+        });
+        rvProductImages.setAdapter(adapter);
+
+        tvBack.setOnClickListener(v -> finish());
+
+        attachThousandsFormatter(etPrice);
+
+        // 预填已有商品信息
+        etName.setText(product.name);
+        etDesc.setText(product.desc);
+        etPrice.setText(product.price == Math.floor(product.price)
+                ? String.format("%,d", (long) product.price)
+                : String.format("%,.2f", product.price));
+        if (product.coverUri != null && !product.coverUri.isEmpty()) {
+            for (String s : product.coverUri.split(",")) {
+                if (!s.isEmpty())
+                    coverUris.add(Uri.parse(s));
+            }
+            adapter.notifyDataSetChanged();
+        }
+
+        btnSubmit.setOnClickListener(v -> {
+            String name = etName.getText().toString().trim();
+            String desc = etDesc.getText().toString().trim();
+            String priceStr = etPrice.getText().toString().trim().replace(",", "");
+            if (name.isEmpty() || desc.isEmpty() || priceStr.isEmpty()) {
+                Toast.makeText(this, "所有字段不能为空", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            double price;
+            try {
+                price = Double.parseDouble(priceStr);
+            } catch (NumberFormatException e) {
+                Toast.makeText(this, "价格格式不正确", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            String cover = null;
+            if (!coverUris.isEmpty()) {
+                cover = coverUris.stream().map(Uri::toString).collect(Collectors.joining(","));
+            }
+            dm.updateProduct(productId, name, desc, price, cover);
+            Toast.makeText(this, "商品修改成功", Toast.LENGTH_SHORT).show();
+            finish();
+        });
+    }
+
+    /** Live-format the price field with thousands separators while keeping it parseable. */
+    private void attachThousandsFormatter(EditText et) {
+        et.addTextChangedListener(new TextWatcher() {
+            private boolean editing = false;
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (editing)
+                    return;
+                editing = true;
+                String formatted = groupPrice(s.toString());
+                s.replace(0, s.length(), formatted);
+                editing = false;
+            }
+        });
+    }
+
+    /** Insert thousands separators into the integer part, preserve up to two decimals. */
+    private String groupPrice(String input) {
+        String raw = input.replace(",", "");
+        int dot = raw.indexOf('.');
+        String intPart = (dot >= 0 ? raw.substring(0, dot) : raw).replaceAll("[^0-9]", "");
+        String decPart = dot >= 0 ? raw.substring(dot + 1).replaceAll("[^0-9]", "") : null;
+        if (decPart != null && decPart.length() > 2)
+            decPart = decPart.substring(0, 2);
+
+        StringBuilder grouped = new StringBuilder();
+        int count = 0;
+        for (int i = intPart.length() - 1; i >= 0; i--) {
+            grouped.append(intPart.charAt(i));
+            if (++count % 3 == 0 && i != 0)
+                grouped.append(',');
+        }
+        String intGrouped = grouped.reverse().toString();
+
+        if (dot >= 0)
+            return (intGrouped.isEmpty() ? "0" : intGrouped) + "." + decPart;
+        return intGrouped;
+    }
+
+    private Uri createImageFile() {
+        File imagePath = new File(getCacheDir(), "images");
+        if (!imagePath.exists())
+            imagePath.mkdirs();
+        File newFile = new File(imagePath, "photo_" + System.currentTimeMillis() + ".jpg");
+        return FileProvider.getUriForFile(this, getPackageName() + ".fileprovider", newFile);
+    }
+
+    private void showImagePickerDialog() {
+        com.example.jntt.utils.ImageUtils.showImagePickerDialog(this, "添加商品图片",
+                new com.example.jntt.utils.ImageUtils.OnImagePickerListener() {
+                    @Override
+                    public void onTakePhoto() {
+                        currentCameraUri = createImageFile();
+                        takePicture.launch(currentCameraUri);
+                    }
+
+                    @Override
+                    public void onPickFromGallery() {
+                        pickCover.launch("image/*");
+                    }
+                });
+    }
+}
