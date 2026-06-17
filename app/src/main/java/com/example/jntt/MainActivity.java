@@ -8,6 +8,8 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
+import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.ColorUtils;
 import androidx.fragment.app.Fragment;
@@ -22,6 +24,7 @@ public class MainActivity extends AppCompatActivity {
 
     private static final int ACTIVE_COLOR = 0xFF2F80ED;
     private static final int INACTIVE_COLOR = 0xFF1F1F1F;
+    private static final long EXIT_INTERVAL_MS = 2000L;
 
     private View glassPill;
     private LinearLayout tabBar;
@@ -30,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView[] labels;
     private int currentIndex = 0;
     private ValueAnimator pillAnimator;
+    private long lastBackPressedAt = 0L;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,6 +91,21 @@ public class MainActivity extends AppCompatActivity {
         if (savedInstanceState == null) {
             switchFragment(new HeadlineFragment(), true);
         }
+
+        // 注册返回回调：兼容 Android 13+ 预测式返回手势（targetSdk>=35 默认开启），
+        // 旧式 onBackPressed() 重写在此情况下不再被可靠回调，会导致直接返回桌面。
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                long now = System.currentTimeMillis();
+                if (now - lastBackPressedAt <= EXIT_INTERVAL_MS) {
+                    moveTaskToBack(true);
+                    return;
+                }
+                lastBackPressedAt = now;
+                Toast.makeText(MainActivity.this, "Press back again to exit", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void selectTab(int idx, boolean animate) {
@@ -185,4 +204,5 @@ public class MainActivity extends AppCompatActivity {
         FragmentTransaction tx = getSupportFragmentManager().beginTransaction();
         tx.replace(R.id.fragmentContainer, f).commit();
     }
+
 }
