@@ -103,7 +103,7 @@ public class MainActivity extends AppCompatActivity {
                     return;
                 }
                 lastBackPressedAt = now;
-                Toast.makeText(MainActivity.this, "Press back again to exit", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, "再按一次退出", Toast.LENGTH_SHORT).show();
             }
         });
     }
