@@ -1,3 +1,6 @@
+# 配置文件：ProGuard/R8 混淆规则文件。
+# 项目职责：发布构建时控制哪些类/方法需要保留、如何压缩和混淆。
+# 配合代码：由 app/build.gradle.kts 的 proguardFiles 配置引用。
 # Add project specific ProGuard rules here.
 # You can control the set of applied configuration files using the
 # proguardFiles setting in build.gradle.

@@ -14,6 +14,11 @@ import com.example.jntt.model.Article;
 import java.util.List;
 
 /** 我的文章界面：复用文章列表，仅显示当前账号发布的文章 */
+/**
+ * 项目职责：我的文章页，负责当前用户文章列表和详情跳转。
+ * 技术说明：绑定布局控件；绑定点击事件。
+ * 配合代码：配合当前页面布局、DataManager 和相关 Adapter 使用。
+ */
 public class MyArticlesActivity extends AppCompatActivity {
 
     private RecyclerView rv;
@@ -22,6 +27,11 @@ public class MyArticlesActivity extends AppCompatActivity {
     private String targetUsername;
     private String currentUser;
 
+    /**
+     * 项目职责：初始化我的文章页，负责当前用户文章列表和详情跳转，加载布局、读取业务数据并绑定用户操作。
+     * 关键调用：绑定布局控件；读写本地业务数据；页面跳转或传递参数。
+     * 配合代码：配合 AndroidManifest、activity_*.xml、DataManager 和页面跳转使用。
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,12 +69,22 @@ public class MyArticlesActivity extends AppCompatActivity {
         ivAddArticleIcon.setVisibility(viewingOwnArticles ? View.VISIBLE : View.INVISIBLE);
     }
 
+    /**
+     * 项目职责：我的文章页，负责当前用户文章列表和详情跳转回到前台时重新读取数据库数据并刷新显示。
+     * 关键调用：使用 Java/Android 基础语法完成该业务步骤。
+     * 配合代码：配合 AndroidManifest、activity_*.xml、DataManager 和页面跳转使用。
+     */
     @Override
     protected void onResume() {
         super.onResume();
         loadData();
     }
 
+    /**
+     * 项目职责：我的文章页，负责当前用户文章列表和详情跳转。
+     * 关键调用：使用 Java/Android 基础语法完成该业务步骤。
+     * 配合代码：配合当前页面布局、DataManager 和相关 Adapter 使用。
+     */
     private void loadData() {
         DataManager dm = DataManager.getInstance(this);
         List<Article> articles = dm.getArticlesByAuthor(targetUsername);

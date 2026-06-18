@@ -1,4 +1,9 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  资源文件：activity_product_detail.xml
+  项目职责：商品详情页面布局，承载商品轮播图、价格、介绍、评价摘要、加购和购买入口。
+  配合代码：Java 代码通过 setContentView、inflate、findViewById 和 R.id/R.layout 引用这里的控件。
+-->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"

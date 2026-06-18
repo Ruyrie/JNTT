@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  资源文件：bg_clear_dialog.xml
+  项目职责：bg_clear_dialog.xml drawable 资源，负责提供按钮背景、图标、占位图或状态效果。
+  配合代码：配合布局里的 android:background/android:src 使用，也可在 Java 中通过 R.drawable 引用。
+-->
 <shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
     <solid android:color="#FFFFFF" />
     <corners android:radius="22dp" />

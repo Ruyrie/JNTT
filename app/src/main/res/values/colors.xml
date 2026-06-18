@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  资源文件：colors.xml
+  项目职责：颜色资源表，集中管理主题和控件使用的颜色值。
+  配合代码：配合布局 XML、主题系统和 Java/Kotlin 中的 R.string/R.color/R.style/R.attr 使用。
+-->
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>

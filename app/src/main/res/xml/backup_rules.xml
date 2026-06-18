@@ -1,13 +1,15 @@
-<?xml version="1.0" encoding="utf-8"?><!--
-   Sample backup rules file; uncomment and customize as necessary.
-   See https://developer.android.com/guide/topics/data/autobackup
-   for details.
-   Note: This file is ignored for devices older than API 31
-   See https://developer.android.com/about/versions/12/backup-restore
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  资源文件：backup_rules.xml
+  项目职责：配置 Android 自动备份时哪些应用数据可以被备份或排除。
+  使用技术：Android Auto Backup 会读取 full-backup-content 根节点下的 include/exclude 规则。
+  配合代码：AndroidManifest.xml 通过 android:fullBackupContent 引用本文件。
+  注意：当前示例规则保持注释状态，不会改变现有备份行为。
 -->
 <full-backup-content>
     <!--
-   <include domain="sharedpref" path="."/>
-   <exclude domain="sharedpref" path="device.xml"/>
--->
+      模板示例：需要控制备份范围时，可以取消下面 include/exclude 的注释并填写路径。
+      <include domain="sharedpref" path="."/>
+      <exclude domain="sharedpref" path="device.xml"/>
+    -->
 </full-backup-content>

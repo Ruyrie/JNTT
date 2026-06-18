@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  资源文件：AndroidManifest.xml
+  项目职责：应用清单，声明启动页、所有 Activity、FileProvider、备份规则和应用主题。
+  配合代码：配合所有 Activity、Application 资源、Gradle applicationId 使用；未在这里声明的 Activity 通常不能被系统启动。
+-->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 

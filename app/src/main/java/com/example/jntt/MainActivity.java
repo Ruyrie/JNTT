@@ -20,6 +20,11 @@ import com.example.jntt.fragment.MineFragment;
 import com.example.jntt.view.BlurBehindView;
 
 /** 主界面：iOS 液态玻璃风格底部导航 */
+/**
+ * 项目职责：主界面容器，负责底部导航、Fragment 切换和返回退出控制。
+ * 技术说明：执行底部导航动画；计算图标过渡颜色；替换主界面 Fragment；绑定布局控件。
+ * 配合代码：配合 activity_main.xml、底部导航控件和三个 Fragment 使用。
+ */
 public class MainActivity extends AppCompatActivity {
 
     private static final int ACTIVE_COLOR = 0xFF2F80ED;
@@ -35,6 +40,11 @@ public class MainActivity extends AppCompatActivity {
     private ValueAnimator pillAnimator;
     private long lastBackPressedAt = 0L;
 
+    /**
+     * 项目职责：初始化主界面容器，负责底部导航、Fragment 切换和返回退出控制，加载布局、读取业务数据并绑定用户操作。
+     * 关键调用：绑定布局控件；提示用户操作结果。
+     * 配合代码：配合 AndroidManifest、activity_*.xml、DataManager 和页面跳转使用。
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -73,6 +83,11 @@ public class MainActivity extends AppCompatActivity {
         // 等布局完成后，把药丸定位到第一个 tab
         tabBar.getViewTreeObserver().addOnGlobalLayoutListener(
                 new ViewTreeObserver.OnGlobalLayoutListener() {
+                    /**
+                     * 项目职责：等待底部导航完成测量后定位玻璃药丸初始位置。
+                     * 关键调用：使用 Java/Android 基础语法完成该业务步骤。
+                     * 配合代码：配合 activity_main.xml、底部导航控件和三个 Fragment 使用。
+                     */
                     @Override
                     public void onGlobalLayout() {
                         tabBar.getViewTreeObserver().removeOnGlobalLayoutListener(this);
@@ -95,6 +110,11 @@ public class MainActivity extends AppCompatActivity {
         // 注册返回回调：兼容 Android 13+ 预测式返回手势（targetSdk>=35 默认开启），
         // 旧式 onBackPressed() 重写在此情况下不再被可靠回调，会导致直接返回桌面。
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            /**
+             * 项目职责：处理主界面返回键，两秒内连续返回才退出到后台。
+             * 关键调用：提示用户操作结果。
+             * 配合代码：配合 activity_main.xml、底部导航控件和三个 Fragment 使用。
+             */
             @Override
             public void handleOnBackPressed() {
                 long now = System.currentTimeMillis();
@@ -108,6 +128,11 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * 项目职责：处理底部导航切换，移动玻璃药丸、切换图标颜色并替换 Fragment。
+     * 关键调用：执行底部导航动画。
+     * 配合代码：配合 activity_main.xml、底部导航控件和三个 Fragment 使用。
+     */
     private void selectTab(int idx, boolean animate) {
         if (idx == currentIndex)
             return;
@@ -189,6 +214,11 @@ public class MainActivity extends AppCompatActivity {
         switchFragment(f, false);
     }
 
+    /**
+     * 项目职责：执行底部导航图标颜色过渡动画。
+     * 关键调用：执行底部导航动画；计算图标过渡颜色。
+     * 配合代码：配合 activity_main.xml、底部导航控件和三个 Fragment 使用。
+     */
     private void animateIconColor(ImageView iv, int from, int to) {
         ValueAnimator anim = ValueAnimator.ofFloat(0f, 1f);
         anim.setDuration(280);
@@ -200,6 +230,11 @@ public class MainActivity extends AppCompatActivity {
         anim.start();
     }
 
+    /**
+     * 项目职责：把首页、商城、我的 Fragment 替换到主界面容器中。
+     * 关键调用：替换主界面 Fragment。
+     * 配合代码：配合 activity_main.xml、底部导航控件和三个 Fragment 使用。
+     */
     private void switchFragment(Fragment f, boolean first) {
         FragmentTransaction tx = getSupportFragmentManager().beginTransaction();
         tx.replace(R.id.fragmentContainer, f).commit();

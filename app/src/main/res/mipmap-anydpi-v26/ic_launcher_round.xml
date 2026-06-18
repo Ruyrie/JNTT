@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  资源文件：ic_launcher_round.xml
+  项目职责：ic_launcher_round.xml 启动图标资源，配合 Manifest 中的应用图标配置使用。
+  配合代码：配合 AndroidManifest 中的 android:icon/android:roundIcon 使用。
+-->
 <adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
     <background android:drawable="@drawable/ic_launcher_background"/>
     <foreground android:drawable="@mipmap/ic_launcher_foreground"/>

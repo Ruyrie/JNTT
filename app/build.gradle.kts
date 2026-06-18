@@ -1,3 +1,6 @@
+// 配置文件：app 模块 Gradle 构建脚本。
+// 项目职责：声明 Android 插件、applicationId、SDK 版本、依赖库和编译配置。
+// 配合代码：Android Studio/Gradle 读取这里来编译 app，并生成 R、BuildConfig、APK 等构建产物。
 plugins {
     alias(libs.plugins.android.application)
 }

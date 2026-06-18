@@ -34,12 +34,22 @@ public class DataManager {
     private final Context ctx;
     private final AppDatabase appDb;
 
+    /**
+     * 项目职责：创建本地数据管理器，保存 Application Context，初始化 AppDatabase 并补齐默认数据。
+     * 关键调用：使用 Java/Android 基础语法完成该业务步骤。
+     * 配合代码：配合 AppDatabase、jntt.db 和各业务页面使用。
+     */
     private DataManager(Context ctx) {
         this.ctx = ctx.getApplicationContext();
         this.appDb = AppDatabase.getInstance(this.ctx);
         seedDefaultData();
     }
 
+    /**
+     * 项目职责：创建本地数据门面，负责把页面业务请求转换为 SharedPreferences 和 SQLite 读写需要的数据、监听器或上下文引用。
+     * 关键调用：使用 Java/Android 基础语法完成该业务步骤。
+     * 配合代码：被 Activity、Fragment 和 Adapter 调用，底层配合 AppDatabase 与 jntt.db 表。
+     */
     public static DataManager getInstance(Context ctx) {
         if (instance == null)
             instance = new DataManager(ctx);
@@ -48,26 +58,56 @@ public class DataManager {
 
     // ─── 会话（仍用 SharedPreferences） ─────────────────────────────────────
 
+    /**
+     * 项目职责：创建本地数据门面，负责把页面业务请求转换为 SharedPreferences 和 SQLite 读写需要的数据、监听器或上下文引用。
+     * 关键调用：访问 SharedPreferences。
+     * 配合代码：被 Activity、Fragment 和 Adapter 调用，底层配合 AppDatabase 与 jntt.db 表。
+     */
     public void setLoggedUser(String username) {
         prefs().edit().putString(KEY_LOGGED_USER, username).apply();
     }
 
+    /**
+     * 项目职责：创建本地数据门面，负责把页面业务请求转换为 SharedPreferences 和 SQLite 读写需要的数据、监听器或上下文引用。
+     * 关键调用：访问 SharedPreferences。
+     * 配合代码：被 Activity、Fragment 和 Adapter 调用，底层配合 AppDatabase 与 jntt.db 表。
+     */
     public String getLoggedUser() {
         return prefs().getString(KEY_LOGGED_USER, null);
     }
 
+    /**
+     * 项目职责：清除当前登录用户，用于设置页退出登录后回到登录页。
+     * 关键调用：访问 SharedPreferences。
+     * 配合代码：被 Activity、Fragment 和 Adapter 调用，底层配合 AppDatabase 与 jntt.db 表。
+     */
     public void logout() {
         prefs().edit().remove(KEY_LOGGED_USER).apply();
     }
 
+    /**
+     * 项目职责：创建本地数据门面，负责把页面业务请求转换为 SharedPreferences 和 SQLite 读写需要的数据、监听器或上下文引用。
+     * 关键调用：访问 SharedPreferences。
+     * 配合代码：被 Activity、Fragment 和 Adapter 调用，底层配合 AppDatabase 与 jntt.db 表。
+     */
     public void setAdminMode(boolean enabled) {
         prefs().edit().putBoolean(KEY_ADMIN_MODE, enabled).apply();
     }
 
+    /**
+     * 项目职责：读取管理员模式开关状态，用于控制添加/编辑/删除商品等管理入口。
+     * 关键调用：访问 SharedPreferences。
+     * 配合代码：被 Activity、Fragment 和 Adapter 调用，底层配合 AppDatabase 与 jntt.db 表。
+     */
     public boolean isAdminMode() {
         return prefs().getBoolean(KEY_ADMIN_MODE, false);
     }
 
+    /**
+     * 项目职责：把账号加入隐藏集合，用于账号管理删除后不再显示历史账号。
+     * 关键调用：访问 SharedPreferences。
+     * 配合代码：被 Activity、Fragment 和 Adapter 调用，底层配合 AppDatabase 与 jntt.db 表。
+     */
     public void hideUserFromHistory(String username) {
         java.util.Set<String> hidden = new java.util.HashSet<>(
                 prefs().getStringSet("hidden_users", new java.util.HashSet<>()));
@@ -75,12 +115,22 @@ public class DataManager {
         prefs().edit().putStringSet("hidden_users", hidden).apply();
     }
 
+    /**
+     * 项目职责：取得会话 SharedPreferences，保存登录用户、管理员模式和隐藏账号集合。
+     * 关键调用：访问 SharedPreferences。
+     * 配合代码：被 Activity、Fragment 和 Adapter 调用，底层配合 AppDatabase 与 jntt.db 表。
+     */
     private SharedPreferences prefs() {
         return ctx.getSharedPreferences(PREF_SESSION, Context.MODE_PRIVATE);
     }
 
     // ─── 用户 ────────────────────────────────────────────────────────────────
 
+    /**
+     * 项目职责：创建本地数据门面，负责把页面业务请求转换为 SharedPreferences 和 SQLite 读写需要的数据、监听器或上下文引用。
+     * 关键调用：访问 SharedPreferences；执行 SQLite 查询；读取查询结果。
+     * 配合代码：被 Activity、Fragment 和 Adapter 调用，底层配合 AppDatabase 与 jntt.db 表。
+     */
     public List<User> getUsers() {
         List<User> list = new ArrayList<>();
         java.util.Set<String> hidden = prefs().getStringSet("hidden_users", new java.util.HashSet<>());
@@ -98,6 +148,11 @@ public class DataManager {
     }
 
     /** 注册，用户名唯一，返回 false 表示已存在 */
+    /**
+     * 项目职责：创建本地数据门面，负责把页面业务请求转换为 SharedPreferences 和 SQLite 读写需要的数据、监听器或上下文引用。
+     * 关键调用：组织 SQLite 写入字段；写入关注关系并避免重复。
+     * 配合代码：被 Activity、Fragment 和 Adapter 调用，底层配合 AppDatabase 与 jntt.db 表。
+     */
     public boolean register(String username, String password, String phone) {
         if (phone != null && !phone.isEmpty()) {
             if (isPhoneBound(phone))
@@ -113,16 +168,31 @@ public class DataManager {
         return wdb().insertWithOnConflict("users", null, cv, SQLiteDatabase.CONFLICT_IGNORE) != -1;
     }
 
+    /**
+     * 项目职责：创建本地数据门面，负责把页面业务请求转换为 SharedPreferences 和 SQLite 读写需要的数据、监听器或上下文引用。
+     * 关键调用：使用 Java/Android 基础语法完成该业务步骤。
+     * 配合代码：被 Activity、Fragment 和 Adapter 调用，底层配合 AppDatabase 与 jntt.db 表。
+     */
     public boolean register(String username, String password) {
         return register(username, password, null);
     }
 
+    /**
+     * 项目职责：检查手机号是否已绑定账号，用于找回密码时避免重复绑定或定位账号。
+     * 关键调用：执行 SQLite 查询；读取查询结果。
+     * 配合代码：被 Activity、Fragment 和 Adapter 调用，底层配合 AppDatabase 与 jntt.db 表。
+     */
     public boolean isPhoneBound(String phone) {
         try (Cursor c = rdb().rawQuery("SELECT 1 FROM users WHERE phone=?", new String[] { phone })) {
             return c.moveToFirst();
         }
     }
 
+    /**
+     * 项目职责：创建本地数据门面，负责把页面业务请求转换为 SharedPreferences 和 SQLite 读写需要的数据、监听器或上下文引用。
+     * 关键调用：执行 SQLite 查询；读取查询结果。
+     * 配合代码：被 Activity、Fragment 和 Adapter 调用，底层配合 AppDatabase 与 jntt.db 表。
+     */
     public String getPhone(String username) {
         try (Cursor c = rdb().rawQuery("SELECT phone FROM users WHERE username=?", new String[] { username })) {
             if (c.moveToFirst()) {
@@ -133,6 +203,11 @@ public class DataManager {
         return "";
     }
 
+    /**
+     * 项目职责：创建本地数据门面，负责把页面业务请求转换为 SharedPreferences 和 SQLite 读写需要的数据、监听器或上下文引用。
+     * 关键调用：组织 SQLite 写入字段；更新 SQLite 记录。
+     * 配合代码：被 Activity、Fragment 和 Adapter 调用，底层配合 AppDatabase 与 jntt.db 表。
+     */
     public boolean updatePhone(String username, String phone) {
         if (isPhoneBound(phone))
             return false;
@@ -141,6 +216,11 @@ public class DataManager {
         return wdb().update("users", cv, "username=?", new String[] { username }) > 0;
     }
 
+    /**
+     * 项目职责：创建本地数据门面，负责把页面业务请求转换为 SharedPreferences 和 SQLite 读写需要的数据、监听器或上下文引用。
+     * 关键调用：执行 SQLite 查询；读取查询结果。
+     * 配合代码：被 Activity、Fragment 和 Adapter 调用，底层配合 AppDatabase 与 jntt.db 表。
+     */
     public String getSignature(String username) {
         try (Cursor c = rdb().rawQuery("SELECT signature FROM users WHERE username=?", new String[] { username })) {
             if (c.moveToFirst()) {
@@ -151,6 +231,11 @@ public class DataManager {
         return "这个人很懒，什么都没留下";
     }
 
+    /**
+     * 项目职责：创建本地数据门面，负责把页面业务请求转换为 SharedPreferences 和 SQLite 读写需要的数据、监听器或上下文引用。
+     * 关键调用：访问 SharedPreferences；执行 SQLite 查询；读取查询结果。
+     * 配合代码：被 Activity、Fragment 和 Adapter 调用，底层配合 AppDatabase 与 jntt.db 表。
+     */
     public User login(String usernameOrPhone, String password) {
         try (Cursor c = rdb().rawQuery(
                 "SELECT username,password FROM users WHERE (username=? OR phone=?) AND password=?",
@@ -168,6 +253,11 @@ public class DataManager {
         return null;
     }
 
+    /**
+     * 项目职责：根据用户名或手机号查找真实用户名，用于登录/找回密码统一账号入口。
+     * 关键调用：执行 SQLite 查询；读取查询结果。
+     * 配合代码：被 Activity、Fragment 和 Adapter 调用，底层配合 AppDatabase 与 jntt.db 表。
+     */
     public String findUsernameByAccount(String account) {
         try (Cursor c = rdb().rawQuery(
                 "SELECT username FROM users WHERE username=? OR phone=?",
@@ -179,6 +269,11 @@ public class DataManager {
         return null;
     }
 
+    /**
+     * 项目职责：创建本地数据门面，负责把页面业务请求转换为 SharedPreferences 和 SQLite 读写需要的数据、监听器或上下文引用。
+     * 关键调用：执行 SQLite 查询；读取查询结果。
+     * 配合代码：被 Activity、Fragment 和 Adapter 调用，底层配合 AppDatabase 与 jntt.db 表。
+     */
     public boolean isSameAsOldPassword(String username, String password) {
         try (Cursor c = rdb().rawQuery("SELECT password FROM users WHERE username=?", new String[] { username })) {
             if (c.moveToFirst()) {
@@ -189,12 +284,22 @@ public class DataManager {
         return false;
     }
 
+    /**
+     * 项目职责：创建本地数据门面，负责把页面业务请求转换为 SharedPreferences 和 SQLite 读写需要的数据、监听器或上下文引用。
+     * 关键调用：组织 SQLite 写入字段；更新 SQLite 记录。
+     * 配合代码：被 Activity、Fragment 和 Adapter 调用，底层配合 AppDatabase 与 jntt.db 表。
+     */
     public boolean changePassword(String username, String newPassword) {
         ContentValues cv = new ContentValues();
         cv.put("password", newPassword);
         return wdb().update("users", cv, "username=?", new String[] { username }) > 0;
     }
 
+    /**
+     * 项目职责：创建本地数据门面，负责把页面业务请求转换为 SharedPreferences 和 SQLite 读写需要的数据、监听器或上下文引用。
+     * 关键调用：删除 SQLite 记录。
+     * 配合代码：被 Activity、Fragment 和 Adapter 调用，底层配合 AppDatabase 与 jntt.db 表。
+     */
     public boolean deleteUser(String username) {
         wdb().delete("users", "username=?", new String[] { username });
         return true;
@@ -202,6 +307,11 @@ public class DataManager {
 
     // ─── 用户资料 ────────────────────────────────────────────────────────────
 
+    /**
+     * 项目职责：创建本地数据门面，负责把页面业务请求转换为 SharedPreferences 和 SQLite 读写需要的数据、监听器或上下文引用。
+     * 关键调用：执行 SQLite 查询；读取查询结果。
+     * 配合代码：被 Activity、Fragment 和 Adapter 调用，底层配合 AppDatabase 与 jntt.db 表。
+     */
     public String getNickname(String username) {
         try (Cursor c = rdb().rawQuery(
                 "SELECT nickname FROM users WHERE username=?", new String[] { username })) {
@@ -213,18 +323,33 @@ public class DataManager {
         return username;
     }
 
+    /**
+     * 项目职责：创建本地数据门面，负责把页面业务请求转换为 SharedPreferences 和 SQLite 读写需要的数据、监听器或上下文引用。
+     * 关键调用：组织 SQLite 写入字段；更新 SQLite 记录。
+     * 配合代码：被 Activity、Fragment 和 Adapter 调用，底层配合 AppDatabase 与 jntt.db 表。
+     */
     public boolean setNickname(String username, String nickname) {
         ContentValues cv = new ContentValues();
         cv.put("nickname", nickname);
         return wdb().update("users", cv, "username=?", new String[] { username }) > 0;
     }
 
+    /**
+     * 项目职责：创建本地数据门面，负责把页面业务请求转换为 SharedPreferences 和 SQLite 读写需要的数据、监听器或上下文引用。
+     * 关键调用：组织 SQLite 写入字段；更新 SQLite 记录。
+     * 配合代码：被 Activity、Fragment 和 Adapter 调用，底层配合 AppDatabase 与 jntt.db 表。
+     */
     public boolean updateSignature(String username, String signature) {
         ContentValues cv = new ContentValues();
         cv.put("signature", signature);
         return wdb().update("users", cv, "username=?", new String[] { username }) > 0;
     }
 
+    /**
+     * 项目职责：创建本地数据门面，负责把页面业务请求转换为 SharedPreferences 和 SQLite 读写需要的数据、监听器或上下文引用。
+     * 关键调用：执行 SQLite 查询；读取查询结果。
+     * 配合代码：被 Activity、Fragment 和 Adapter 调用，底层配合 AppDatabase 与 jntt.db 表。
+     */
     public String getAvatarUri(String username) {
         try (Cursor c = rdb().rawQuery(
                 "SELECT avatar_uri FROM users WHERE username=?", new String[] { username })) {
@@ -234,6 +359,11 @@ public class DataManager {
         return null;
     }
 
+    /**
+     * 项目职责：创建本地数据门面，负责把页面业务请求转换为 SharedPreferences 和 SQLite 读写需要的数据、监听器或上下文引用。
+     * 关键调用：组织 SQLite 写入字段；更新 SQLite 记录。
+     * 配合代码：被 Activity、Fragment 和 Adapter 调用，底层配合 AppDatabase 与 jntt.db 表。
+     */
     public boolean setAvatarUri(String username, String uri) {
         ContentValues cv = new ContentValues();
         cv.put("avatar_uri", uri);
@@ -242,18 +372,33 @@ public class DataManager {
 
     // ─── 文章 ────────────────────────────────────────────────────────────────
 
+    /**
+     * 项目职责：创建本地数据门面，负责把页面业务请求转换为 SharedPreferences 和 SQLite 读写需要的数据、监听器或上下文引用。
+     * 关键调用：使用 Java/Android 基础语法完成该业务步骤。
+     * 配合代码：被 Activity、Fragment 和 Adapter 调用，底层配合 AppDatabase 与 jntt.db 表。
+     */
     public List<Article> getArticles() {
         return queryArticles(
                 "SELECT a.id,a.title,a.content,a.author,a.time,a.read_count,a.cover_uri,u.nickname,u.avatar_uri FROM articles a LEFT JOIN users u ON a.author=u.username ORDER BY a.id DESC",
                 null);
     }
 
+    /**
+     * 项目职责：创建本地数据门面，负责把页面业务请求转换为 SharedPreferences 和 SQLite 读写需要的数据、监听器或上下文引用。
+     * 关键调用：使用 Java/Android 基础语法完成该业务步骤。
+     * 配合代码：被 Activity、Fragment 和 Adapter 调用，底层配合 AppDatabase 与 jntt.db 表。
+     */
     public List<Article> getArticlesByAuthor(String author) {
         return queryArticles(
                 "SELECT a.id,a.title,a.content,a.author,a.time,a.read_count,a.cover_uri,u.nickname,u.avatar_uri FROM articles a LEFT JOIN users u ON a.author=u.username WHERE a.author=? ORDER BY a.id DESC",
                 new String[] { author });
     }
 
+    /**
+     * 项目职责：创建本地数据门面，负责把页面业务请求转换为 SharedPreferences 和 SQLite 读写需要的数据、监听器或上下文引用。
+     * 关键调用：组织 SQLite 写入字段；插入 SQLite 记录；计算固定主键表的下一个 id。
+     * 配合代码：被 Activity、Fragment 和 Adapter 调用，底层配合 AppDatabase 与 jntt.db 表。
+     */
     public void addArticle(String title, String content, String coverUri) {
         int newId = nextId("articles");
         ContentValues cv = new ContentValues();
@@ -268,11 +413,21 @@ public class DataManager {
         wdb().insert("articles", null, cv);
     }
 
+    /**
+     * 项目职责：创建本地数据门面，负责把页面业务请求转换为 SharedPreferences 和 SQLite 读写需要的数据、监听器或上下文引用。
+     * 关键调用：使用 Java/Android 基础语法完成该业务步骤。
+     * 配合代码：被 Activity、Fragment 和 Adapter 调用，底层配合 AppDatabase 与 jntt.db 表。
+     */
     public void incrementReadCount(int articleId) {
         wdb().execSQL("UPDATE articles SET read_count = read_count + 1 WHERE id=?",
                 new Object[] { articleId });
     }
 
+    /**
+     * 项目职责：创建本地数据门面，负责把页面业务请求转换为 SharedPreferences 和 SQLite 读写需要的数据、监听器或上下文引用。
+     * 关键调用：执行 SQLite 查询；读取查询结果。
+     * 配合代码：被 Activity、Fragment 和 Adapter 调用，底层配合 AppDatabase 与 jntt.db 表。
+     */
     private List<Article> queryArticles(String sql, String[] args) {
         List<Article> list = new ArrayList<>();
         try (Cursor c = rdb().rawQuery(sql, args)) {
@@ -301,6 +456,11 @@ public class DataManager {
 
     // ─── 文章点赞 / 收藏 ─────────────────────────────────────────────────────
 
+    /**
+     * 项目职责：创建本地数据门面，负责把页面业务请求转换为 SharedPreferences 和 SQLite 读写需要的数据、监听器或上下文引用。
+     * 关键调用：组织 SQLite 写入字段；写入关注关系并避免重复。
+     * 配合代码：被 Activity、Fragment 和 Adapter 调用，底层配合 AppDatabase 与 jntt.db 表。
+     */
     public void likeArticle(String username, int articleId) {
         if (username == null || username.equals(getArticleAuthor(articleId)))
             return;
@@ -310,11 +470,21 @@ public class DataManager {
         wdb().insertWithOnConflict("article_likes", null, cv, SQLiteDatabase.CONFLICT_IGNORE);
     }
 
+    /**
+     * 项目职责：创建本地数据门面，负责把页面业务请求转换为 SharedPreferences 和 SQLite 读写需要的数据、监听器或上下文引用。
+     * 关键调用：删除 SQLite 记录。
+     * 配合代码：被 Activity、Fragment 和 Adapter 调用，底层配合 AppDatabase 与 jntt.db 表。
+     */
     public void unlikeArticle(String username, int articleId) {
         wdb().delete("article_likes", "username=? AND article_id=?",
                 new String[] { username, String.valueOf(articleId) });
     }
 
+    /**
+     * 项目职责：创建本地数据门面，负责把页面业务请求转换为 SharedPreferences 和 SQLite 读写需要的数据、监听器或上下文引用。
+     * 关键调用：执行 SQLite 查询；读取查询结果。
+     * 配合代码：被 Activity、Fragment 和 Adapter 调用，底层配合 AppDatabase 与 jntt.db 表。
+     */
     public boolean isArticleLiked(String username, int articleId) {
         if (username == null || username.equals(getArticleAuthor(articleId)))
             return false;
@@ -325,6 +495,11 @@ public class DataManager {
         }
     }
 
+    /**
+     * 项目职责：创建本地数据门面，负责把页面业务请求转换为 SharedPreferences 和 SQLite 读写需要的数据、监听器或上下文引用。
+     * 关键调用：复用计数查询。
+     * 配合代码：被 Activity、Fragment 和 Adapter 调用，底层配合 AppDatabase 与 jntt.db 表。
+     */
     public int getArticleLikeCount(int articleId) {
         return queryCount(
                 "SELECT COUNT(*) FROM article_likes l INNER JOIN articles a ON l.article_id=a.id WHERE l.article_id=? AND l.username<>a.author",
@@ -332,6 +507,11 @@ public class DataManager {
     }
 
     /** 返回当前用户点赞的文章列表（我的收藏） */
+    /**
+     * 项目职责：创建本地数据门面，负责把页面业务请求转换为 SharedPreferences 和 SQLite 读写需要的数据、监听器或上下文引用。
+     * 关键调用：执行 SQLite 查询；读取查询结果。
+     * 配合代码：被 Activity、Fragment 和 Adapter 调用，底层配合 AppDatabase 与 jntt.db 表。
+     */
     public List<Article> getLikedArticles(String username) {
         List<Article> list = new ArrayList<>();
         String sql = "SELECT l.article_id, a.title, a.content, a.author, a.time, a.read_count, a.cover_uri, u.nickname, u.avatar_uri "
@@ -360,12 +540,27 @@ public class DataManager {
         return list;
     }
 
+    /**
+     * 项目职责：创建本地数据门面，负责把页面业务请求转换为 SharedPreferences 和 SQLite 读写需要的数据、监听器或上下文引用。
+     * 关键调用：删除 SQLite 记录。
+     * 配合代码：被 Activity、Fragment 和 Adapter 调用，底层配合 AppDatabase 与 jntt.db 表。
+     */
     public int clearInvalidLikedArticles(String username) {
         // 删除那些在 articles 表中不存在对应记录的点赞
         String sql = "article_id NOT IN (SELECT id FROM articles) AND username=?";
+        /**
+         * 项目职责：取得可写数据库连接，供 DataManager 插入、更新、删除业务表。
+         * 关键调用：删除 SQLite 记录。
+         * 配合代码：被 Activity、Fragment 和 Adapter 调用，底层配合 AppDatabase 与 jntt.db 表。
+         */
         return wdb().delete("article_likes", sql, new String[] { username });
     }
 
+    /**
+     * 项目职责：创建本地数据门面，负责把页面业务请求转换为 SharedPreferences 和 SQLite 读写需要的数据、监听器或上下文引用。
+     * 关键调用：删除 SQLite 记录。
+     * 配合代码：被 Activity、Fragment 和 Adapter 调用，底层配合 AppDatabase 与 jntt.db 表。
+     */
     public void deleteArticle(int articleId) {
         wdb().delete("articles", "id=?", new String[] { String.valueOf(articleId) });
         // 注意：不删除 article_likes 中的记录，以便其他用户能在收藏列表中看到“已被删除”状态
@@ -375,6 +570,11 @@ public class DataManager {
 
     // ─── 商品评价 ────────────────────────────────────────────────────────────────
 
+    /**
+     * 项目职责：创建本地数据门面，负责把页面业务请求转换为 SharedPreferences 和 SQLite 读写需要的数据、监听器或上下文引用。
+     * 关键调用：复用计数查询。
+     * 配合代码：被 Activity、Fragment 和 Adapter 调用，底层配合 AppDatabase 与 jntt.db 表。
+     */
     public boolean hasPurchasedProduct(String username, int productId) {
         if (username == null || username.isEmpty())
             return false;
@@ -383,6 +583,11 @@ public class DataManager {
                 new String[] { username, String.valueOf(productId) }) > 0;
     }
 
+    /**
+     * 项目职责：创建本地数据门面，负责把页面业务请求转换为 SharedPreferences 和 SQLite 读写需要的数据、监听器或上下文引用。
+     * 关键调用：组织 SQLite 写入字段；插入 SQLite 记录。
+     * 配合代码：被 Activity、Fragment 和 Adapter 调用，底层配合 AppDatabase 与 jntt.db 表。
+     */
     public com.example.jntt.model.ProductComment addProductComment(int productId, String username, String content,
             String images) {
         String time = now("MM-dd HH:mm");
@@ -396,6 +601,11 @@ public class DataManager {
         return new com.example.jntt.model.ProductComment((int) id, productId, username, content, images, time);
     }
 
+    /**
+     * 项目职责：创建本地数据门面，负责把页面业务请求转换为 SharedPreferences 和 SQLite 读写需要的数据、监听器或上下文引用。
+     * 关键调用：执行 SQLite 查询；读取查询结果。
+     * 配合代码：被 Activity、Fragment 和 Adapter 调用，底层配合 AppDatabase 与 jntt.db 表。
+     */
     public List<com.example.jntt.model.ProductComment> getProductComments(int productId) {
         List<com.example.jntt.model.ProductComment> list = new ArrayList<>();
         String sql = "SELECT c.id, c.product_id, c.username, c.content, c.images, c.time, u.nickname, u.avatar_uri " +
@@ -415,10 +625,20 @@ public class DataManager {
         return list;
     }
 
+    /**
+     * 项目职责：创建本地数据门面，负责把页面业务请求转换为 SharedPreferences 和 SQLite 读写需要的数据、监听器或上下文引用。
+     * 关键调用：删除 SQLite 记录。
+     * 配合代码：被 Activity、Fragment 和 Adapter 调用，底层配合 AppDatabase 与 jntt.db 表。
+     */
     public void deleteProductComment(int commentId) {
         wdb().delete("product_comments", "id=?", new String[] { String.valueOf(commentId) });
     }
 
+    /**
+     * 项目职责：创建本地数据门面，负责把页面业务请求转换为 SharedPreferences 和 SQLite 读写需要的数据、监听器或上下文引用。
+     * 关键调用：复用计数查询。
+     * 配合代码：被 Activity、Fragment 和 Adapter 调用，底层配合 AppDatabase 与 jntt.db 表。
+     */
     public int getProductCommentCount(int productId) {
         return queryCount("SELECT COUNT(*) FROM product_comments WHERE product_id=?",
                 String.valueOf(productId));
@@ -426,6 +646,11 @@ public class DataManager {
 
     // ─── 评论 ────────────────────────────────────────────────────────────────
 
+    /**
+     * 项目职责：创建本地数据门面，负责把页面业务请求转换为 SharedPreferences 和 SQLite 读写需要的数据、监听器或上下文引用。
+     * 关键调用：组织 SQLite 写入字段；插入 SQLite 记录。
+     * 配合代码：被 Activity、Fragment 和 Adapter 调用，底层配合 AppDatabase 与 jntt.db 表。
+     */
     public Comment addComment(int articleId, String username, String content) {
         String time = now("MM-dd HH:mm");
         ContentValues cv = new ContentValues();
@@ -437,6 +662,11 @@ public class DataManager {
         return new Comment((int) id, articleId, username, content, time, 0);
     }
 
+    /**
+     * 项目职责：创建本地数据门面，负责把页面业务请求转换为 SharedPreferences 和 SQLite 读写需要的数据、监听器或上下文引用。
+     * 关键调用：执行 SQLite 查询；读取查询结果。
+     * 配合代码：被 Activity、Fragment 和 Adapter 调用，底层配合 AppDatabase 与 jntt.db 表。
+     */
     public List<Comment> getComments(int articleId, String currentUser) {
         List<Comment> list = new ArrayList<>();
         String sql = "SELECT c.id, c.article_id, c.username, c.content, c.time, " +
@@ -458,11 +688,21 @@ public class DataManager {
         return list;
     }
 
+    /**
+     * 项目职责：创建本地数据门面，负责把页面业务请求转换为 SharedPreferences 和 SQLite 读写需要的数据、监听器或上下文引用。
+     * 关键调用：删除 SQLite 记录。
+     * 配合代码：被 Activity、Fragment 和 Adapter 调用，底层配合 AppDatabase 与 jntt.db 表。
+     */
     public void deleteComment(int commentId) {
         wdb().delete("comment_likes", "comment_id=?", new String[] { String.valueOf(commentId) });
         wdb().delete("comments", "id=?", new String[] { String.valueOf(commentId) });
     }
 
+    /**
+     * 项目职责：创建本地数据门面，负责把页面业务请求转换为 SharedPreferences 和 SQLite 读写需要的数据、监听器或上下文引用。
+     * 关键调用：复用计数查询。
+     * 配合代码：被 Activity、Fragment 和 Adapter 调用，底层配合 AppDatabase 与 jntt.db 表。
+     */
     public int getCommentCount(int articleId) {
         return queryCount("SELECT COUNT(*) FROM comments WHERE article_id=?",
                 String.valueOf(articleId));
@@ -470,6 +710,11 @@ public class DataManager {
 
     // ─── 评论点赞 ────────────────────────────────────────────────────────────
 
+    /**
+     * 项目职责：创建本地数据门面，负责把页面业务请求转换为 SharedPreferences 和 SQLite 读写需要的数据、监听器或上下文引用。
+     * 关键调用：组织 SQLite 写入字段；写入关注关系并避免重复。
+     * 配合代码：被 Activity、Fragment 和 Adapter 调用，底层配合 AppDatabase 与 jntt.db 表。
+     */
     public void likeComment(String username, int commentId) {
         if (username == null || username.equals(getCommentAuthor(commentId)))
             return;
@@ -479,11 +724,21 @@ public class DataManager {
         wdb().insertWithOnConflict("comment_likes", null, cv, SQLiteDatabase.CONFLICT_IGNORE);
     }
 
+    /**
+     * 项目职责：创建本地数据门面，负责把页面业务请求转换为 SharedPreferences 和 SQLite 读写需要的数据、监听器或上下文引用。
+     * 关键调用：删除 SQLite 记录。
+     * 配合代码：被 Activity、Fragment 和 Adapter 调用，底层配合 AppDatabase 与 jntt.db 表。
+     */
     public void unlikeComment(String username, int commentId) {
         wdb().delete("comment_likes", "username=? AND comment_id=?",
                 new String[] { username, String.valueOf(commentId) });
     }
 
+    /**
+     * 项目职责：创建本地数据门面，负责把页面业务请求转换为 SharedPreferences 和 SQLite 读写需要的数据、监听器或上下文引用。
+     * 关键调用：执行 SQLite 查询；读取查询结果。
+     * 配合代码：被 Activity、Fragment 和 Adapter 调用，底层配合 AppDatabase 与 jntt.db 表。
+     */
     public boolean isCommentLiked(String username, int commentId) {
         if (username == null || username.equals(getCommentAuthor(commentId)))
             return false;
@@ -496,6 +751,11 @@ public class DataManager {
 
     // ─── 关注 ────────────────────────────────────────────────────────────────
 
+    /**
+     * 项目职责：写入关注关系，用于用户关注别人。
+     * 关键调用：组织 SQLite 写入字段；写入关注关系并避免重复。
+     * 配合代码：被 Activity、Fragment 和 Adapter 调用，底层配合 AppDatabase 与 jntt.db 表。
+     */
     public void followUser(String follower, String following) {
         ContentValues cv = new ContentValues();
         cv.put("follower", follower);
@@ -503,11 +763,21 @@ public class DataManager {
         wdb().insertWithOnConflict("follows", null, cv, SQLiteDatabase.CONFLICT_IGNORE);
     }
 
+    /**
+     * 项目职责：删除关注关系，用于取消关注。
+     * 关键调用：删除 SQLite 记录。
+     * 配合代码：被 Activity、Fragment 和 Adapter 调用，底层配合 AppDatabase 与 jntt.db 表。
+     */
     public void unfollowUser(String follower, String following) {
         wdb().delete("follows", "follower=? AND following=?",
                 new String[] { follower, following });
     }
 
+    /**
+     * 项目职责：判断当前用户是否已关注目标用户，用于关注按钮状态。
+     * 关键调用：执行 SQLite 查询；读取查询结果。
+     * 配合代码：被 Activity、Fragment 和 Adapter 调用，底层配合 AppDatabase 与 jntt.db 表。
+     */
     public boolean isFollowing(String follower, String following) {
         try (Cursor c = rdb().rawQuery(
                 "SELECT 1 FROM follows WHERE follower=? AND `following`=?",
@@ -516,15 +786,30 @@ public class DataManager {
         }
     }
 
+    /**
+     * 项目职责：创建本地数据门面，负责把页面业务请求转换为 SharedPreferences 和 SQLite 读写需要的数据、监听器或上下文引用。
+     * 关键调用：复用计数查询。
+     * 配合代码：被 Activity、Fragment 和 Adapter 调用，底层配合 AppDatabase 与 jntt.db 表。
+     */
     public int getFollowersCount(String username) {
         return queryCount("SELECT COUNT(*) FROM follows WHERE `following`=?", username);
     }
 
+    /**
+     * 项目职责：创建本地数据门面，负责把页面业务请求转换为 SharedPreferences 和 SQLite 读写需要的数据、监听器或上下文引用。
+     * 关键调用：复用计数查询。
+     * 配合代码：被 Activity、Fragment 和 Adapter 调用，底层配合 AppDatabase 与 jntt.db 表。
+     */
     public int getFollowingCount(String username) {
         return queryCount("SELECT COUNT(*) FROM follows WHERE follower=?", username);
     }
 
     /** 返回文章点赞最多的一条评论，用于首页卡片预览；无评论返回 null */
+    /**
+     * 项目职责：创建本地数据门面，负责把页面业务请求转换为 SharedPreferences 和 SQLite 读写需要的数据、监听器或上下文引用。
+     * 关键调用：执行 SQLite 查询；读取查询结果。
+     * 配合代码：被 Activity、Fragment 和 Adapter 调用，底层配合 AppDatabase 与 jntt.db 表。
+     */
     public Comment getTopComment(int articleId) {
         String sql = "SELECT c.id, c.article_id, c.username, c.content, c.time, " +
                 "COUNT(cl.id) AS like_count, u.nickname, u.avatar_uri " +
@@ -545,6 +830,11 @@ public class DataManager {
     }
 
     /** 返回关注 username 的用户名列表（粉丝） */
+    /**
+     * 项目职责：创建本地数据门面，负责把页面业务请求转换为 SharedPreferences 和 SQLite 读写需要的数据、监听器或上下文引用。
+     * 关键调用：执行 SQLite 查询；读取查询结果。
+     * 配合代码：被 Activity、Fragment 和 Adapter 调用，底层配合 AppDatabase 与 jntt.db 表。
+     */
     public List<String> getFollowers(String username) {
         List<String> list = new ArrayList<>();
         try (Cursor c = rdb().rawQuery(
@@ -557,6 +847,11 @@ public class DataManager {
     }
 
     /** 返回 username 关注的用户名列表 */
+    /**
+     * 项目职责：创建本地数据门面，负责把页面业务请求转换为 SharedPreferences 和 SQLite 读写需要的数据、监听器或上下文引用。
+     * 关键调用：执行 SQLite 查询；读取查询结果。
+     * 配合代码：被 Activity、Fragment 和 Adapter 调用，底层配合 AppDatabase 与 jntt.db 表。
+     */
     public List<String> getFollowing(String username) {
         List<String> list = new ArrayList<>();
         try (Cursor c = rdb().rawQuery(
@@ -569,6 +864,11 @@ public class DataManager {
     }
 
     /** 该用户所有文章累计获得的点赞数 */
+    /**
+     * 项目职责：创建本地数据门面，负责把页面业务请求转换为 SharedPreferences 和 SQLite 读写需要的数据、监听器或上下文引用。
+     * 关键调用：复用计数查询。
+     * 配合代码：被 Activity、Fragment 和 Adapter 调用，底层配合 AppDatabase 与 jntt.db 表。
+     */
     public int getTotalLikesReceived(String username) {
         return queryCount(
                 "SELECT COUNT(*) FROM article_likes al " +
@@ -576,6 +876,11 @@ public class DataManager {
                 username);
     }
 
+    /**
+     * 项目职责：创建本地数据门面，负责把页面业务请求转换为 SharedPreferences 和 SQLite 读写需要的数据、监听器或上下文引用。
+     * 关键调用：执行 SQLite 查询；读取查询结果。
+     * 配合代码：被 Activity、Fragment 和 Adapter 调用，底层配合 AppDatabase 与 jntt.db 表。
+     */
     public List<String> getUsersWhoLikedMyArticles(String username) {
         List<String> list = new ArrayList<>();
         try (Cursor c = rdb().rawQuery(
@@ -591,6 +896,11 @@ public class DataManager {
 
     // ─── 商品 ────────────────────────────────────────────────────────────────
 
+    /**
+     * 项目职责：创建本地数据门面，负责把页面业务请求转换为 SharedPreferences 和 SQLite 读写需要的数据、监听器或上下文引用。
+     * 关键调用：执行 SQLite 查询；读取查询结果。
+     * 配合代码：被 Activity、Fragment 和 Adapter 调用，底层配合 AppDatabase 与 jntt.db 表。
+     */
     public List<Product> getProducts() {
         List<Product> list = new ArrayList<>();
         try (Cursor c = rdb().rawQuery(
@@ -601,6 +911,11 @@ public class DataManager {
         return list;
     }
 
+    /**
+     * 项目职责：创建本地数据门面，负责把页面业务请求转换为 SharedPreferences 和 SQLite 读写需要的数据、监听器或上下文引用。
+     * 关键调用：组织 SQLite 写入字段；插入 SQLite 记录；计算固定主键表的下一个 id。
+     * 配合代码：被 Activity、Fragment 和 Adapter 调用，底层配合 AppDatabase 与 jntt.db 表。
+     */
     public void addProduct(String name, String desc, double price, String coverUri) {
         int newId = nextId("products");
         ContentValues cv = new ContentValues();
@@ -614,6 +929,11 @@ public class DataManager {
         wdb().insert("products", null, cv);
     }
 
+    /**
+     * 项目职责：创建本地数据门面，负责把页面业务请求转换为 SharedPreferences 和 SQLite 读写需要的数据、监听器或上下文引用。
+     * 关键调用：组织 SQLite 写入字段；更新 SQLite 记录。
+     * 配合代码：被 Activity、Fragment 和 Adapter 调用，底层配合 AppDatabase 与 jntt.db 表。
+     */
     public void updateProduct(int id, String name, String desc, double price, String coverUri) {
         ContentValues cv = new ContentValues();
         cv.put("name", name);
@@ -623,6 +943,11 @@ public class DataManager {
         wdb().update("products", cv, "id=?", new String[] { String.valueOf(id) });
     }
 
+    /**
+     * 项目职责：创建本地数据门面，负责把页面业务请求转换为 SharedPreferences 和 SQLite 读写需要的数据、监听器或上下文引用。
+     * 关键调用：执行 SQLite 查询；读取查询结果。
+     * 配合代码：被 Activity、Fragment 和 Adapter 调用，底层配合 AppDatabase 与 jntt.db 表。
+     */
     public Product getProduct(int id) {
         try (Cursor c = rdb().rawQuery(
                 "SELECT id,name,`desc`,price,cover_uri FROM products WHERE id=?",
@@ -633,11 +958,21 @@ public class DataManager {
         return null;
     }
 
+    /**
+     * 项目职责：创建本地数据门面，负责把页面业务请求转换为 SharedPreferences 和 SQLite 读写需要的数据、监听器或上下文引用。
+     * 关键调用：删除 SQLite 记录。
+     * 配合代码：被 Activity、Fragment 和 Adapter 调用，底层配合 AppDatabase 与 jntt.db 表。
+     */
     public void deleteProduct(int id) {
         wdb().delete("products", "id=?", new String[] { String.valueOf(id) });
     }
 
     /** ID set of products that still exist (used to flag delisted items in the cart). */
+    /**
+     * 项目职责：创建本地数据门面，负责把页面业务请求转换为 SharedPreferences 和 SQLite 读写需要的数据、监听器或上下文引用。
+     * 关键调用：执行 SQLite 查询；读取查询结果。
+     * 配合代码：被 Activity、Fragment 和 Adapter 调用，底层配合 AppDatabase 与 jntt.db 表。
+     */
     public Set<Integer> getAvailableProductIds() {
         Set<Integer> ids = new HashSet<>();
         try (Cursor c = rdb().rawQuery("SELECT id FROM products", null)) {
@@ -649,6 +984,11 @@ public class DataManager {
 
     // ─── 购物车 ───────────────────────────────────────────────────────────────
 
+    /**
+     * 项目职责：创建本地数据门面，负责把页面业务请求转换为 SharedPreferences 和 SQLite 读写需要的数据、监听器或上下文引用。
+     * 关键调用：执行 SQLite 查询；读取查询结果。
+     * 配合代码：被 Activity、Fragment 和 Adapter 调用，底层配合 AppDatabase 与 jntt.db 表。
+     */
     public List<CartItem> getCart(String username) {
         List<CartItem> list = new ArrayList<>();
         try (Cursor c = rdb().rawQuery(
@@ -660,6 +1000,11 @@ public class DataManager {
         return list;
     }
 
+    /**
+     * 项目职责：创建本地数据门面，负责把页面业务请求转换为 SharedPreferences 和 SQLite 读写需要的数据、监听器或上下文引用。
+     * 关键调用：执行 SQLite 查询；读取查询结果；组织 SQLite 写入字段；插入 SQLite 记录。
+     * 配合代码：被 Activity、Fragment 和 Adapter 调用，底层配合 AppDatabase 与 jntt.db 表。
+     */
     public void addToCart(String username, Product product) {
         try (Cursor c = rdb().rawQuery(
                 "SELECT quantity FROM cart WHERE username=? AND product_id=?",
@@ -680,6 +1025,11 @@ public class DataManager {
         }
     }
 
+    /**
+     * 项目职责：创建本地数据门面，负责把页面业务请求转换为 SharedPreferences 和 SQLite 读写需要的数据、监听器或上下文引用。
+     * 关键调用：组织 SQLite 写入字段；插入 SQLite 记录；删除 SQLite 记录。
+     * 配合代码：被 Activity、Fragment 和 Adapter 调用，底层配合 AppDatabase 与 jntt.db 表。
+     */
     public void saveCartPublic(String username, List<CartItem> items) {
         SQLiteDatabase d = wdb();
         d.delete("cart", "username=?", new String[] { username });
@@ -696,6 +1046,11 @@ public class DataManager {
 
     // ─── 订单 ────────────────────────────────────────────────────────────────
 
+    /**
+     * 项目职责：创建本地数据门面，负责把页面业务请求转换为 SharedPreferences 和 SQLite 读写需要的数据、监听器或上下文引用。
+     * 关键调用：执行 SQLite 查询；读取查询结果。
+     * 配合代码：被 Activity、Fragment 和 Adapter 调用，底层配合 AppDatabase 与 jntt.db 表。
+     */
     public List<Order> getOrders(String username) {
         List<Order> list = new ArrayList<>();
         try (Cursor c = rdb().rawQuery(
@@ -709,6 +1064,11 @@ public class DataManager {
         return list;
     }
 
+    /**
+     * 项目职责：创建本地数据门面，负责把页面业务请求转换为 SharedPreferences 和 SQLite 读写需要的数据、监听器或上下文引用。
+     * 关键调用：组织 SQLite 写入字段；插入 SQLite 记录。
+     * 配合代码：被 Activity、Fragment 和 Adapter 调用，底层配合 AppDatabase 与 jntt.db 表。
+     */
     public void addOrder(String username, int productId, String name, double price, int quantity) {
         ContentValues cv = new ContentValues();
         cv.put("order_id", "JN" + System.currentTimeMillis());
@@ -722,6 +1082,11 @@ public class DataManager {
         wdb().insert("orders", null, cv);
     }
 
+    /**
+     * 项目职责：创建本地数据门面，负责把页面业务请求转换为 SharedPreferences 和 SQLite 读写需要的数据、监听器或上下文引用。
+     * 关键调用：组织 SQLite 写入字段；更新 SQLite 记录。
+     * 配合代码：被 Activity、Fragment 和 Adapter 调用，底层配合 AppDatabase 与 jntt.db 表。
+     */
     public void updateOrderStatus(String username, String orderId, String status) {
         ContentValues cv = new ContentValues();
         cv.put("status", status);
@@ -731,26 +1096,51 @@ public class DataManager {
 
     // ─── 工具方法 ─────────────────────────────────────────────────────────────
 
+    /**
+     * 项目职责：取得只读数据库连接，供 DataManager 查询各业务表。
+     * 关键调用：打开只读 SQLite 数据库。
+     * 配合代码：被 Activity、Fragment 和 Adapter 调用，底层配合 AppDatabase 与 jntt.db 表。
+     */
     private SQLiteDatabase rdb() {
         return appDb.getReadableDatabase();
     }
 
+    /**
+     * 项目职责：取得可写数据库连接，供 DataManager 插入、更新、删除业务表。
+     * 关键调用：打开可写 SQLite 数据库。
+     * 配合代码：被 Activity、Fragment 和 Adapter 调用，底层配合 AppDatabase 与 jntt.db 表。
+     */
     private SQLiteDatabase wdb() {
         return appDb.getWritableDatabase();
     }
 
+    /**
+     * 项目职责：执行 COUNT 查询，供粉丝数、关注数、评论数等统计复用。
+     * 关键调用：执行 SQLite 查询；读取查询结果；复用计数查询。
+     * 配合代码：被 Activity、Fragment 和 Adapter 调用，底层配合 AppDatabase 与 jntt.db 表。
+     */
     private int queryCount(String sql, String arg) {
         try (Cursor c = rdb().rawQuery(sql, new String[] { arg })) {
             return c.moveToFirst() ? c.getInt(0) : 0;
         }
     }
 
+    /**
+     * 项目职责：执行 COUNT 查询，供粉丝数、关注数、评论数等统计复用。
+     * 关键调用：执行 SQLite 查询；读取查询结果；复用计数查询。
+     * 配合代码：被 Activity、Fragment 和 Adapter 调用，底层配合 AppDatabase 与 jntt.db 表。
+     */
     private int queryCount(String sql, String[] args) {
         try (Cursor c = rdb().rawQuery(sql, args)) {
             return c.moveToFirst() ? c.getInt(0) : 0;
         }
     }
 
+    /**
+     * 项目职责：创建本地数据门面，负责把页面业务请求转换为 SharedPreferences 和 SQLite 读写需要的数据、监听器或上下文引用。
+     * 关键调用：执行 SQLite 查询；读取查询结果。
+     * 配合代码：被 Activity、Fragment 和 Adapter 调用，底层配合 AppDatabase 与 jntt.db 表。
+     */
     private String getArticleAuthor(int articleId) {
         try (Cursor c = rdb().rawQuery("SELECT author FROM articles WHERE id=?",
                 new String[] { String.valueOf(articleId) })) {
@@ -758,6 +1148,11 @@ public class DataManager {
         }
     }
 
+    /**
+     * 项目职责：创建本地数据门面，负责把页面业务请求转换为 SharedPreferences 和 SQLite 读写需要的数据、监听器或上下文引用。
+     * 关键调用：执行 SQLite 查询；读取查询结果。
+     * 配合代码：被 Activity、Fragment 和 Adapter 调用，底层配合 AppDatabase 与 jntt.db 表。
+     */
     private String getCommentAuthor(int commentId) {
         try (Cursor c = rdb().rawQuery("SELECT username FROM comments WHERE id=?",
                 new String[] { String.valueOf(commentId) })) {
@@ -765,6 +1160,11 @@ public class DataManager {
         }
     }
 
+    /**
+     * 项目职责：计算非自增表的下一个 id，供文章和商品新增时生成主键。
+     * 关键调用：执行 SQLite 查询；读取查询结果；计算固定主键表的下一个 id。
+     * 配合代码：被 Activity、Fragment 和 Adapter 调用，底层配合 AppDatabase 与 jntt.db 表。
+     */
     private int nextId(String table) {
         try (Cursor c = rdb().rawQuery(
                 "SELECT COALESCE(MAX(id),0)+1 FROM " + table, null)) {
@@ -772,12 +1172,22 @@ public class DataManager {
         }
     }
 
+    /**
+     * 项目职责：生成当前时间字符串，供文章、评论、订单等记录保存时间。
+     * 关键调用：生成统一时间文本。
+     * 配合代码：被 Activity、Fragment 和 Adapter 调用，底层配合 AppDatabase 与 jntt.db 表。
+     */
     private String now(String pattern) {
         return new SimpleDateFormat(pattern, Locale.getDefault()).format(new Date());
     }
 
     // ─── 种子数据（DB 空时初始化） ────────────────────────────────────────────
 
+    /**
+     * 项目职责：创建本地数据门面，负责把页面业务请求转换为 SharedPreferences 和 SQLite 读写需要的数据、监听器或上下文引用。
+     * 关键调用：执行 SQLite 查询；读取查询结果。
+     * 配合代码：被 Activity、Fragment 和 Adapter 调用，底层配合 AppDatabase 与 jntt.db 表。
+     */
     private void seedDefaultData() {
         // 确保能刷新出 10 件初始商品和 5 篇文章
         boolean needSeed = false;
@@ -840,6 +1250,11 @@ public class DataManager {
                 "农家林地散养大白鹅产蛋，蛋黄大而橙红，营养丰富，天然无公害。", 65.00);
     }
 
+    /**
+     * 项目职责：创建本地数据门面，负责把页面业务请求转换为 SharedPreferences 和 SQLite 读写需要的数据、监听器或上下文引用。
+     * 关键调用：组织 SQLite 写入字段；写入关注关系并避免重复。
+     * 配合代码：被 Activity、Fragment 和 Adapter 调用，底层配合 AppDatabase 与 jntt.db 表。
+     */
     private void insertArticle(SQLiteDatabase d, int id, String title, String content,
             String author, String time, int readCount) {
         ContentValues cv = new ContentValues();
@@ -852,6 +1267,11 @@ public class DataManager {
         d.insertWithOnConflict("articles", null, cv, SQLiteDatabase.CONFLICT_IGNORE);
     }
 
+    /**
+     * 项目职责：创建本地数据门面，负责把页面业务请求转换为 SharedPreferences 和 SQLite 读写需要的数据、监听器或上下文引用。
+     * 关键调用：组织 SQLite 写入字段；写入关注关系并避免重复。
+     * 配合代码：被 Activity、Fragment 和 Adapter 调用，底层配合 AppDatabase 与 jntt.db 表。
+     */
     private void insertProduct(SQLiteDatabase d, int id, String name, String desc, double price) {
         ContentValues cv = new ContentValues();
         cv.put("id", id);

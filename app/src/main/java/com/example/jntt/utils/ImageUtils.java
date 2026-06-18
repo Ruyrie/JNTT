@@ -15,14 +15,39 @@ import com.google.android.material.bottomsheet.BottomSheetDialog;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 
+/**
+ * 项目职责：图片选择工具，负责复用拍照/相册选择底部弹窗。
+ * 技术说明：读取查询结果；绑定布局控件；绑定点击事件。
+ * 配合代码：配合当前页面布局、DataManager 和相关 Adapter 使用。
+ */
 public class ImageUtils {
 
+    /**
+     * 项目职责：OnImagePickerListener 对应的项目组件。
+     * 技术说明：使用 Java/Android 基础语法完成该业务步骤。
+     * 配合代码：由对应页面或 Adapter 持有，用于把列表点击/变化回调到业务页面。
+     */
     public interface OnImagePickerListener {
+        /**
+         * 项目职责：把拍照选项回调给宿主页面启动相机。
+         * 关键调用：使用 Java/Android 基础语法完成该业务步骤。
+         * 配合代码：配合当前页面布局、DataManager 和相关 Adapter 使用。
+         */
         void onTakePhoto();
 
+        /**
+         * 项目职责：把相册选项回调给宿主页面启动图片选择器。
+         * 关键调用：使用 Java/Android 基础语法完成该业务步骤。
+         * 配合代码：配合当前页面布局、DataManager 和相关 Adapter 使用。
+         */
         void onPickFromGallery();
     }
 
+    /**
+     * 项目职责：展示拍照/相册底部弹窗，供文章、商品、评价、头像页面复用。
+     * 关键调用：绑定布局控件；绑定点击事件。
+     * 配合代码：配合当前页面布局、DataManager 和相关 Adapter 使用。
+     */
     public static void showImagePickerDialog(Context context, String title, OnImagePickerListener listener) {
         BottomSheetDialog dialog = new BottomSheetDialog(context, R.style.BottomSheetDialogTheme);
         View view = LayoutInflater.from(context).inflate(R.layout.dialog_image_picker, null);
@@ -48,6 +73,11 @@ public class ImageUtils {
         dialog.show();
     }
 
+    /**
+     * 项目职责：图片选择工具，负责复用拍照/相册选择底部弹窗。
+     * 关键调用：读取查询结果。
+     * 配合代码：配合当前页面布局、DataManager 和相关 Adapter 使用。
+     */
     public static String uriToBase64(Context context, Uri uri) {
         try {
             InputStream inputStream = context.getContentResolver().openInputStream(uri);
@@ -74,6 +104,11 @@ public class ImageUtils {
         }
     }
 
+    /**
+     * 项目职责：图片选择工具，负责复用拍照/相册选择底部弹窗。
+     * 关键调用：使用 Java/Android 基础语法完成该业务步骤。
+     * 配合代码：配合当前页面布局、DataManager 和相关 Adapter 使用。
+     */
     public static void setAvatarFromBase64(ImageView imageView, String base64Str) {
         if (base64Str == null || !base64Str.startsWith("data:image")) {
             return;

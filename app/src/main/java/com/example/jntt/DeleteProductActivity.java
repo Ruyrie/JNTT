@@ -19,6 +19,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 /** 删除商品界面（仅管理员可见） */
+/**
+ * 项目职责：管理员删除商品页，负责商品列表展示、删除确认和删除数据库记录。
+ * 技术说明：绑定布局控件；绑定点击事件；提示用户操作结果。
+ * 配合代码：配合当前页面布局、DataManager 和相关 Adapter 使用。
+ */
 public class DeleteProductActivity extends AppCompatActivity {
 
     private DataManager dm;
@@ -27,6 +32,11 @@ public class DeleteProductActivity extends AppCompatActivity {
     private RecyclerView rv;
     private TextView tvEmpty;
 
+    /**
+     * 项目职责：初始化管理员删除商品页，负责商品列表展示、删除确认和删除数据库记录，加载布局、读取业务数据并绑定用户操作。
+     * 关键调用：绑定布局控件；连接 RecyclerView 与 Adapter；设置列表排列方式；读写本地业务数据。
+     * 配合代码：配合 AndroidManifest、activity_*.xml、DataManager 和页面跳转使用。
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,6 +59,11 @@ public class DeleteProductActivity extends AppCompatActivity {
         updateEmptyState();
     }
 
+    /**
+     * 项目职责：管理员删除商品页，负责商品列表展示、删除确认和删除数据库记录。
+     * 关键调用：绑定布局控件；绑定点击事件；提示用户操作结果。
+     * 配合代码：配合当前页面布局、DataManager 和相关 Adapter 使用。
+     */
     private void confirmDelete(Product product) {
         Dialog dialog = new Dialog(this);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -89,6 +104,11 @@ public class DeleteProductActivity extends AppCompatActivity {
         dialog.show();
     }
 
+    /**
+     * 项目职责：管理员删除商品页，负责商品列表展示、删除确认和删除数据库记录。
+     * 关键调用：使用 Java/Android 基础语法完成该业务步骤。
+     * 配合代码：配合当前页面布局、DataManager 和相关 Adapter 使用。
+     */
     private void updateEmptyState() {
         boolean empty = products.isEmpty();
         rv.setVisibility(empty ? View.GONE : View.VISIBLE);

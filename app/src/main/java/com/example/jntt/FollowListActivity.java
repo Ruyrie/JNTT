@@ -19,6 +19,11 @@ import java.util.List;
  */
 public class FollowListActivity extends AppCompatActivity {
 
+    /**
+     * 项目职责：初始化初始化关注/粉丝页，负责用户关系列表展示和关注操作：加载布局、读取参数/本地数据、绑定控件和用户操作，加载布局、读取业务数据并绑定用户操作。
+     * 关键调用：绑定布局控件；连接 RecyclerView 与 Adapter；设置列表排列方式；读写本地业务数据。
+     * 配合代码：配合 AndroidManifest、activity_*.xml、DataManager 和页面跳转使用。
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,6 +67,11 @@ public class FollowListActivity extends AppCompatActivity {
 
     // ─── Inner adapter ───────────────────────────────────────────────────────
 
+    /**
+     * 项目职责：FollowUserAdapter 对应的项目组件。
+     * 技术说明：绑定布局控件；绑定点击事件。
+     * 配合代码：由对应页面或 Adapter 持有，用于把列表点击/变化回调到业务页面。
+     */
     static class FollowUserAdapter extends RecyclerView.Adapter<FollowUserAdapter.VH> {
 
         private final List<String> users;
@@ -74,6 +84,11 @@ public class FollowListActivity extends AppCompatActivity {
             this.dm = dm;
         }
 
+        /**
+         * 项目职责：为初始化初始化关注/粉丝页创建 RecyclerView 列表项 ViewHolder。
+         * 关键调用：加载列表项 XML 布局；加载 XML 布局。
+         * 配合代码：配合当前模块的布局、数据类和调用方使用。
+         */
         @NonNull
         @Override
         public VH onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -82,6 +97,11 @@ public class FollowListActivity extends AppCompatActivity {
             return new VH(v);
         }
 
+        /**
+         * 项目职责：把当前位置的数据绑定到初始化初始化关注/粉丝页的 item 布局控件上。
+         * 关键调用：显示用户选择的图片 URI。
+         * 配合代码：配合当前模块的布局、数据类和调用方使用。
+         */
         @Override
         public void onBindViewHolder(@NonNull VH h, int position) {
             String username = users.get(position);
@@ -140,17 +160,32 @@ public class FollowListActivity extends AppCompatActivity {
             });
         }
 
+        /**
+         * 项目职责：初始化关注/粉丝页，负责用户关系列表展示和关注操作：加载布局、读取参数/本地数据、绑定控件和用户操作。
+         * 关键调用：使用 Java/Android 基础语法完成该业务步骤。
+         * 配合代码：配合当前页面布局、DataManager 和相关 Adapter 使用。
+         */
         private void refreshToggle(VH h, String username) {
             boolean following = dm.isFollowing(currentUser, username);
             h.tvToggle.setText(following ? "已关注" : "关注");
             h.tvToggle.setTextColor(following ? 0xFF999999 : 0xFF2F80ED);
         }
 
+        /**
+         * 项目职责：返回初始化初始化关注/粉丝页当前列表需要展示的条目数量。
+         * 关键调用：使用 Java/Android 基础语法完成该业务步骤。
+         * 配合代码：配合当前模块的布局、数据类和调用方使用。
+         */
         @Override
         public int getItemCount() {
             return users.size();
         }
 
+        /**
+         * 项目职责：VH 对应的项目组件。
+         * 技术说明：绑定布局控件。
+         * 配合代码：配合当前页面布局、DataManager 和相关 Adapter 使用。
+         */
         static class VH extends RecyclerView.ViewHolder {
             TextView tvAvatar, tvUsername, tvToggle;
             android.widget.ImageView ivAvatar;

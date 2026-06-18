@@ -19,6 +19,11 @@ import com.example.jntt.data.DataManager;
 import com.example.jntt.model.CartItem;
 import java.util.List;
 
+/**
+ * 项目职责：购物车页，负责展示当前用户购物车、选择商品、调整数量、清空/删除和生成订单。
+ * 技术说明：绑定布局控件；绑定点击事件；提示用户操作结果。
+ * 配合代码：配合当前页面布局、DataManager 和相关 Adapter 使用。
+ */
 public class CartActivity extends AppCompatActivity {
 
     private CartAdapter adapter;
@@ -28,6 +33,11 @@ public class CartActivity extends AppCompatActivity {
     private DataManager dm;
     private String username;
 
+    /**
+     * 项目职责：初始化购物车页，负责展示当前用户购物车、选择商品、调整数量、清空/删除和生成订单，加载布局、读取业务数据并绑定用户操作。
+     * 关键调用：绑定布局控件；连接 RecyclerView 与 Adapter；设置列表排列方式；读写本地业务数据。
+     * 配合代码：配合 AndroidManifest、activity_*.xml、DataManager 和页面跳转使用。
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,6 +72,11 @@ public class CartActivity extends AppCompatActivity {
         refreshBottomBar();
     }
 
+    /**
+     * 项目职责：购物车页，负责展示当前用户购物车、选择商品、调整数量、清空/删除和生成订单。
+     * 关键调用：绑定布局控件；绑定点击事件；提示用户操作结果。
+     * 配合代码：配合当前页面布局、DataManager 和相关 Adapter 使用。
+     */
     private void showClearCartDialog() {
         if (items.isEmpty()) {
             Toast.makeText(this, "购物车已经是空的", Toast.LENGTH_SHORT).show();
@@ -97,11 +112,21 @@ public class CartActivity extends AppCompatActivity {
         dialog.show();
     }
 
+    /**
+     * 项目职责：购物车页，负责展示当前用户购物车、选择商品、调整数量、清空/删除和生成订单。
+     * 关键调用：使用 Java/Android 基础语法完成该业务步骤。
+     * 配合代码：配合当前页面布局、DataManager 和相关 Adapter 使用。
+     */
     private void persistCartState() {
         dm.saveCartPublic(username, items);
         refreshBottomBar();
     }
 
+    /**
+     * 项目职责：购物车页，负责展示当前用户购物车、选择商品、调整数量、清空/删除和生成订单。
+     * 关键调用：使用 Java/Android 基础语法完成该业务步骤。
+     * 配合代码：配合当前页面布局、DataManager 和相关 Adapter 使用。
+     */
     private void refreshBottomBar() {
         double total = adapter.getSelectedTotal();
         tvTotal.setText(String.format("¥%,.2f", total));
@@ -111,6 +136,11 @@ public class CartActivity extends AppCompatActivity {
         cbSelectAll.setOnCheckedChangeListener((btn, checked) -> adapter.setAllChecked(checked));
     }
 
+    /**
+     * 项目职责：购物车页，负责展示当前用户购物车、选择商品、调整数量、清空/删除和生成订单。
+     * 关键调用：提示用户操作结果。
+     * 配合代码：配合当前页面布局、DataManager 和相关 Adapter 使用。
+     */
     private void checkout() {
         List<com.example.jntt.model.CartItem> checkedItems = adapter.getCheckedItems();
         if (checkedItems.isEmpty()) {

@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  资源文件：dialog_bind_phone.xml
+  项目职责：绑定手机弹窗布局，供账号安全相关输入使用。
+  配合代码：Java 代码通过 setContentView、inflate、findViewById 和 R.id/R.layout 引用这里的控件。
+-->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"

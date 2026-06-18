@@ -1,3 +1,8 @@
+<!--
+  资源文件：themes.xml
+  项目职责：主题资源，定义 JNTT 的应用主题、状态栏和基础控件样式。
+  配合代码：配合布局 XML、主题系统和 Java/Kotlin 中的 R.string/R.color/R.style/R.attr 使用。
+-->
 <resources xmlns:tools="http://schemas.android.com/tools">
     <style name="Base.Theme.JNTT" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="colorPrimary">@color/colorPrimary</item>

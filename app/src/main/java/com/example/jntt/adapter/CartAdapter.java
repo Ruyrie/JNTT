@@ -15,9 +15,24 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * 项目职责：购物车 Adapter，负责把 CartItem 渲染成购物车行，处理勾选、数量加减、删除和下架提示。
+ * 技术说明：绑定布局控件；绑定点击事件；刷新列表。
+ * 配合代码：由对应页面或 Adapter 持有，用于把列表点击/变化回调到业务页面。
+ */
 public class CartAdapter extends RecyclerView.Adapter<CartAdapter.VH> {
 
+    /**
+     * 项目职责：购物车变化回调接口，负责把 CartAdapter 中数量/勾选/删除变化交给 CartActivity 保存。
+     * 技术说明：使用 Java/Android 基础语法完成该业务步骤。
+     * 配合代码：由对应页面或 Adapter 持有，用于把列表点击/变化回调到业务页面。
+     */
     public interface OnChangeListener {
+        /**
+         * 项目职责：购物车 Adapter，负责把 CartItem 渲染成购物车行，处理勾选、数量加减、删除和下架提示。
+         * 关键调用：使用 Java/Android 基础语法完成该业务步骤。
+         * 配合代码：由对应页面或 Adapter 持有，用于把列表点击/变化回调到业务页面。
+         */
         void onChange();
     }
 
@@ -26,24 +41,49 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.VH> {
     private Set<Integer> availableIds = null; // null = availability unknown, treat all as available
     private OnChangeListener listener;
 
+    /**
+     * 项目职责：创建购物车 Adapter，保存页面传入的数据列表和点击回调。
+     * 关键调用：使用 Java/Android 基础语法完成该业务步骤。
+     * 配合代码：配合 RecyclerView、item_*.xml 和宿主页面的数据列表使用。
+     */
     public CartAdapter(List<CartItem> data) {
         this.data = data;
     }
 
+    /**
+     * 项目职责：购物车 Adapter，负责把 CartItem 渲染成购物车行，处理勾选、数量加减、删除和下架提示。
+     * 关键调用：使用 Java/Android 基础语法完成该业务步骤。
+     * 配合代码：由对应页面或 Adapter 持有，用于把列表点击/变化回调到业务页面。
+     */
     public void setOnChangeListener(OnChangeListener l) {
         this.listener = l;
     }
 
     /** Supply the set of product ids that still exist; delisted items are flagged "商品已下架". */
+    /**
+     * 项目职责：购物车 Adapter，负责把 CartItem 渲染成购物车行，处理勾选、数量加减、删除和下架提示。
+     * 关键调用：刷新列表。
+     * 配合代码：由对应页面或 Adapter 持有，用于把列表点击/变化回调到业务页面。
+     */
     public void setAvailableIds(Set<Integer> ids) {
         this.availableIds = ids;
         notifyDataSetChanged();
     }
 
+    /**
+     * 项目职责：购物车 Adapter，负责把 CartItem 渲染成购物车行，处理勾选、数量加减、删除和下架提示。
+     * 关键调用：使用 Java/Android 基础语法完成该业务步骤。
+     * 配合代码：由对应页面或 Adapter 持有，用于把列表点击/变化回调到业务页面。
+     */
     private boolean isAvailable(CartItem c) {
         return availableIds == null || availableIds.contains(c.productId);
     }
 
+    /**
+     * 项目职责：购物车 Adapter，负责把 CartItem 渲染成购物车行，处理勾选、数量加减、删除和下架提示。
+     * 关键调用：刷新列表。
+     * 配合代码：由对应页面或 Adapter 持有，用于把列表点击/变化回调到业务页面。
+     */
     public void setAllChecked(boolean val) {
         checkedIds.clear();
         if (val) {
@@ -56,6 +96,11 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.VH> {
             listener.onChange();
     }
 
+    /**
+     * 项目职责：购物车 Adapter，负责把 CartItem 渲染成购物车行，处理勾选、数量加减、删除和下架提示。
+     * 关键调用：使用 Java/Android 基础语法完成该业务步骤。
+     * 配合代码：由对应页面或 Adapter 持有，用于把列表点击/变化回调到业务页面。
+     */
     public boolean areAllChecked() {
         boolean anyAvailable = false;
         for (CartItem c : data) {
@@ -68,6 +113,11 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.VH> {
         return anyAvailable;
     }
 
+    /**
+     * 项目职责：购物车 Adapter，负责把 CartItem 渲染成购物车行，处理勾选、数量加减、删除和下架提示。
+     * 关键调用：使用 Java/Android 基础语法完成该业务步骤。
+     * 配合代码：由对应页面或 Adapter 持有，用于把列表点击/变化回调到业务页面。
+     */
     public double getSelectedTotal() {
         double total = 0;
         for (CartItem c : data)
@@ -77,6 +127,11 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.VH> {
     }
 
     /** Return a snapshot of currently checked items */
+    /**
+     * 项目职责：购物车 Adapter，负责把 CartItem 渲染成购物车行，处理勾选、数量加减、删除和下架提示。
+     * 关键调用：使用 Java/Android 基础语法完成该业务步骤。
+     * 配合代码：由对应页面或 Adapter 持有，用于把列表点击/变化回调到业务页面。
+     */
     public List<CartItem> getCheckedItems() {
         List<CartItem> result = new ArrayList<>();
         for (CartItem c : data)
@@ -86,6 +141,11 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.VH> {
     }
 
     /** Remove checked items, return count */
+    /**
+     * 项目职责：购物车 Adapter，负责把 CartItem 渲染成购物车行，处理勾选、数量加减、删除和下架提示。
+     * 关键调用：刷新列表。
+     * 配合代码：由对应页面或 Adapter 持有，用于把列表点击/变化回调到业务页面。
+     */
     public int removeChecked() {
         int before = data.size();
         data.removeIf(c -> checkedIds.contains(c.productId));
@@ -95,6 +155,11 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.VH> {
     }
 
     /** Remove ALL items */
+    /**
+     * 项目职责：购物车 Adapter，负责把 CartItem 渲染成购物车行，处理勾选、数量加减、删除和下架提示。
+     * 关键调用：刷新列表。
+     * 配合代码：由对应页面或 Adapter 持有，用于把列表点击/变化回调到业务页面。
+     */
     public void clearAll() {
         data.clear();
         checkedIds.clear();
@@ -103,6 +168,11 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.VH> {
             listener.onChange();
     }
 
+    /**
+     * 项目职责：为购物车 Adapter创建 RecyclerView 列表项 ViewHolder。
+     * 关键调用：加载列表项 XML 布局；加载 XML 布局。
+     * 配合代码：配合 RecyclerView、item_*.xml 和宿主页面的数据列表使用。
+     */
     @NonNull
     @Override
     public VH onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -111,6 +181,11 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.VH> {
         return new VH(v);
     }
 
+    /**
+     * 项目职责：把当前位置的数据绑定到购物车 Adapter的 item 布局控件上。
+     * 关键调用：显示内置图片资源。
+     * 配合代码：配合 RecyclerView、item_*.xml 和宿主页面的数据列表使用。
+     */
     @Override
     public void onBindViewHolder(@NonNull VH holder, int position) {
         CartItem c = data.get(position);
@@ -198,11 +273,21 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.VH> {
         });
     }
 
+    /**
+     * 项目职责：返回购物车 Adapter当前列表需要展示的条目数量。
+     * 关键调用：使用 Java/Android 基础语法完成该业务步骤。
+     * 配合代码：配合 RecyclerView、item_*.xml 和宿主页面的数据列表使用。
+     */
     @Override
     public int getItemCount() {
         return data.size();
     }
 
+    /**
+     * 项目职责：VH 对应的项目组件。
+     * 技术说明：绑定布局控件。
+     * 配合代码：配合当前页面布局、DataManager 和相关 Adapter 使用。
+     */
     static class VH extends RecyclerView.ViewHolder {
         CheckBox cbItem;
         ImageView ivImage;

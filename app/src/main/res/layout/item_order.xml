@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  资源文件：item_order.xml
+  项目职责：订单条目布局，供 OrderAdapter 显示订单商品、状态、金额和操作入口。
+  配合代码：Java 代码通过 setContentView、inflate、findViewById 和 R.id/R.layout 引用这里的控件。
+-->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"

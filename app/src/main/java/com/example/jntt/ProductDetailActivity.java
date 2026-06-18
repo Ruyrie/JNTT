@@ -11,11 +11,21 @@ import com.example.jntt.data.DataManager;
 import com.example.jntt.model.Product;
 
 /** 商品详情界面：图片、名称、介绍、价格、加入购物车/购买/购物车入口 */
+/**
+ * 项目职责：商品详情页，负责商品图片、价格、详情、评价摘要、购物车和购买入口。
+ * 技术说明：绑定布局控件；绑定点击事件；提示用户操作结果。
+ * 配合代码：配合当前页面布局、DataManager 和相关 Adapter 使用。
+ */
 public class ProductDetailActivity extends AppCompatActivity {
 
     private int productId;
     private DataManager dm;
 
+    /**
+     * 项目职责：初始化商品详情页，负责商品图片、价格、详情、评价摘要、购物车和购买入口，加载布局、读取业务数据并绑定用户操作。
+     * 关键调用：绑定布局控件；显示内置图片资源；显示用户选择的图片 URI；连接 RecyclerView 与 Adapter。
+     * 配合代码：配合 AndroidManifest、activity_*.xml、DataManager 和页面跳转使用。
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -131,6 +141,11 @@ public class ProductDetailActivity extends AppCompatActivity {
         }
 
         vpProductImage.addOnScrollListener(new androidx.recyclerview.widget.RecyclerView.OnScrollListener() {
+            /**
+             * 项目职责：商品详情页，负责商品图片、价格、详情、评价摘要、购物车和购买入口。
+             * 关键调用：使用 Java/Android 基础语法完成该业务步骤。
+             * 配合代码：配合当前页面布局、DataManager 和相关 Adapter 使用。
+             */
             @Override
             public void onScrollStateChanged(@androidx.annotation.NonNull androidx.recyclerview.widget.RecyclerView recyclerView,
                                              int newState) {
@@ -155,6 +170,11 @@ public class ProductDetailActivity extends AppCompatActivity {
         rvDetailImages.setLayoutManager(new androidx.recyclerview.widget.LinearLayoutManager(this));
         rvDetailImages.setAdapter(
                 new androidx.recyclerview.widget.RecyclerView.Adapter<androidx.recyclerview.widget.RecyclerView.ViewHolder>() {
+                    /**
+                     * 项目职责：为商品详情页创建 RecyclerView 列表项 ViewHolder。
+                     * 关键调用：使用 Java/Android 基础语法完成该业务步骤。
+                     * 配合代码：配合当前模块的布局、数据类和调用方使用。
+                     */
                     @androidx.annotation.NonNull
                     @Override
                     public androidx.recyclerview.widget.RecyclerView.ViewHolder onCreateViewHolder(
@@ -169,6 +189,11 @@ public class ProductDetailActivity extends AppCompatActivity {
                         };
                     }
 
+                    /**
+                     * 项目职责：把当前位置的数据绑定到商品详情页的 item 布局控件上。
+                     * 关键调用：显示内置图片资源；显示用户选择的图片 URI。
+                     * 配合代码：配合当前模块的布局、数据类和调用方使用。
+                     */
                     @Override
                     public void onBindViewHolder(
                             @androidx.annotation.NonNull androidx.recyclerview.widget.RecyclerView.ViewHolder holder,
@@ -186,6 +211,11 @@ public class ProductDetailActivity extends AppCompatActivity {
                         }
                     }
 
+                    /**
+                     * 项目职责：返回商品详情页当前列表需要展示的条目数量。
+                     * 关键调用：使用 Java/Android 基础语法完成该业务步骤。
+                     * 配合代码：配合当前模块的布局、数据类和调用方使用。
+                     */
                     @Override
                     public int getItemCount() {
                         return images.size();
@@ -217,6 +247,11 @@ public class ProductDetailActivity extends AppCompatActivity {
         findViewById(R.id.ivCartIcon).setOnClickListener(v -> startActivity(new Intent(this, CartActivity.class)));
     }
 
+    /**
+     * 项目职责：商品详情页，负责商品图片、价格、详情、评价摘要、购物车和购买入口回到前台时重新读取数据库数据并刷新显示。
+     * 关键调用：使用 Java/Android 基础语法完成该业务步骤。
+     * 配合代码：配合 AndroidManifest、activity_*.xml、DataManager 和页面跳转使用。
+     */
     @Override
     protected void onResume() {
         super.onResume();
@@ -225,6 +260,11 @@ public class ProductDetailActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * 项目职责：商品详情页，负责商品图片、价格、详情、评价摘要、购物车和购买入口。
+     * 关键调用：绑定布局控件。
+     * 配合代码：配合当前页面布局、DataManager 和相关 Adapter 使用。
+     */
     private void loadCommentPreview() {
         int count = dm.getProductCommentCount(productId);
         TextView tvCommentCountTitle = findViewById(R.id.tvCommentCountTitle);

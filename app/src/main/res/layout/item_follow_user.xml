@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  资源文件：item_follow_user.xml
+  项目职责：关注/粉丝条目布局，展示用户头像、昵称和关注按钮。
+  配合代码：Java 代码通过 setContentView、inflate、findViewById 和 R.id/R.layout 引用这里的控件。
+-->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"

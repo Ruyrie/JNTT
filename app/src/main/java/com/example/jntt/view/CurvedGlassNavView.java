@@ -26,16 +26,31 @@ public class CurvedGlassNavView extends FrameLayout {
     private float holeDepth = 75f; // 凹槽深度
     private float cornerRadius = 90f; // 整体圆角
 
+    /**
+     * 项目职责：创建底部导航背景 View，初始化绘制参数并接入 Android View 构造流程。
+     * 关键调用：使用 Java/Android 基础语法完成该业务步骤。
+     * 配合代码：配合 XML 布局和 Android View 绘制流程使用。
+     */
     public CurvedGlassNavView(@NonNull Context context) {
         super(context);
         init();
     }
 
+    /**
+     * 项目职责：创建底部导航背景 View，初始化绘制参数并接入 Android View 构造流程。
+     * 关键调用：使用 Java/Android 基础语法完成该业务步骤。
+     * 配合代码：配合 XML 布局和 Android View 绘制流程使用。
+     */
     public CurvedGlassNavView(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         init();
     }
 
+    /**
+     * 项目职责：初始化自定义 View 的画笔、路径、圆角或裁剪参数。
+     * 关键调用：使用 Java/Android 基础语法完成该业务步骤。
+     * 配合代码：配合 XML 布局和 Android View 绘制流程使用。
+     */
     private void init() {
         setWillNotDraw(false);
         clipPath = new Path();
@@ -51,17 +66,32 @@ public class CurvedGlassNavView extends FrameLayout {
     }
 
     /** 设置凹槽的中心位置，并触发重绘 */
+    /**
+     * 项目职责：创建底部导航背景 View，负责绘制弧形玻璃导航栏需要的数据、监听器或上下文引用。
+     * 关键调用：使用 Java/Android 基础语法完成该业务步骤。
+     * 配合代码：配合 XML 布局和 Android View 绘制流程使用。
+     */
     public void setHolePosition(float x) {
         this.holeX = x;
         invalidate();
     }
 
+    /**
+     * 项目职责：在自定义 View 尺寸变化时重新计算绘制区域。
+     * 关键调用：使用 Java/Android 基础语法完成该业务步骤。
+     * 配合代码：配合 XML 布局和 Android View 绘制流程使用。
+     */
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
         updatePath(w, h);
     }
 
+    /**
+     * 项目职责：创建底部导航背景 View，负责绘制弧形玻璃导航栏需要的数据、监听器或上下文引用。
+     * 关键调用：使用 Java/Android 基础语法完成该业务步骤。
+     * 配合代码：配合 XML 布局和 Android View 绘制流程使用。
+     */
     private void updatePath(int w, int h) {
         clipPath.reset();
 
@@ -120,6 +150,11 @@ public class CurvedGlassNavView extends FrameLayout {
         clipPath.close();
     }
 
+    /**
+     * 项目职责：创建底部导航背景 View，负责绘制弧形玻璃导航栏需要的数据、监听器或上下文引用。
+     * 关键调用：使用 Java/Android 基础语法完成该业务步骤。
+     * 配合代码：配合 XML 布局和 Android View 绘制流程使用。
+     */
     @Override
     public void draw(Canvas canvas) {
         updatePath(getWidth(), getHeight());

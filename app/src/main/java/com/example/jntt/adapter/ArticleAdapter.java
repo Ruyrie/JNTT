@@ -16,9 +16,24 @@ import com.example.jntt.model.Article;
 import com.example.jntt.model.Comment;
 import java.util.List;
 
+/**
+ * 项目职责：文章 Adapter，负责文章卡片展示、点赞收藏状态和详情入口。
+ * 技术说明：绑定布局控件；绑定点击事件；提示用户操作结果。
+ * 配合代码：由对应页面或 Adapter 持有，用于把列表点击/变化回调到业务页面。
+ */
 public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.VH> {
 
+    /**
+     * 项目职责：商品卡片点击回调接口，负责把 ProductAdapter 中的商品点击交给 MallFragment 打开详情页。
+     * 技术说明：使用 Java/Android 基础语法完成该业务步骤。
+     * 配合代码：由对应页面或 Adapter 持有，用于把列表点击/变化回调到业务页面。
+     */
     public interface OnItemClickListener {
+        /**
+         * 项目职责：把商品/文章/账号等列表项点击回调给页面处理详情跳转。
+         * 关键调用：使用 Java/Android 基础语法完成该业务步骤。
+         * 配合代码：由对应页面或 Adapter 持有，用于把列表点击/变化回调到业务页面。
+         */
         void onItemClick(Article article);
     }
 
@@ -33,15 +48,18 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.VH> {
     };
 
     /**
-     * Lightweight constructor — no like/comment features (MyArticles, MyFavorites).
+     * 项目职责：创建文章列表 Adapter，保存页面传入的数据列表和点击回调。
+     * 关键调用：使用 Java/Android 基础语法完成该业务步骤。
+     * 配合代码：配合 RecyclerView、item_*.xml 和宿主页面的数据列表使用。
      */
     public ArticleAdapter(List<Article> data, OnItemClickListener listener) {
         this(data, listener, null, null);
     }
 
     /**
-     * Full-featured constructor — enables live like counts and comment preview
-     * (Headlines feed).
+     * 项目职责：创建文章列表 Adapter，保存页面传入的数据列表和点击回调。
+     * 关键调用：使用 Java/Android 基础语法完成该业务步骤。
+     * 配合代码：配合 RecyclerView、item_*.xml 和宿主页面的数据列表使用。
      */
     public ArticleAdapter(List<Article> data, OnItemClickListener listener,
             DataManager dm, String currentUser) {
@@ -51,6 +69,11 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.VH> {
         this.currentUser = currentUser;
     }
 
+    /**
+     * 项目职责：为文章列表 Adapter创建 RecyclerView 列表项 ViewHolder。
+     * 关键调用：加载列表项 XML 布局；加载 XML 布局。
+     * 配合代码：配合 RecyclerView、item_*.xml 和宿主页面的数据列表使用。
+     */
     @NonNull
     @Override
     public VH onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -59,6 +82,11 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.VH> {
         return new VH(v);
     }
 
+    /**
+     * 项目职责：把当前位置的数据绑定到文章列表 Adapter的 item 布局控件上。
+     * 关键调用：显示内置图片资源；显示用户选择的图片 URI。
+     * 配合代码：配合 RecyclerView、item_*.xml 和宿主页面的数据列表使用。
+     */
     @Override
     public void onBindViewHolder(@NonNull VH h, int position) {
         Article a = data.get(position);
@@ -161,6 +189,11 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.VH> {
         });
     }
 
+    /**
+     * 项目职责：文章 Adapter，负责文章卡片展示、点赞收藏状态和详情入口。
+     * 关键调用：绑定点击事件；提示用户操作结果。
+     * 配合代码：由对应页面或 Adapter 持有，用于把列表点击/变化回调到业务页面。
+     */
     private void bindSocialRow(VH h, Article a) {
         // Like icon + count
         refreshItemLike(h, a);
@@ -204,6 +237,11 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.VH> {
         }
     }
 
+    /**
+     * 项目职责：文章 Adapter，负责文章卡片展示、点赞收藏状态和详情入口。
+     * 关键调用：使用 Java/Android 基础语法完成该业务步骤。
+     * 配合代码：由对应页面或 Adapter 持有，用于把列表点击/变化回调到业务页面。
+     */
     private void refreshItemLike(VH h, Article a) {
         boolean liked = dm.isArticleLiked(currentUser, a.id);
         int count = dm.getArticleLikeCount(a.id);
@@ -211,11 +249,21 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.VH> {
         h.tvItemLikeCount.setText(count > 0 ? String.valueOf(count) : "");
     }
 
+    /**
+     * 项目职责：返回文章列表 Adapter当前列表需要展示的条目数量。
+     * 关键调用：使用 Java/Android 基础语法完成该业务步骤。
+     * 配合代码：配合 RecyclerView、item_*.xml 和宿主页面的数据列表使用。
+     */
     @Override
     public int getItemCount() {
         return data.size();
     }
 
+    /**
+     * 项目职责：VH 对应的项目组件。
+     * 技术说明：绑定布局控件。
+     * 配合代码：配合当前页面布局、DataManager 和相关 Adapter 使用。
+     */
     static class VH extends RecyclerView.ViewHolder {
         TextView tvAuthorInitial, tvAuthor, tvTime, tvReadCount, tvArticleTitle, tvArticleContent;
         TextView tvItemLikeCount, tvItemCommentCount;

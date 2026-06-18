@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  资源文件：file_paths.xml
+  项目职责：FileProvider 路径配置，允许拍照/裁剪流程安全访问缓存图片文件。
+  配合代码：例如 FileProvider、备份/数据提取规则会由 Manifest 或 Android 系统引用。
+-->
 <paths>
     <cache-path name="cache_images" path="images/" />
 </paths>

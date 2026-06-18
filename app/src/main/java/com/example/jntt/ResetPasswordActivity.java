@@ -9,12 +9,22 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import com.example.jntt.data.DataManager;
 
+/**
+ * 项目职责：重置密码页，负责验证码通过后的新密码保存。
+ * 技术说明：绑定布局控件；绑定点击事件；提示用户操作结果。
+ * 配合代码：配合当前页面布局、DataManager 和相关 Adapter 使用。
+ */
 public class ResetPasswordActivity extends AppCompatActivity {
 
     private String username;
     private String displayAccount;
     private DataManager dm;
 
+    /**
+     * 项目职责：初始化重置密码页，负责验证码通过后的新密码保存，加载布局、读取业务数据并绑定用户操作。
+     * 关键调用：绑定布局控件；读写本地业务数据；页面跳转或传递参数；提示用户操作结果。
+     * 配合代码：配合 AndroidManifest、activity_*.xml、DataManager 和页面跳转使用。
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

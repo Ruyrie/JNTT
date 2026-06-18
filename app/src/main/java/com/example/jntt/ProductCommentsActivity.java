@@ -14,6 +14,11 @@ import com.example.jntt.data.DataManager;
 import com.example.jntt.model.ProductComment;
 import java.util.List;
 
+/**
+ * 项目职责：商品评价列表页，负责评价列表、发布评价入口和删除本人评价。
+ * 技术说明：绑定布局控件；绑定点击事件；提示用户操作结果。
+ * 配合代码：配合当前页面布局、DataManager 和相关 Adapter 使用。
+ */
 public class ProductCommentsActivity extends AppCompatActivity {
 
     private int productId;
@@ -24,6 +29,11 @@ public class ProductCommentsActivity extends AppCompatActivity {
     private ProductCommentAdapter adapter;
     private List<ProductComment> comments;
 
+    /**
+     * 项目职责：初始化商品评价列表页，负责评价列表、发布评价入口和删除本人评价，加载布局、读取业务数据并绑定用户操作。
+     * 关键调用：绑定布局控件；设置列表排列方式；读写本地业务数据；页面跳转或传递参数。
+     * 配合代码：配合 AndroidManifest、activity_*.xml、DataManager 和页面跳转使用。
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,12 +64,22 @@ public class ProductCommentsActivity extends AppCompatActivity {
         rvComments.setLayoutManager(new LinearLayoutManager(this));
     }
 
+    /**
+     * 项目职责：商品评价列表页，负责评价列表、发布评价入口和删除本人评价回到前台时重新读取数据库数据并刷新显示。
+     * 关键调用：使用 Java/Android 基础语法完成该业务步骤。
+     * 配合代码：配合 AndroidManifest、activity_*.xml、DataManager 和页面跳转使用。
+     */
     @Override
     protected void onResume() {
         super.onResume();
         loadComments();
     }
 
+    /**
+     * 项目职责：商品评价列表页，负责评价列表、发布评价入口和删除本人评价。
+     * 关键调用：绑定布局控件；绑定点击事件。
+     * 配合代码：配合当前页面布局、DataManager 和相关 Adapter 使用。
+     */
     private void loadComments() {
         comments = dm.getProductComments(productId);
         if (comments.isEmpty()) {

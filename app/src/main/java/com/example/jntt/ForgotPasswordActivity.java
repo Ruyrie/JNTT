@@ -11,6 +11,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.jntt.data.DataManager;
 import com.example.jntt.utils.CaptchaUtils;
 
+/**
+ * 项目职责：忘记密码页，负责找回密码流程入口。
+ * 技术说明：绑定布局控件；绑定点击事件；提示用户操作结果。
+ * 配合代码：配合当前页面布局、DataManager 和相关 Adapter 使用。
+ */
 public class ForgotPasswordActivity extends AppCompatActivity {
 
     private EditText etAccount, etCaptcha;
@@ -18,6 +23,11 @@ public class ForgotPasswordActivity extends AppCompatActivity {
     private DataManager dm;
     private String realCaptcha;
 
+    /**
+     * 项目职责：初始化忘记密码页，负责找回密码流程入口，加载布局、读取业务数据并绑定用户操作。
+     * 关键调用：绑定布局控件；读写本地业务数据。
+     * 配合代码：配合 AndroidManifest、activity_*.xml、DataManager 和页面跳转使用。
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,6 +47,11 @@ public class ForgotPasswordActivity extends AppCompatActivity {
         btnNextStep.setOnClickListener(v -> doNextStep());
     }
 
+    /**
+     * 项目职责：忘记密码页，负责找回密码流程入口。
+     * 关键调用：使用 Java/Android 基础语法完成该业务步骤。
+     * 配合代码：配合当前页面布局、DataManager 和相关 Adapter 使用。
+     */
     private void refreshCaptcha() {
         CaptchaUtils utils = CaptchaUtils.getInstance();
         Bitmap bitmap = utils.createBitmap();
@@ -44,6 +59,11 @@ public class ForgotPasswordActivity extends AppCompatActivity {
         ivCaptcha.setImageBitmap(bitmap);
     }
 
+    /**
+     * 项目职责：忘记密码页，负责找回密码流程入口。
+     * 关键调用：提示用户操作结果。
+     * 配合代码：配合当前页面布局、DataManager 和相关 Adapter 使用。
+     */
     private void doNextStep() {
         String account = etAccount.getText().toString().trim();
         String inputCaptcha = etCaptcha.getText().toString().trim();

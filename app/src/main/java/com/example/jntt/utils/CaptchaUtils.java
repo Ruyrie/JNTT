@@ -6,6 +6,11 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import java.util.Random;
 
+/**
+ * 项目职责：验证码工具，负责生成验证码文本和验证码图片。
+ * 技术说明：使用 Java/Android 基础语法完成该业务步骤。
+ * 配合代码：配合当前页面布局、DataManager 和相关 Adapter 使用。
+ */
 public class CaptchaUtils {
 
     private static final char[] CHARS = {
@@ -20,6 +25,11 @@ public class CaptchaUtils {
     private static CaptchaUtils instance;
     private String code;
 
+    /**
+     * 项目职责：验证码工具，负责生成验证码文本和验证码图片。
+     * 关键调用：使用 Java/Android 基础语法完成该业务步骤。
+     * 配合代码：配合当前页面布局、DataManager 和相关 Adapter 使用。
+     */
     public static CaptchaUtils getInstance() {
         if (instance == null) {
             instance = new CaptchaUtils();
@@ -27,10 +37,20 @@ public class CaptchaUtils {
         return instance;
     }
 
+    /**
+     * 项目职责：生成随机验证码字符串。
+     * 关键调用：使用 Java/Android 基础语法完成该业务步骤。
+     * 配合代码：配合当前页面布局、DataManager 和相关 Adapter 使用。
+     */
     public String getCode() {
         return code;
     }
 
+    /**
+     * 项目职责：根据验证码字符串生成带干扰线的验证码图片。
+     * 关键调用：使用 Java/Android 基础语法完成该业务步骤。
+     * 配合代码：配合当前页面布局、DataManager 和相关 Adapter 使用。
+     */
     public Bitmap createBitmap() {
         int width = 120;
         int height = 50;
@@ -76,6 +96,11 @@ public class CaptchaUtils {
         return bitmap;
     }
 
+    /**
+     * 项目职责：为验证码干扰线或文字生成随机颜色。
+     * 关键调用：使用 Java/Android 基础语法完成该业务步骤。
+     * 配合代码：配合当前页面布局、DataManager 和相关 Adapter 使用。
+     */
     private int getRandomColor() {
         Random random = new Random();
         int r = random.nextInt(150);

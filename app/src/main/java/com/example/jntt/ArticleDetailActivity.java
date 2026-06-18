@@ -22,6 +22,11 @@ import com.example.jntt.model.Article;
 import com.example.jntt.model.Comment;
 import java.util.List;
 
+/**
+ * 项目职责：文章详情页，负责文章展示、点赞、评论提交和删除。
+ * 技术说明：显示或隐藏软键盘；绑定布局控件；绑定点击事件；刷新列表。
+ * 配合代码：配合当前页面布局、DataManager 和相关 Adapter 使用。
+ */
 public class ArticleDetailActivity extends AppCompatActivity {
 
     private int articleId;
@@ -37,6 +42,11 @@ public class ArticleDetailActivity extends AppCompatActivity {
     private LinearLayout llNoComments;
     private NestedScrollView nestedScroll;
 
+    /**
+     * 项目职责：初始化文章详情页，负责文章展示、点赞、评论提交和删除，加载布局、读取业务数据并绑定用户操作。
+     * 关键调用：读写本地业务数据；页面跳转或传递参数。
+     * 配合代码：配合 AndroidManifest、activity_*.xml、DataManager 和页面跳转使用。
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,6 +78,11 @@ public class ArticleDetailActivity extends AppCompatActivity {
 
     // ─── Article binding ─────────────────────────────────────────────────────
 
+    /**
+     * 项目职责：文章详情页，负责文章展示、点赞、评论提交和删除。
+     * 关键调用：绑定布局控件；绑定点击事件；提示用户操作结果。
+     * 配合代码：配合当前页面布局、DataManager 和相关 Adapter 使用。
+     */
     private void bindViews() {
         nestedScroll = findViewById(R.id.nestedScroll);
 
@@ -142,6 +157,11 @@ public class ArticleDetailActivity extends AppCompatActivity {
 
         if (!internalImages.isEmpty()) {
             rvArticleImages.setAdapter(new RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+                /**
+                 * 项目职责：为文章详情页创建 RecyclerView 列表项 ViewHolder。
+                 * 关键调用：使用 Java/Android 基础语法完成该业务步骤。
+                 * 配合代码：配合当前模块的布局、数据类和调用方使用。
+                 */
                 @NonNull
                 @Override
                 public RecyclerView.ViewHolder onCreateViewHolder(@NonNull android.view.ViewGroup parent,
@@ -157,11 +177,21 @@ public class ArticleDetailActivity extends AppCompatActivity {
                     };
                 }
 
+                /**
+                 * 项目职责：把当前位置的数据绑定到文章详情页的 item 布局控件上。
+                 * 关键调用：显示内置图片资源。
+                 * 配合代码：配合当前模块的布局、数据类和调用方使用。
+                 */
                 @Override
                 public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
                     ((ImageView) holder.itemView).setImageResource(internalImages.get(position));
                 }
 
+                /**
+                 * 项目职责：返回文章详情页当前列表需要展示的条目数量。
+                 * 关键调用：使用 Java/Android 基础语法完成该业务步骤。
+                 * 配合代码：配合当前模块的布局、数据类和调用方使用。
+                 */
                 @Override
                 public int getItemCount() {
                     return internalImages.size();
@@ -219,6 +249,11 @@ public class ArticleDetailActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * 项目职责：文章详情页，负责文章展示、点赞、评论提交和删除。
+     * 关键调用：使用 Java/Android 基础语法完成该业务步骤。
+     * 配合代码：配合当前页面布局、DataManager 和相关 Adapter 使用。
+     */
     private void refreshFollowBtn(TextView btn) {
         boolean following = dm.isFollowing(currentUser, article.author);
         btn.setText(following ? "已关注" : "+ 关注");
@@ -227,6 +262,11 @@ public class ArticleDetailActivity extends AppCompatActivity {
 
     // ─── Comments ────────────────────────────────────────────────────────────
 
+    /**
+     * 项目职责：文章详情页，负责文章展示、点赞、评论提交和删除。
+     * 关键调用：绑定布局控件；绑定点击事件；刷新列表。
+     * 配合代码：配合当前页面布局、DataManager 和相关 Adapter 使用。
+     */
     private void setupComments() {
         tvCommentCount = findViewById(R.id.tvCommentCount);
         tvCommentCountBar = findViewById(R.id.tvCommentCountBar);
@@ -272,6 +312,11 @@ public class ArticleDetailActivity extends AppCompatActivity {
         rv.setAdapter(commentAdapter);
     }
 
+    /**
+     * 项目职责：文章详情页，负责文章展示、点赞、评论提交和删除。
+     * 关键调用：使用 Java/Android 基础语法完成该业务步骤。
+     * 配合代码：配合当前页面布局、DataManager 和相关 Adapter 使用。
+     */
     private void updateCommentCountUI() {
         int n = comments.size();
         tvCommentCount.setText(n + " 条");
@@ -281,6 +326,11 @@ public class ArticleDetailActivity extends AppCompatActivity {
 
     // ─── Bottom bar (like + comment input) ───────────────────────────────────
 
+    /**
+     * 项目职责：文章详情页，负责文章展示、点赞、评论提交和删除。
+     * 关键调用：绑定布局控件；绑定点击事件；提示用户操作结果。
+     * 配合代码：配合当前页面布局、DataManager 和相关 Adapter 使用。
+     */
     private void setupBottomBar() {
         ivLikeBtn = findViewById(R.id.tvLikeBtn);
         tvLikeCount = findViewById(R.id.tvLikeCount);
@@ -330,6 +380,11 @@ public class ArticleDetailActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * 项目职责：文章详情页，负责文章展示、点赞、评论提交和删除。
+     * 关键调用：使用 Java/Android 基础语法完成该业务步骤。
+     * 配合代码：配合当前页面布局、DataManager 和相关 Adapter 使用。
+     */
     private void refreshLikeUI() {
         boolean liked = currentUser != null && dm.isArticleLiked(currentUser, articleId);
         int count = dm.getArticleLikeCount(articleId);
@@ -337,6 +392,11 @@ public class ArticleDetailActivity extends AppCompatActivity {
         tvLikeCount.setText(count > 0 ? String.valueOf(count) : "");
     }
 
+    /**
+     * 项目职责：文章详情页，负责文章展示、点赞、评论提交和删除。
+     * 关键调用：显示或隐藏软键盘；提示用户操作结果。
+     * 配合代码：配合当前页面布局、DataManager 和相关 Adapter 使用。
+     */
     private void submitComment(EditText et) {
         if (currentUser == null) {
             Toast.makeText(this, "请先登录", Toast.LENGTH_SHORT).show();
@@ -364,6 +424,11 @@ public class ArticleDetailActivity extends AppCompatActivity {
         nestedScroll.post(() -> nestedScroll.fullScroll(View.FOCUS_DOWN));
     }
 
+    /**
+     * 项目职责：文章详情页，负责文章展示、点赞、评论提交和删除回到前台时重新读取数据库数据并刷新显示。
+     * 关键调用：使用 Java/Android 基础语法完成该业务步骤。
+     * 配合代码：配合 AndroidManifest、activity_*.xml、DataManager 和页面跳转使用。
+     */
     @Override
     protected void onResume() {
         super.onResume();

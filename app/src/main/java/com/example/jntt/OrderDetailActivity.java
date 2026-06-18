@@ -12,12 +12,22 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.jntt.data.DataManager;
 import com.example.jntt.model.Order;
 
+/**
+ * 项目职责：订单详情页，负责订单商品、价格、数量、状态和评价入口展示。
+ * 技术说明：绑定布局控件；绑定点击事件；提示用户操作结果。
+ * 配合代码：配合当前页面布局、DataManager 和相关 Adapter 使用。
+ */
 public class OrderDetailActivity extends AppCompatActivity {
 
     private Order order;
     private DataManager dm;
     private String username;
 
+    /**
+     * 项目职责：初始化订单详情页，负责订单商品、价格、数量、状态和评价入口展示，加载布局、读取业务数据并绑定用户操作。
+     * 关键调用：读写本地业务数据；页面跳转或传递参数。
+     * 配合代码：配合 AndroidManifest、activity_*.xml、DataManager 和页面跳转使用。
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,6 +51,11 @@ public class OrderDetailActivity extends AppCompatActivity {
         bind();
     }
 
+    /**
+     * 项目职责：订单详情页，负责订单商品、价格、数量、状态和评价入口展示。
+     * 关键调用：绑定布局控件；绑定点击事件；提示用户操作结果。
+     * 配合代码：配合当前页面布局、DataManager 和相关 Adapter 使用。
+     */
     private void bind() {
         TextView tvStatus = findViewById(R.id.tvDetailStatus);
         TextView tvCountdown = findViewById(R.id.tvDetailCountdown);

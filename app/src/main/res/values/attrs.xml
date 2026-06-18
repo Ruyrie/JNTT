@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  资源文件：attrs.xml
+  项目职责：自定义属性资源，供自定义 View 或主题扩展使用。
+  配合代码：配合布局 XML、主题系统和 Java/Kotlin 中的 R.string/R.color/R.style/R.attr 使用。
+-->
 <resources>
     <declare-styleable name="RoundedClipFrame">
         <attr name="cornerRadius" format="dimension" />

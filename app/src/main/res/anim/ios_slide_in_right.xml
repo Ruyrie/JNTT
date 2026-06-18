@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  资源文件：ios_slide_in_right.xml
+  项目职责：ios_slide_in_right.xml 页面转场动画资源，负责 iOS 风格淡入淡出或滑动切换效果。
+  配合代码：配合 overridePendingTransition、主题动画或转场逻辑使用。
+-->
 <set xmlns:android="http://schemas.android.com/apk/res/android"
     android:shareInterpolator="false">
     <translate

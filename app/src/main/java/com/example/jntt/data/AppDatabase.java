@@ -15,16 +15,31 @@ public class AppDatabase extends SQLiteOpenHelper {
 
         private static AppDatabase instance;
 
+        /**
+         * 项目职责：读取SQLite 建库类，负责创建 jntt.db 的业务表结构需要的业务数据或状态。
+         * 关键调用：使用 Java/Android 基础语法完成该业务步骤。
+         * 配合代码：配合当前页面布局、DataManager 和相关 Adapter 使用。
+         */
         public static AppDatabase getInstance(Context ctx) {
                 if (instance == null)
                         instance = new AppDatabase(ctx.getApplicationContext());
                 return instance;
         }
 
+        /**
+         * 项目职责：创建 SQLiteOpenHelper，指定数据库文件 jntt.db 和数据库版本号。
+         * 关键调用：使用 Java/Android 基础语法完成该业务步骤。
+         * 配合代码：配合 DataManager 提供 SQLiteDatabase 连接。
+         */
         private AppDatabase(Context ctx) {
                 super(ctx, DB_NAME, null, DB_VERSION);
         }
 
+        /**
+         * 项目职责：初始化读取SQLite 建库类，负责创建 jntt.db 的业务表结构需要的业务数据或状态，加载布局、读取业务数据并绑定用户操作。
+         * 关键调用：使用 Java/Android 基础语法完成该业务步骤。
+         * 配合代码：配合当前模块的布局、数据类和调用方使用。
+         */
         @Override
         public void onCreate(SQLiteDatabase db) {
                 // 用户表（含昵称和头像）
@@ -123,6 +138,11 @@ public class AppDatabase extends SQLiteOpenHelper {
                 db.execSQL("CREATE INDEX idx_product_comments_product ON product_comments(product_id)");
         }
 
+        /**
+         * 项目职责：读取SQLite 建库类，负责创建 jntt.db 的业务表结构需要的业务数据或状态。
+         * 关键调用：使用 Java/Android 基础语法完成该业务步骤。
+         * 配合代码：配合当前页面布局、DataManager 和相关 Adapter 使用。
+         */
         @Override
         public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
                 if (oldVersion < 2) {

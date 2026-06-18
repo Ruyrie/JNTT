@@ -11,11 +11,21 @@ import com.example.jntt.data.DataManager;
 import com.example.jntt.model.User;
 
 /** 登录界面 */
+/**
+ * 项目职责：登录页，负责账号密码校验和进入主界面。
+ * 技术说明：绑定布局控件；绑定点击事件；提示用户操作结果。
+ * 配合代码：配合当前页面布局、DataManager 和相关 Adapter 使用。
+ */
 public class LoginActivity extends AppCompatActivity {
 
     private EditText etUsername, etPassword;
     private DataManager dm;
 
+    /**
+     * 项目职责：初始化登录页，负责账号密码校验和进入主界面，加载布局、读取业务数据并绑定用户操作。
+     * 关键调用：绑定布局控件；读写本地业务数据；页面跳转或传递参数。
+     * 配合代码：配合 AndroidManifest、activity_*.xml、DataManager 和页面跳转使用。
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,6 +50,11 @@ public class LoginActivity extends AppCompatActivity {
         tvForgotPassword.setOnClickListener(v -> startActivity(new Intent(this, ForgotPasswordActivity.class)));
     }
 
+    /**
+     * 项目职责：登录页，负责账号密码校验和进入主界面。
+     * 关键调用：绑定布局控件；绑定点击事件；提示用户操作结果。
+     * 配合代码：配合当前页面布局、DataManager 和相关 Adapter 使用。
+     */
     private void doLogin() {
         String username = etUsername.getText().toString().trim();
         String password = etPassword.getText().toString().trim();
@@ -87,6 +102,11 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * 项目职责：登录页，负责账号密码校验和进入主界面。
+     * 关键调用：使用 Java/Android 基础语法完成该业务步骤。
+     * 配合代码：配合当前页面布局、DataManager 和相关 Adapter 使用。
+     */
     private void goMain() {
         startActivity(new Intent(this, MainActivity.class));
         finish();

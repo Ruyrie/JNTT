@@ -21,8 +21,18 @@ import com.example.jntt.R;
 import com.example.jntt.SettingsActivity;
 import com.example.jntt.data.DataManager;
 
+/**
+ * 项目职责：我的 Fragment，负责用户资料展示和个人中心入口。
+ * 技术说明：绑定布局控件；绑定点击事件。
+ * 配合代码：配合当前页面布局、DataManager 和相关 Adapter 使用。
+ */
 public class MineFragment extends Fragment {
 
+        /**
+         * 项目职责：加载我的 Fragment，负责用户资料展示和个人中心入口对应的 Fragment 布局文件。
+         * 关键调用：加载列表项 XML 布局；加载 XML 布局。
+         * 配合代码：配合 MainActivity、fragment_*.xml、DataManager 和 Adapter 使用。
+         */
         @Nullable
         @Override
         public View onCreateView(@NonNull LayoutInflater inflater,
@@ -31,11 +41,21 @@ public class MineFragment extends Fragment {
                 return inflater.inflate(R.layout.fragment_mine, container, false);
         }
 
+        /**
+         * 项目职责：在我的 Fragment，负责用户资料展示和个人中心入口界面创建完成后绑定控件、数据列表和点击事件。
+         * 关键调用：使用 Java/Android 基础语法完成该业务步骤。
+         * 配合代码：配合 MainActivity、fragment_*.xml、DataManager 和 Adapter 使用。
+         */
         @Override
         public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
                 bindViews(view);
         }
 
+        /**
+         * 项目职责：我的 Fragment，负责用户资料展示和个人中心入口回到前台时重新读取数据库数据并刷新显示。
+         * 关键调用：使用 Java/Android 基础语法完成该业务步骤。
+         * 配合代码：配合 MainActivity、fragment_*.xml、DataManager 和 Adapter 使用。
+         */
         @Override
         public void onResume() {
                 super.onResume();
@@ -43,6 +63,11 @@ public class MineFragment extends Fragment {
                         bindViews(getView());
         }
 
+        /**
+         * 项目职责：我的 Fragment，负责用户资料展示和个人中心入口。
+         * 关键调用：绑定布局控件；绑定点击事件。
+         * 配合代码：配合当前页面布局、DataManager 和相关 Adapter 使用。
+         */
         private void bindViews(View view) {
                 DataManager dm = DataManager.getInstance(requireContext());
                 String username = dm.getLoggedUser();

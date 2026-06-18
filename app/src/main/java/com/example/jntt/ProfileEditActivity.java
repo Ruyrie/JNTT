@@ -16,6 +16,11 @@ import androidx.core.content.FileProvider;
 import com.example.jntt.data.DataManager;
 import java.io.File;
 
+/**
+ * 项目职责：资料编辑页，负责昵称、签名和头像选择/裁剪保存。
+ * 技术说明：绑定布局控件；绑定点击事件；提示用户操作结果。
+ * 配合代码：配合当前页面布局、DataManager 和相关 Adapter 使用。
+ */
 public class ProfileEditActivity extends AppCompatActivity {
 
     private DataManager dm;
@@ -43,6 +48,11 @@ public class ProfileEditActivity extends AppCompatActivity {
                 }
             });
 
+    /**
+     * 项目职责：资料编辑页，负责昵称、签名和头像选择/裁剪保存。
+     * 关键调用：绑定布局控件。
+     * 配合代码：配合当前页面布局、DataManager 和相关 Adapter 使用。
+     */
     private void processDirectImage(Uri uri) {
         pendingAvatarUri = uri.toString();
         pendingAvatarBase64 = com.example.jntt.utils.ImageUtils.uriToBase64(this, uri);
@@ -55,6 +65,11 @@ public class ProfileEditActivity extends AppCompatActivity {
         iv.setBackground(null);
     }
 
+    /**
+     * 项目职责：资料编辑页，负责昵称、签名和头像选择/裁剪保存。
+     * 关键调用：提示用户操作结果。
+     * 配合代码：配合当前页面布局、DataManager 和相关 Adapter 使用。
+     */
     private void startCrop(Uri sourceUri) {
         try {
             Uri destinationUri = Uri.fromFile(new File(getCacheDir(), "crop_" + System.currentTimeMillis() + ".jpg"));
@@ -94,6 +109,11 @@ public class ProfileEditActivity extends AppCompatActivity {
                 }
             });
 
+    /**
+     * 项目职责：初始化资料编辑页，负责昵称、签名和头像选择/裁剪保存，加载布局、读取业务数据并绑定用户操作。
+     * 关键调用：绑定布局控件；显示用户选择的图片 URI；读写本地业务数据；提示用户操作结果。
+     * 配合代码：配合 AndroidManifest、activity_*.xml、DataManager 和页面跳转使用。
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -170,6 +190,11 @@ public class ProfileEditActivity extends AppCompatActivity {
         tvBindPhoneBtn.setOnClickListener(v -> showBindPhoneDialog());
     }
 
+    /**
+     * 项目职责：资料编辑页，负责昵称、签名和头像选择/裁剪保存。
+     * 关键调用：绑定布局控件；绑定点击事件。
+     * 配合代码：配合当前页面布局、DataManager 和相关 Adapter 使用。
+     */
     private void showAvatarPreviewDialog() {
         android.app.Dialog dialog = new android.app.Dialog(this, android.R.style.Theme_Black_NoTitleBar_Fullscreen);
         dialog.setContentView(R.layout.dialog_avatar_preview);
@@ -204,6 +229,11 @@ public class ProfileEditActivity extends AppCompatActivity {
         dialog.show();
     }
 
+    /**
+     * 项目职责：资料编辑页，负责昵称、签名和头像选择/裁剪保存。
+     * 关键调用：使用 Java/Android 基础语法完成该业务步骤。
+     * 配合代码：配合当前页面布局、DataManager 和相关 Adapter 使用。
+     */
     private Uri createImageFile() {
         File imagePath = new File(getCacheDir(), "images");
         if (!imagePath.exists() && !imagePath.mkdirs())
@@ -212,15 +242,30 @@ public class ProfileEditActivity extends AppCompatActivity {
         return FileProvider.getUriForFile(this, getPackageName() + ".fileprovider", newFile);
     }
 
+    /**
+     * 项目职责：展示拍照/相册底部弹窗，供文章、商品、评价、头像页面复用。
+     * 关键调用：使用 Java/Android 基础语法完成该业务步骤。
+     * 配合代码：配合当前页面布局、DataManager 和相关 Adapter 使用。
+     */
     private void showImagePickerDialog() {
         com.example.jntt.utils.ImageUtils.showImagePickerDialog(this, "修改头像",
                 new com.example.jntt.utils.ImageUtils.OnImagePickerListener() {
+                    /**
+                     * 项目职责：把拍照选项回调给宿主页面启动相机。
+                     * 关键调用：使用 Java/Android 基础语法完成该业务步骤。
+                     * 配合代码：配合当前页面布局、DataManager 和相关 Adapter 使用。
+                     */
                     @Override
                     public void onTakePhoto() {
                         currentCameraUri = createImageFile();
                         takePicture.launch(currentCameraUri);
                     }
 
+                    /**
+                     * 项目职责：把相册选项回调给宿主页面启动图片选择器。
+                     * 关键调用：使用 Java/Android 基础语法完成该业务步骤。
+                     * 配合代码：配合当前页面布局、DataManager 和相关 Adapter 使用。
+                     */
                     @Override
                     public void onPickFromGallery() {
                         pickImage.launch("image/*");
@@ -228,6 +273,11 @@ public class ProfileEditActivity extends AppCompatActivity {
                 });
     }
 
+    /**
+     * 项目职责：资料编辑页，负责昵称、签名和头像选择/裁剪保存。
+     * 关键调用：使用 Java/Android 基础语法完成该业务步骤。
+     * 配合代码：配合当前页面布局、DataManager 和相关 Adapter 使用。
+     */
     private void refreshPhoneDisplay() {
         String phone = dm.getPhone(username);
         if (phone != null && !phone.isEmpty()) {
@@ -239,6 +289,11 @@ public class ProfileEditActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * 项目职责：资料编辑页，负责昵称、签名和头像选择/裁剪保存。
+     * 关键调用：绑定布局控件；绑定点击事件；提示用户操作结果。
+     * 配合代码：配合当前页面布局、DataManager 和相关 Adapter 使用。
+     */
     private void showBindPhoneDialog() {
         View view = getLayoutInflater().inflate(R.layout.dialog_bind_phone, null);
         AlertDialog dialog = new AlertDialog.Builder(this)

@@ -10,11 +10,21 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import com.example.jntt.data.DataManager;
 
+/**
+ * 项目职责：设置页，负责退出登录、账号管理、管理员模式和管理入口跳转。
+ * 技术说明：绑定布局控件；绑定点击事件。
+ * 配合代码：配合当前页面布局、DataManager 和相关 Adapter 使用。
+ */
 public class SettingsActivity extends AppCompatActivity {
 
     private DataManager dm;
     private LinearLayout layoutAdminOptions;
 
+    /**
+     * 项目职责：初始化设置页，负责退出登录、账号管理、管理员模式和管理入口跳转，加载布局、读取业务数据并绑定用户操作。
+     * 关键调用：绑定布局控件；读写本地业务数据；页面跳转或传递参数。
+     * 配合代码：配合 AndroidManifest、activity_*.xml、DataManager 和页面跳转使用。
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,10 +68,20 @@ public class SettingsActivity extends AppCompatActivity {
                 .setOnClickListener(v -> startActivity(new Intent(this, DeleteProductActivity.class)));
     }
 
+    /**
+     * 项目职责：设置页，负责退出登录、账号管理、管理员模式和管理入口跳转。
+     * 关键调用：使用 Java/Android 基础语法完成该业务步骤。
+     * 配合代码：配合当前页面布局、DataManager 和相关 Adapter 使用。
+     */
     private void updateAdminVisibility(boolean enabled) {
         layoutAdminOptions.setVisibility(enabled ? View.VISIBLE : View.GONE);
     }
 
+    /**
+     * 项目职责：设置页，负责退出登录、账号管理、管理员模式和管理入口跳转。
+     * 关键调用：绑定布局控件；绑定点击事件。
+     * 配合代码：配合当前页面布局、DataManager 和相关 Adapter 使用。
+     */
     private void confirmLogout() {
         View view = getLayoutInflater().inflate(R.layout.dialog_confirm, null);
         android.widget.TextView tvTitle = view.findViewById(R.id.tvDialogTitle);

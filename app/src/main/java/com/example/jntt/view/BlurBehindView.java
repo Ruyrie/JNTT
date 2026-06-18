@@ -28,31 +28,71 @@ public class BlurBehindView extends View {
         return true;
     };
 
+    /**
+     * 项目职责：创建玻璃模糊背景 View，初始化绘制参数并接入 Android View 构造流程。
+     * 关键调用：使用 Java/Android 基础语法完成该业务步骤。
+     * 配合代码：配合 XML 布局和 Android View 绘制流程使用。
+     */
     public BlurBehindView(Context c) { super(c); init(); }
+    /**
+     * 项目职责：创建玻璃模糊背景 View，初始化绘制参数并接入 Android View 构造流程。
+     * 关键调用：使用 Java/Android 基础语法完成该业务步骤。
+     * 配合代码：配合 XML 布局和 Android View 绘制流程使用。
+     */
     public BlurBehindView(Context c, @Nullable AttributeSet a) { super(c, a); init(); }
+    /**
+     * 项目职责：创建玻璃模糊背景 View，初始化绘制参数并接入 Android View 构造流程。
+     * 关键调用：使用 Java/Android 基础语法完成该业务步骤。
+     * 配合代码：配合 XML 布局和 Android View 绘制流程使用。
+     */
     public BlurBehindView(Context c, @Nullable AttributeSet a, int s) { super(c, a, s); init(); }
 
+    /**
+     * 项目职责：初始化自定义 View 的画笔、路径、圆角或裁剪参数。
+     * 关键调用：使用 Java/Android 基础语法完成该业务步骤。
+     * 配合代码：配合 XML 布局和 Android View 绘制流程使用。
+     */
     private void init() {
         setRenderEffect(RenderEffect.createBlurEffect(
                 blurRadius, blurRadius, Shader.TileMode.CLAMP));
     }
 
+    /**
+     * 项目职责：设置模糊背景的截图来源 View，通常是主界面的 Fragment 容器。
+     * 关键调用：使用 Java/Android 基础语法完成该业务步骤。
+     * 配合代码：配合 XML 布局和 Android View 绘制流程使用。
+     */
     public void setSourceView(View source) {
         this.sourceView = source;
     }
 
+    /**
+     * 项目职责：设置底部导航背景模糊半径。
+     * 关键调用：使用 Java/Android 基础语法完成该业务步骤。
+     * 配合代码：配合 XML 布局和 Android View 绘制流程使用。
+     */
     public void setBlurRadius(float radius) {
         this.blurRadius = radius;
         setRenderEffect(RenderEffect.createBlurEffect(
                 radius, radius, Shader.TileMode.CLAMP));
     }
 
+    /**
+     * 项目职责：创建玻璃模糊背景 View，负责为底部导航绘制背景模糊效果需要的数据、监听器或上下文引用。
+     * 关键调用：使用 Java/Android 基础语法完成该业务步骤。
+     * 配合代码：配合 XML 布局和 Android View 绘制流程使用。
+     */
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
         getViewTreeObserver().addOnPreDrawListener(preDrawListener);
     }
 
+    /**
+     * 项目职责：创建玻璃模糊背景 View，负责为底部导航绘制背景模糊效果需要的数据、监听器或上下文引用。
+     * 关键调用：使用 Java/Android 基础语法完成该业务步骤。
+     * 配合代码：配合 XML 布局和 Android View 绘制流程使用。
+     */
     @Override
     protected void onDetachedFromWindow() {
         getViewTreeObserver().removeOnPreDrawListener(preDrawListener);
@@ -60,6 +100,11 @@ public class BlurBehindView extends View {
         super.onDetachedFromWindow();
     }
 
+    /**
+     * 项目职责：在自定义 View 尺寸变化时重新计算绘制区域。
+     * 关键调用：使用 Java/Android 基础语法完成该业务步骤。
+     * 配合代码：配合 XML 布局和 Android View 绘制流程使用。
+     */
     @Override
     protected void onSizeChanged(int w, int h, int ow, int oh) {
         super.onSizeChanged(w, h, ow, oh);
@@ -72,6 +117,11 @@ public class BlurBehindView extends View {
         snapshotCanvas = new Canvas(snapshot);
     }
 
+    /**
+     * 项目职责：绘制自定义 View 的模糊背景、玻璃导航或圆角裁剪效果。
+     * 关键调用：使用 Java/Android 基础语法完成该业务步骤。
+     * 配合代码：配合 XML 布局和 Android View 绘制流程使用。
+     */
     @Override
     protected void onDraw(Canvas canvas) {
         if (sourceView == null || snapshot == null || drawingSnapshot) return;

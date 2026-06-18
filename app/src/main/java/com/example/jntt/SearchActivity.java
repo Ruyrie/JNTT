@@ -20,6 +20,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 /** iOS 风格全屏搜索界面 */
+/**
+ * 项目职责：搜索页，负责文章关键词检索和结果列表展示。
+ * 技术说明：显示或隐藏软键盘；绑定布局控件；绑定点击事件；刷新列表。
+ * 配合代码：配合 activity_search.xml、ArticleAdapter 和 DataManager.getArticles 使用。
+ */
 public class SearchActivity extends AppCompatActivity {
 
     private List<Article>  allArticles;
@@ -30,6 +35,11 @@ public class SearchActivity extends AppCompatActivity {
     private LinearLayout  llHome, llNoResults;
     private TextView      tvNoResultsHint;
 
+    /**
+     * 项目职责：初始化搜索页，负责文章关键词检索和结果列表展示，加载布局、读取业务数据并绑定用户操作。
+     * 关键调用：绑定布局控件；连接 RecyclerView 与 Adapter；设置列表排列方式；读写本地业务数据。
+     * 配合代码：配合 AndroidManifest、activity_*.xml、DataManager 和页面跳转使用。
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -98,6 +108,11 @@ public class SearchActivity extends AppCompatActivity {
         if (imm != null) imm.showSoftInput(etQuery, InputMethodManager.SHOW_IMPLICIT);
     }
 
+    /**
+     * 项目职责：给搜索页热门标签绑定点击事件，点击后把关键词填入搜索框。
+     * 关键调用：绑定布局控件；绑定点击事件。
+     * 配合代码：配合 activity_search.xml、ArticleAdapter 和 DataManager.getArticles 使用。
+     */
     private void wireTag(int viewId, String query, EditText et) {
         View v = findViewById(viewId);
         if (v != null) v.setOnClickListener(x -> {
@@ -106,6 +121,11 @@ public class SearchActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * 项目职责：搜索页，负责文章关键词检索和结果列表展示。
+     * 关键调用：刷新列表。
+     * 配合代码：配合 activity_search.xml、ArticleAdapter 和 DataManager.getArticles 使用。
+     */
     private void performSearch(String query) {
         if (query.isEmpty()) {
             rvResults.setVisibility(View.GONE);
@@ -133,6 +153,11 @@ public class SearchActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * 项目职责：搜索提交后收起软键盘，避免遮挡结果列表。
+     * 关键调用：显示或隐藏软键盘。
+     * 配合代码：配合 activity_search.xml、ArticleAdapter 和 DataManager.getArticles 使用。
+     */
     private void hideKeyboard(View v) {
         InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
         if (imm != null) imm.hideSoftInputFromWindow(v.getWindowToken(), 0);

@@ -12,12 +12,22 @@ import com.example.jntt.model.User;
 import java.util.List;
 
 /** 账号管理界面：列出所有账号，支持短按修改密码、长按删除、添加账号 */
+/**
+ * 项目职责：账号管理页，负责账号列表、添加账号、修改密码和删除账号确认。
+ * 技术说明：绑定布局控件；绑定点击事件；刷新列表。
+ * 配合代码：配合当前页面布局、DataManager 和相关 Adapter 使用。
+ */
 public class AccountManagerActivity extends AppCompatActivity {
 
     private DataManager dm;
     private List<User> users;
     private UserAdapter adapter;
 
+    /**
+     * 项目职责：初始化账号管理页，负责账号列表、添加账号、修改密码和删除账号确认，加载布局、读取业务数据并绑定用户操作。
+     * 关键调用：加载列表项 XML 布局；加载 XML 布局；绑定布局控件；连接 RecyclerView 与 Adapter。
+     * 配合代码：配合 AndroidManifest、activity_*.xml、DataManager 和页面跳转使用。
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -32,6 +42,11 @@ public class AccountManagerActivity extends AppCompatActivity {
 
         users = dm.getUsers();
         adapter = new UserAdapter(users, new UserAdapter.OnItemListener() {
+            /**
+             * 项目职责：账号管理页，负责账号列表、添加账号、修改密码和删除账号确认。
+             * 关键调用：使用 Java/Android 基础语法完成该业务步骤。
+             * 配合代码：配合当前页面布局、DataManager 和相关 Adapter 使用。
+             */
             @Override
             public void onShortClick(User user) {
                 // 修改密码
@@ -40,6 +55,11 @@ public class AccountManagerActivity extends AppCompatActivity {
                 startActivity(intent);
             }
 
+            /**
+             * 项目职责：账号管理页，负责账号列表、添加账号、修改密码和删除账号确认。
+             * 关键调用：绑定布局控件；绑定点击事件。
+             * 配合代码：配合当前页面布局、DataManager 和相关 Adapter 使用。
+             */
             @Override
             public void onLongClick(User user) {
                 // 长按删除，不能删除当前登录账号
@@ -102,12 +122,22 @@ public class AccountManagerActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * 项目职责：账号管理页，负责账号列表、添加账号、修改密码和删除账号确认回到前台时重新读取数据库数据并刷新显示。
+     * 关键调用：使用 Java/Android 基础语法完成该业务步骤。
+     * 配合代码：配合 AndroidManifest、activity_*.xml、DataManager 和页面跳转使用。
+     */
     @Override
     protected void onResume() {
         super.onResume();
         refreshList();
     }
 
+    /**
+     * 项目职责：账号管理页，负责账号列表、添加账号、修改密码和删除账号确认。
+     * 关键调用：刷新列表。
+     * 配合代码：配合当前页面布局、DataManager 和相关 Adapter 使用。
+     */
     private void refreshList() {
         users.clear();
         users.addAll(dm.getUsers());
